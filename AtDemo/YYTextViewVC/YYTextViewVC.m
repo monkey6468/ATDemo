@@ -1,0 +1,250 @@
+//
+//  YYTextViewVC.m
+//  AtDemo
+//
+//  Created by XWH on 2021/4/20.
+//
+
+#import "YYTextViewVC.h"
+#import "ListViewController.h"
+
+#import "YYText.h"
+#import "YYTextViewCell.h"
+
+#import "HNWKeyboardMonitor.h"
+
+#define NIMInputAtStartChar  @"@"
+#define NIMInputAtEndChar    @" " 
+
+@interface YYTextViewVC ()<YYTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet YYTextView *yyTextView;
+@property (strong, nonatomic) NSMutableArray<User *> *usersList;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *yyTextViewConstraintH;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
+
+@property (strong, nonatomic) NSMutableArray *dataArray;
+@end
+
+@implementation YYTextViewVC
+
+#pragma mark - life
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.usersList = [NSMutableArray array];
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.navigationItem.title = @"YYTextViewVC";
+    
+    [self settingUI];
+    [self initTableView];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [HNWKeyboardMonitor addDelegate:self];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [HNWKeyboardMonitor removeDelegate:self];
+}
+
+#pragma mark - UI
+- (void)settingUI {
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:@""];
+
+    self.yyTextView.delegate = self;
+    self.yyTextView.font = [UIFont systemFontOfSize:25];
+    self.yyTextView.attributedText = text;
+    self.yyTextView.selectedRange = NSMakeRange(0, 0);
+
+    [self.yyTextView becomeFirstResponder];
+}
+
+- (void)initTableView {
+    self.tableView.tableFooterView = UIView.new;
+    
+    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([YYTextViewCell class])
+                                               bundle:nil]
+         forCellReuseIdentifier:NSStringFromClass(YYTextViewCell.class)];
+}
+
+#pragma mark - other
+- (void)showLogInfo {
+    if (self.usersList.count) {
+        for (User *tempUser in self.usersList) {
+            NSLog(@"xwh list: %@ - %ld",tempUser.name, tempUser.range.location);
+        }
+    } else {
+        NSLog(@"xwh list is a Empty");
+    }
+}
+
+- (void)updateList {
+    __block int i = 0;
+    [self.yyTextView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:NSMakeRange(0, self.yyTextView.text.length) options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+        if (![value isKindOfClass:YYTextBinding.class]) {
+            return;
+        }
+        User *tempUser = self.usersList[i];
+        tempUser.range = range;
+        i++;
+        NSLog(@"同步更新 list: %@ - %ld",tempUser.name, tempUser.range.location);
+    }];
+}
+
+- (void)done {
+    [self.view endEditing:YES];
+//    [self updateList];
+    
+    [self showLogInfo];
+    
+    DataModel *model = [[DataModel alloc]init];
+    model.userList = self.usersList;
+    model.text = self.yyTextView.text;
+    [self.dataArray addObject:model];
+    
+    [self.usersList removeAllObjects];
+    self.yyTextView.text = nil;
+    
+    [self.tableView reloadData];
+}
+
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.dataArray.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    DataModel *model = self.dataArray[indexPath.row];
+    return [YYTextViewCell rowHeightWithModel:model];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    YYTextViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(YYTextViewCell.class)];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.model = self.dataArray[indexPath.row];
+    return cell;
+}
+
+#pragma mark - YYTextViewDelegate
+- (void)textViewDidChange:(YYTextView *)textView {
+    // 同步更新usersList中 user range
+//    [self updateList];
+}
+
+- (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if ([text isEqualToString:@""]) {
+        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+            NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
+            for (User *tempUser in userListCopy) {
+                if (tempUser.range.location == range.location) {
+                    NSLog(@"xwh delete: %@ - %ld",tempUser.name, tempUser.range.location);
+                    [self.usersList removeObject:tempUser];
+                    break;
+                }
+            }
+            [self showLogInfo];
+        }];
+    }
+
+    if ([text isEqualToString:NIMInputAtStartChar]) {
+        [self pushListVAtTextInRange:range];
+        return NO;
+    }
+    
+    CGFloat h = LABEL_HEIGHT(textView.text, self.view.frame.size.width, 25);
+    if (h <= 44) {
+        h = 44;
+    }
+    self.yyTextViewConstraintH.constant = h;
+//    [self.view layoutIfNeeded];
+    return YES;
+}
+
+- (void)pushListVAtTextInRange:(NSRange)range {
+    ListViewController *vc = [[ListViewController alloc]init];
+    [self presentViewController:vc animated:YES completion:nil];
+    vc.block = ^(NSInteger index, User * _Nonnull user) {
+        
+        NSInteger insertIndex = 0;
+        //
+        for (int i = 0; i < self.usersList.count; i++) {
+            User *tempUser = self.usersList[i];
+            if (tempUser.range.location <= range.location) {
+                insertIndex = i;
+            }
+            if (self.usersList.count == 1 && tempUser.range.location < range.location) {
+                insertIndex = i+1;
+            }
+        }
+//        for (int i = 0; i < self.usersList.count; i++) {
+//            User *tempUser = self.usersList[i];
+//            if (i >= insertIndex) {
+//                tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
+//            }
+//        }
+        NSLog(@"index: %ld",insertIndex);
+        
+        NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user.name,NIMInputAtEndChar];
+        user.name = newAtUserName;
+        user.range = NSMakeRange(range.location, newAtUserName.length);
+        [self.usersList insertObject:user atIndex:insertIndex];
+
+        // 若地方不对，则需更新usersList
+        NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithAttributedString:self.yyTextView.attributedText];
+        
+        [muAttriSting insertAttributedString:[[NSAttributedString alloc]initWithString:newAtUserName] atIndex:range.location];
+        
+        // 更新最后添加的user range
+//        User *lastUser = [[User alloc]init];
+//        lastUser.name = newAtUserName;
+//        lastUser.range = NSMakeRange(range.location, newAtUserName.length);
+//        [self.usersList replaceObjectAtIndex:self.usersList.count-1 withObject:lastUser];
+        
+        NSRange bindlingRange = NSMakeRange(user.range.location, user.range.length);
+        YYTextBinding *binding = [YYTextBinding bindingWithDeleteConfirm:YES];
+       
+        [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
+        [muAttriSting yy_setColor:UIColor.blackColor range:bindlingRange];
+        [muAttriSting yy_setFont:[UIFont systemFontOfSize:20] range:NSMakeRange(0, muAttriSting.length)];
+        self.yyTextView.attributedText = muAttriSting;
+        
+        self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
+    };
+}
+
+#pragma mark HNWKeyboardMonitorDelegate
+- (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillShow:(HNWKeyboardInfo *)info {
+    if (@available(iOS 11.0, *)) {
+        self.bottomLineConstraintB.constant = -info.keyboardEndFrame.size.height+self.view.safeAreaInsets.bottom;
+    } else {
+        self.bottomLineConstraintB.constant = -info.keyboardEndFrame.size.height;
+    }
+    [UIView animateWithDuration:info.animationDuration animations:^{
+        [self.view layoutIfNeeded];
+    }];
+}
+
+- (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillHide:(HNWKeyboardInfo *)info {
+    self.bottomLineConstraintB.constant = 0;
+    [UIView animateWithDuration:info.animationDuration animations:^{
+        [self.view layoutIfNeeded];
+    }];
+}
+
+#pragma mark - get data
+- (NSMutableArray *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
+@end
