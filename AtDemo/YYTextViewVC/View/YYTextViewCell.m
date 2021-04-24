@@ -45,7 +45,7 @@
 }
 
 + (CGFloat)rowHeightWithModel:(DataModel *)model {
-    CGFloat h = LABEL_HEIGHT(model.text, [UIScreen mainScreen].bounds.size.width, 25);
+    CGFloat h = LABEL_HEIGHT(model.text, [UIScreen mainScreen].bounds.size.width, 25)+5;
     return h;
 }
 @end

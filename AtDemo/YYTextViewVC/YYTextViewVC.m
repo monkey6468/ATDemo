@@ -86,22 +86,8 @@
     }
 }
 
-- (void)updateList {
-    __block int i = 0;
-    [self.yyTextView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:NSMakeRange(0, self.yyTextView.text.length) options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        if (![value isKindOfClass:YYTextBinding.class]) {
-            return;
-        }
-        User *tempUser = self.usersList[i];
-        tempUser.range = range;
-        i++;
-        NSLog(@"同步更新 list: %@ - %ld",tempUser.name, tempUser.range.location);
-    }];
-}
-
 - (void)done {
     [self.view endEditing:YES];
-//    [self updateList];
     
     [self showLogInfo];
     
@@ -136,21 +122,39 @@
 
 #pragma mark - YYTextViewDelegate
 - (void)textViewDidChange:(YYTextView *)textView {
-    // 同步更新usersList中 user range
-//    [self updateList];
+    //
 }
 
 - (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([text isEqualToString:@""]) {
         [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
             NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
-            for (User *tempUser in userListCopy) {
-                if (tempUser.range.location == range.location) {
+            // 寻找删除的index
+            NSInteger deleteIndex = 0;
+            User *deleteUser = nil;
+            for (int i = 0; i < userListCopy.count; i++) {
+                User *tempUser = userListCopy[i];
+                NSInteger selectLocation = range.location;
+                NSInteger tempLocation = tempUser.range.location;
+                if (tempLocation == selectLocation) {
+                    deleteIndex = i;
+                    deleteUser = tempUser;
                     NSLog(@"xwh delete: %@ - %ld",tempUser.name, tempUser.range.location);
                     [self.usersList removeObject:tempUser];
                     break;
                 }
             }
+            
+            // 若有删除，则需要更新插入后元素的location
+            if (deleteUser) {
+                for (int i = 0; i < self.usersList.count; i++) {
+                    User *tempUser = self.usersList[i];
+                    if (i >= deleteIndex) {
+                        tempUser.range = NSMakeRange(tempUser.range.location-deleteUser.range.length, tempUser.range.length);
+                    }
+                }
+            }
+            
             [self showLogInfo];
         }];
     }
@@ -171,31 +175,40 @@
 
 - (void)pushListVAtTextInRange:(NSRange)range {
     ListViewController *vc = [[ListViewController alloc]init];
-    [self presentViewController:vc animated:YES completion:nil];
+    [self presentViewController:vc animated:NO completion:nil];
     vc.block = ^(NSInteger index, User * _Nonnull user) {
-        
-        NSInteger insertIndex = 0;
-        //
-        for (int i = 0; i < self.usersList.count; i++) {
-            User *tempUser = self.usersList[i];
-            if (tempUser.range.location <= range.location) {
-                insertIndex = i;
-            }
-            if (self.usersList.count == 1 && tempUser.range.location < range.location) {
-                insertIndex = i+1;
-            }
-        }
-//        for (int i = 0; i < self.usersList.count; i++) {
-//            User *tempUser = self.usersList[i];
-//            if (i >= insertIndex) {
-//                tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
-//            }
-//        }
-        NSLog(@"index: %ld",insertIndex);
-        
+
         NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user.name,NIMInputAtEndChar];
         user.name = newAtUserName;
         user.range = NSMakeRange(range.location, newAtUserName.length);
+
+        NSInteger insertIndex = 0;
+        for (int i = 0; i < self.usersList.count; i++) {
+            User *tempUser = self.usersList[i];
+            NSInteger selectLocation = range.location;
+            NSInteger tempLocation = tempUser.range.location;
+            NSInteger tempLength = tempUser.range.length;
+            if (selectLocation >= tempLocation) {
+                insertIndex = i;
+            }
+            // 解决最后插入的问题
+            if (tempLocation+tempLength <= selectLocation) {
+                insertIndex = i+1;
+            }
+        }
+        
+        // 中间插入，则需要更新插入后元素的location
+        if (insertIndex < self.usersList.count) {
+            for (int i = 0; i < self.usersList.count; i++) {
+                User *tempUser = self.usersList[i];
+                if (i >= insertIndex) {
+                    tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
+                }
+            }
+        }
+
+//        NSLog(@"index: %ld",insertIndex);
+        
         [self.usersList insertObject:user atIndex:insertIndex];
 
         // 若地方不对，则需更新usersList
