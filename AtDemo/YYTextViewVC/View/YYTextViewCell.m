@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
 
 @end
+
 @implementation YYTextViewCell
 
 - (void)awakeFromNib {

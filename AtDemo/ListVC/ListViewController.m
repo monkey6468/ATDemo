@@ -61,7 +61,6 @@
         for (int i = 0; i < 10; i++) {
             User *user = [[User alloc]init];
             user.name = [NSString stringWithFormat:@"0%d",i];
-//            user.range = NSMakeRange(NSNotFound, 0);
             [_dataArray addObject:user];
         }
     }
