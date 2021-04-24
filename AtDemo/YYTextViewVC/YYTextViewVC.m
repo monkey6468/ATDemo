@@ -79,7 +79,7 @@
 - (void)showLogInfo {
     if (self.usersList.count) {
         for (User *tempUser in self.usersList) {
-            NSLog(@"xwh list: %@ - %ld",tempUser.name, tempUser.range.location);
+            NSLog(@"xwh list: %@ - %ld",tempUser.atName, tempUser.range.location);
         }
     } else {
         NSLog(@"xwh list is a Empty");
@@ -126,6 +126,7 @@
 }
 
 - (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+#warning 删除定位不准确
     if ([text isEqualToString:@""]) {
         [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
             NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
@@ -139,7 +140,7 @@
                 if (tempLocation == selectLocation) {
                     deleteIndex = i;
                     deleteUser = tempUser;
-                    NSLog(@"xwh delete: %@ - %ld",tempUser.name, tempUser.range.location);
+                    NSLog(@"xwh delete: %@ - %ld",tempUser.atName, tempUser.range.location);
                     [self.usersList removeObject:tempUser];
                     break;
                 }
@@ -168,6 +169,8 @@
     if (h <= 44) {
         h = 44;
     }
+#warning <#message#>
+    // 普通字符串的中间插入，则需要更新插入后元素的location
     self.yyTextViewConstraintH.constant = h;
 //    [self.view layoutIfNeeded];
     return YES;
@@ -179,7 +182,7 @@
     vc.block = ^(NSInteger index, User * _Nonnull user) {
 
         NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user.name,NIMInputAtEndChar];
-        user.name = newAtUserName;
+        user.atName = newAtUserName;
         user.range = NSMakeRange(range.location, newAtUserName.length);
 
         NSInteger insertIndex = 0;
@@ -206,8 +209,6 @@
                 }
             }
         }
-
-//        NSLog(@"index: %ld",insertIndex);
         
         [self.usersList insertObject:user atIndex:insertIndex];
 
@@ -215,12 +216,6 @@
         NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithAttributedString:self.yyTextView.attributedText];
         
         [muAttriSting insertAttributedString:[[NSAttributedString alloc]initWithString:newAtUserName] atIndex:range.location];
-        
-        // 更新最后添加的user range
-//        User *lastUser = [[User alloc]init];
-//        lastUser.name = newAtUserName;
-//        lastUser.range = NSMakeRange(range.location, newAtUserName.length);
-//        [self.usersList replaceObjectAtIndex:self.usersList.count-1 withObject:lastUser];
         
         NSRange bindlingRange = NSMakeRange(user.range.location, user.range.length);
         YYTextBinding *binding = [YYTextBinding bindingWithDeleteConfirm:YES];
