@@ -16,7 +16,7 @@
     
     self.navigationItem.title = @"ATDemo";
 
-//    [self performSelector:@selector(pushYYTextViewVC:) withObject:nil afterDelay:1];
+    [self performSelector:@selector(pushYYTextViewVC:) withObject:nil afterDelay:1];
 }
 
 - (IBAction)pushUITextViewVC:(UIButton *)sender {

@@ -127,7 +127,7 @@
 }
 
 - (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-#warning 删除定位不准确
+#warning 删除，定位不准确
     if ([text isEqualToString:@""]) {
         [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
             NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
@@ -141,7 +141,7 @@
                 if (tempLocation == selectLocation) {
                     deleteIndex = i;
                     deleteUser = tempUser;
-                    NSLog(@"xwh delete: %@ - %ld",tempUser.atName, tempUser.range.location);
+                    NSLog(@"单个删除: %@ - %ld",tempUser.atName, tempUser.range.location);
                     [self.usersList removeObject:tempUser];
                     break;
                 }
@@ -274,7 +274,7 @@
         [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
         [muAttriSting yy_setColor:UIColor.blackColor range:bindlingRange];
         [muAttriSting yy_setFont:[UIFont systemFontOfSize:20] range:NSMakeRange(0, muAttriSting.length)];
-        self.yyTextView.attributedText = muAttriSting;
+        [self.yyTextView setAttributedText:muAttriSting];
         
         self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
         
