@@ -79,11 +79,12 @@
 - (void)showLogInfo {
     if (self.usersList.count) {
         for (User *tempUser in self.usersList) {
-            NSLog(@"xwh list: %@ - %ld",tempUser.atName, tempUser.range.location);
+            NSLog(@"user info - name:%@ - location:%ld",tempUser.atName, tempUser.range.location);
         }
     } else {
         NSLog(@"xwh list is a Empty");
     }
+    NSLog(@"\n\n");
 }
 
 - (void)done {
@@ -154,16 +155,66 @@
                         tempUser.range = NSMakeRange(tempUser.range.location-deleteUser.range.length, tempUser.range.length);
                     }
                 }
+            } else {
+                NSInteger deleteIndex = range.location;
+                for (int i = 0; i < self.usersList.count; i++) {
+                    User *tempUser = self.usersList[i];
+                    if (tempUser.range.location > deleteIndex) {
+                        tempUser.range = NSMakeRange(tempUser.range.location-range.length, tempUser.range.length);
+                    }
+                }
             }
-            
+            NSLog(@"删除打印:");
             [self showLogInfo];
         }];
+    } else {
+        
+        if ([text isEqualToString:NIMInputAtStartChar]) {
+            [self pushListVAtTextInRange:range];
+            return NO;
+        }
+        
+        // 单个字符串处理
+        NSRange effectiveRange;
+//        YYTextBinding *binding = [textView.attributedText attribute:YYTextBindingAttributeName atIndex:range.location longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, textView.attributedText.length-1)];
+//        if (binding == nil) {
+//            // 字符串插入
+//            NSInteger insertIndex = range.location;
+//            for (int i = 0; i < self.usersList.count; i++) {
+//                User *tempUser = self.usersList[i];
+//                if (tempUser.range.location >= insertIndex) {
+//                    tempUser.range = NSMakeRange(tempUser.range.location+range.length, tempUser.range.length);
+//                }
+//            }
+//
+//            NSLog(@"插入字符串打印:");
+//            [self showLogInfo];
+//        }
+        NSRange insertRange = range;
+        [textView.attributedText enumerateAttributesInRange:NSMakeRange(0, textView.attributedText.length)
+                                                    options:NSAttributedStringEnumerationReverse
+                                                 usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+            if (attrs[YYTextBindingAttributeName] == nil) {
+                // 字符串插入
+                NSInteger insertIndex = insertRange.location;
+                for (int i = 0; i < self.usersList.count; i++) {
+                    User *tempUser = self.usersList[i];
+                    if (tempUser.range.location >= insertIndex) {
+                        tempUser.range = NSMakeRange(tempUser.range.location+insertRange.length, tempUser.range.length);
+                    }
+                }
+
+                NSLog(@"插入字符串打印:");
+                [self showLogInfo];
+            }
+        }];
+//        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+//            NSLog(@"插入字符串打印:");
+//
+//        }];
+        
     }
 
-    if ([text isEqualToString:NIMInputAtStartChar]) {
-        [self pushListVAtTextInRange:range];
-        return NO;
-    }
     
     CGFloat h = LABEL_HEIGHT(textView.text, self.view.frame.size.width, 25);
     if (h <= 44) {
@@ -226,6 +277,9 @@
         self.yyTextView.attributedText = muAttriSting;
         
         self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
+        
+        NSLog(@"插入@打印:");
+        [self showLogInfo];
     };
 }
 
