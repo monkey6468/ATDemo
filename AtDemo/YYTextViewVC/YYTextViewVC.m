@@ -127,6 +127,27 @@
 }
 
 - (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if ([text isEqualToString:@""]) {
+        return YES;
+    }
+    if ([text isEqualToString:NIMInputAtStartChar]) {
+        [self pushListVAtTextInRange:range];
+        return NO;
+    }
+    
+    CGRect frame = [textView.attributedText boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
+    CGFloat h = frame.size.height;
+    if (h <= 44) {
+        h = 44;
+    }
+#warning <#message#>
+    // 普通字符串的中间插入，则需要更新插入后元素的location
+    self.yyTextViewConstraintH.constant = h;
+//    [self.view layoutIfNeeded];
+    return YES;
+    NSLog(@"变动打印:");
+    [self showLogInfo];
+    return YES;
 #warning 删除，定位不准确
     if ([text isEqualToString:@""]) {
         [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
@@ -169,10 +190,7 @@
         }];
     } else {
         
-        if ([text isEqualToString:NIMInputAtStartChar]) {
-            [self pushListVAtTextInRange:range];
-            return NO;
-        }
+        
         
         // 单个字符串处理
         NSRange effectiveRange;
@@ -214,17 +232,6 @@
 //        }];
         
     }
-
-    
-    CGFloat h = LABEL_HEIGHT(textView.text, self.view.frame.size.width, 25);
-    if (h <= 44) {
-        h = 44;
-    }
-#warning <#message#>
-    // 普通字符串的中间插入，则需要更新插入后元素的location
-    self.yyTextViewConstraintH.constant = h;
-//    [self.view layoutIfNeeded];
-    return YES;
 }
 
 - (void)pushListVAtTextInRange:(NSRange)range {
@@ -272,15 +279,15 @@
         YYTextBinding *binding = [YYTextBinding bindingWithDeleteConfirm:YES];
        
         [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
-        [muAttriSting yy_setColor:UIColor.blackColor range:bindlingRange];
+        [muAttriSting yy_setColor:UIColor.redColor range:bindlingRange];
         [muAttriSting yy_setFont:[UIFont systemFontOfSize:20] range:NSMakeRange(0, muAttriSting.length)];
         [self.yyTextView setAttributedText:muAttriSting];
         
         self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
         
         NSLog(@"插入@打印:");
-        [self showLogInfo];
     };
+    [self showLogInfo];
 }
 
 #pragma mark HNWKeyboardMonitorDelegate

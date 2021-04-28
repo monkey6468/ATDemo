@@ -30,18 +30,18 @@
     
     NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
     muAttriSting.yy_font = [UIFont systemFontOfSize:25];
-    for (User *user in model.userList) {
-        [muAttriSting yy_setTextHighlightRange:user.range color:[UIColor blueColor] backgroundColor:UIColor.redColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-            
-            for (User *tempUser in model.userList) {
-                if (tempUser.range.location == range.location
-                && tempUser.range.length == range.length) {
-                    NSLog(@"点击了: %@",tempUser.name);
-                }
-            }
-        }];
-        
-    }
+//    for (User *user in model.userList) {
+//        [muAttriSting yy_setTextHighlightRange:user.range color:[UIColor blueColor] backgroundColor:UIColor.redColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+//            
+//            for (User *tempUser in model.userList) {
+//                if (tempUser.range.location == range.location
+//                && tempUser.range.length == range.length) {
+//                    NSLog(@"点击了: %@",tempUser.name);
+//                }
+//            }
+//        }];
+//        
+//    }
     self.yyLabel.attributedText = muAttriSting;
 }
 
