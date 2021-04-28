@@ -19,7 +19,7 @@
 @interface YYTextViewVC ()<YYTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet YYTextView *yyTextView;
-@property (strong, nonatomic) NSMutableArray<User *> *usersList;
+//@property (strong, nonatomic) NSMutableArray<User *> *usersList;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *yyTextViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
@@ -32,7 +32,7 @@
 #pragma mark - life
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.usersList = [NSMutableArray array];
+//    self.usersList = [NSMutableArray array];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"YYTextViewVC";
     
@@ -77,14 +77,14 @@
 
 #pragma mark - other
 - (void)showLogInfo {
-    if (self.usersList.count) {
-        for (User *tempUser in self.usersList) {
-            NSLog(@"user info - name:%@ - location:%ld",tempUser.atName, tempUser.range.location);
-        }
-    } else {
-        NSLog(@"xwh list is a Empty");
-    }
-    NSLog(@"\n\n");
+//    if (self.usersList.count) {
+//        for (User *tempUser in self.usersList) {
+//            NSLog(@"user info - name:%@ - location:%ld",tempUser.atName, tempUser.range.location);
+//        }
+//    } else {
+//        NSLog(@"xwh list is a Empty");
+//    }
+//    NSLog(@"\n\n");
 }
 
 - (void)done {
@@ -92,15 +92,15 @@
     
     [self showLogInfo];
     
-    DataModel *model = [[DataModel alloc]init];
-    model.userList = self.usersList;
-    model.text = self.yyTextView.text;
-    [self.dataArray addObject:model];
-    
-    [self.usersList removeAllObjects];
+//    DataModel *model = [[DataModel alloc]init];
+//    model.userList = self.usersList;
+//    model.text = self.yyTextView.text;
+//    [self.dataArray addObject:model];
+//
+//    [self.usersList removeAllObjects];
     self.yyTextView.text = nil;
-    
-    [self.tableView reloadData];
+//
+//    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
@@ -148,90 +148,90 @@
     NSLog(@"变动打印:");
     [self showLogInfo];
     return YES;
-#warning 删除，定位不准确
-    if ([text isEqualToString:@""]) {
-        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-            NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
-            // 寻找删除的index
-            NSInteger deleteIndex = 0;
-            User *deleteUser = nil;
-            for (int i = 0; i < userListCopy.count; i++) {
-                User *tempUser = userListCopy[i];
-                NSInteger selectLocation = range.location;
-                NSInteger tempLocation = tempUser.range.location;
-                if (tempLocation == selectLocation) {
-                    deleteIndex = i;
-                    deleteUser = tempUser;
-                    NSLog(@"单个删除: %@ - %ld",tempUser.atName, tempUser.range.location);
-                    [self.usersList removeObject:tempUser];
-                    break;
-                }
-            }
-            
-            // 若有删除，则需要更新插入后元素的location
-            if (deleteUser) {
-                for (int i = 0; i < self.usersList.count; i++) {
-                    User *tempUser = self.usersList[i];
-                    if (i >= deleteIndex) {
-                        tempUser.range = NSMakeRange(tempUser.range.location-deleteUser.range.length, tempUser.range.length);
-                    }
-                }
-            } else {
-                NSInteger deleteIndex = range.location;
-                for (int i = 0; i < self.usersList.count; i++) {
-                    User *tempUser = self.usersList[i];
-                    if (tempUser.range.location > deleteIndex) {
-                        tempUser.range = NSMakeRange(tempUser.range.location-range.length, tempUser.range.length);
-                    }
-                }
-            }
-            NSLog(@"删除打印:");
-            [self showLogInfo];
-        }];
-    } else {
-        
-        
-        
-        // 单个字符串处理
-        NSRange effectiveRange;
-//        YYTextBinding *binding = [textView.attributedText attribute:YYTextBindingAttributeName atIndex:range.location longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, textView.attributedText.length-1)];
-//        if (binding == nil) {
-//            // 字符串插入
-//            NSInteger insertIndex = range.location;
-//            for (int i = 0; i < self.usersList.count; i++) {
-//                User *tempUser = self.usersList[i];
-//                if (tempUser.range.location >= insertIndex) {
-//                    tempUser.range = NSMakeRange(tempUser.range.location+range.length, tempUser.range.length);
+//#warning 删除，定位不准确
+//    if ([text isEqualToString:@""]) {
+//        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+//            NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
+//            // 寻找删除的index
+//            NSInteger deleteIndex = 0;
+//            User *deleteUser = nil;
+//            for (int i = 0; i < userListCopy.count; i++) {
+//                User *tempUser = userListCopy[i];
+//                NSInteger selectLocation = range.location;
+//                NSInteger tempLocation = tempUser.range.location;
+//                if (tempLocation == selectLocation) {
+//                    deleteIndex = i;
+//                    deleteUser = tempUser;
+//                    NSLog(@"单个删除: %@ - %ld",tempUser.atName, tempUser.range.location);
+//                    [self.usersList removeObject:tempUser];
+//                    break;
 //                }
 //            }
 //
-//            NSLog(@"插入字符串打印:");
+//            // 若有删除，则需要更新插入后元素的location
+//            if (deleteUser) {
+//                for (int i = 0; i < self.usersList.count; i++) {
+//                    User *tempUser = self.usersList[i];
+//                    if (i >= deleteIndex) {
+//                        tempUser.range = NSMakeRange(tempUser.range.location-deleteUser.range.length, tempUser.range.length);
+//                    }
+//                }
+//            } else {
+//                NSInteger deleteIndex = range.location;
+//                for (int i = 0; i < self.usersList.count; i++) {
+//                    User *tempUser = self.usersList[i];
+//                    if (tempUser.range.location > deleteIndex) {
+//                        tempUser.range = NSMakeRange(tempUser.range.location-range.length, tempUser.range.length);
+//                    }
+//                }
+//            }
+//            NSLog(@"删除打印:");
 //            [self showLogInfo];
-//        }
-        NSRange insertRange = range;
-        [textView.attributedText enumerateAttributesInRange:NSMakeRange(0, textView.attributedText.length)
-                                                    options:NSAttributedStringEnumerationReverse
-                                                 usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-            if (attrs[YYTextBindingAttributeName] == nil) {
-                // 字符串插入
-                NSInteger insertIndex = insertRange.location;
-                for (int i = 0; i < self.usersList.count; i++) {
-                    User *tempUser = self.usersList[i];
-                    if (tempUser.range.location >= insertIndex) {
-                        tempUser.range = NSMakeRange(tempUser.range.location+insertRange.length, tempUser.range.length);
-                    }
-                }
-
-                NSLog(@"插入字符串打印:");
-                [self showLogInfo];
-            }
-        }];
-//        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-//            NSLog(@"插入字符串打印:");
-//
 //        }];
-        
-    }
+//    } else {
+//
+//
+//
+//        // 单个字符串处理
+//        NSRange effectiveRange;
+////        YYTextBinding *binding = [textView.attributedText attribute:YYTextBindingAttributeName atIndex:range.location longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, textView.attributedText.length-1)];
+////        if (binding == nil) {
+////            // 字符串插入
+////            NSInteger insertIndex = range.location;
+////            for (int i = 0; i < self.usersList.count; i++) {
+////                User *tempUser = self.usersList[i];
+////                if (tempUser.range.location >= insertIndex) {
+////                    tempUser.range = NSMakeRange(tempUser.range.location+range.length, tempUser.range.length);
+////                }
+////            }
+////
+////            NSLog(@"插入字符串打印:");
+////            [self showLogInfo];
+////        }
+//        NSRange insertRange = range;
+//        [textView.attributedText enumerateAttributesInRange:NSMakeRange(0, textView.attributedText.length)
+//                                                    options:NSAttributedStringEnumerationReverse
+//                                                 usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+//            if (attrs[YYTextBindingAttributeName] == nil) {
+//                // 字符串插入
+//                NSInteger insertIndex = insertRange.location;
+//                for (int i = 0; i < self.usersList.count; i++) {
+//                    User *tempUser = self.usersList[i];
+//                    if (tempUser.range.location >= insertIndex) {
+//                        tempUser.range = NSMakeRange(tempUser.range.location+insertRange.length, tempUser.range.length);
+//                    }
+//                }
+//
+//                NSLog(@"插入字符串打印:");
+//                [self showLogInfo];
+//            }
+//        }];
+////        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+////            NSLog(@"插入字符串打印:");
+////
+////        }];
+//
+//    }
 }
 
 - (void)pushListVAtTextInRange:(NSRange)range {
@@ -243,32 +243,32 @@
         user.atName = newAtUserName;
         user.range = NSMakeRange(range.location, newAtUserName.length);
 
-        NSInteger insertIndex = 0;
-        for (int i = 0; i < self.usersList.count; i++) {
-            User *tempUser = self.usersList[i];
-            NSInteger selectLocation = range.location;
-            NSInteger tempLocation = tempUser.range.location;
-            NSInteger tempLength = tempUser.range.length;
-            if (selectLocation >= tempLocation) {
-                insertIndex = i;
-            }
-            // 解决最后插入的问题
-            if (tempLocation+tempLength <= selectLocation) {
-                insertIndex = i+1;
-            }
-        }
-        
-        // 中间插入，则需要更新插入后元素的location
-        if (insertIndex < self.usersList.count) {
-            for (int i = 0; i < self.usersList.count; i++) {
-                User *tempUser = self.usersList[i];
-                if (i >= insertIndex) {
-                    tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
-                }
-            }
-        }
-        
-        [self.usersList insertObject:user atIndex:insertIndex];
+//        NSInteger insertIndex = 0;
+//        for (int i = 0; i < self.usersList.count; i++) {
+//            User *tempUser = self.usersList[i];
+//            NSInteger selectLocation = range.location;
+//            NSInteger tempLocation = tempUser.range.location;
+//            NSInteger tempLength = tempUser.range.length;
+//            if (selectLocation >= tempLocation) {
+//                insertIndex = i;
+//            }
+//            // 解决最后插入的问题
+//            if (tempLocation+tempLength <= selectLocation) {
+//                insertIndex = i+1;
+//            }
+//        }
+//
+//        // 中间插入，则需要更新插入后元素的location
+//        if (insertIndex < self.usersList.count) {
+//            for (int i = 0; i < self.usersList.count; i++) {
+//                User *tempUser = self.usersList[i];
+//                if (i >= insertIndex) {
+//                    tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
+//                }
+//            }
+//        }
+//
+//        [self.usersList insertObject:user atIndex:insertIndex];
 
         // 若地方不对，则需更新usersList
         NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithAttributedString:self.yyTextView.attributedText];
@@ -280,7 +280,8 @@
        
         [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
         [muAttriSting yy_setColor:UIColor.redColor range:bindlingRange];
-        [muAttriSting yy_setFont:[UIFont systemFontOfSize:20] range:NSMakeRange(0, muAttriSting.length)];
+        
+        [muAttriSting yy_setFont:[UIFont systemFontOfSize:25] range:NSMakeRange(0, muAttriSting.length)];
         [self.yyTextView setAttributedText:muAttriSting];
         
         self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
