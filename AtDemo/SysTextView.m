@@ -9,8 +9,8 @@
 #import "ListViewController.h"
 
 @interface SysTextView ()<UITextViewDelegate>
-@property (weak, nonatomic) IBOutlet UITextView *topicTextView;
-@property (copy, nonatomic) NSString *topicString;
+@property (weak, nonatomic) IBOutlet UITextView *textView;
+//@property (copy, nonatomic) NSString *topicString;
 
 /// 改变Range
 @property (assign, nonatomic) NSRange changeRange;
@@ -47,9 +47,9 @@
 
 - (void)textViewDidChange:(UITextView *)textView {
     if (_isChanged) {
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.topicTextView.attributedText];
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
         [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
-        _topicTextView.attributedText = tmpAString;
+        _textView.attributedText = tmpAString;
         _isChanged = NO;
     }
 }
@@ -93,47 +93,13 @@
     return YES;
 }
 
-
-- (void)setTextViewAttributed {
-    NSMutableArray *indexArray = [NSMutableArray array];
-    for (NSInteger i = 0; i < self.topicTextView.text.length; i++) {
-        NSString *indexString = [self.topicTextView.text substringWithRange:NSMakeRange(i, 1)];
-        if ([indexString isEqualToString:self.topicString]) {
-            [indexArray addObject:@(i)];
-        }
-    }
-    // reset
-    NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.topicTextView.text];
-    self.topicTextView.attributedText = aText;
-    self.topicTextView.font = [UIFont systemFontOfSize:16.0];
-
-    // change
-    if (indexArray.count > 1) {
-        NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.topicTextView.text];
-        for (NSInteger i = 0; i < indexArray.count; i++) {
-            NSInteger index1 = [indexArray[i] integerValue];
-            NSInteger index2 = 0;
-            if ((i + 1) < indexArray.count) {
-                index2 = [indexArray[i + 1] integerValue];
-            }
-            if (index2 - index1 > 1) {
-                // 多余中间有值才显示
-                [aText setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor } range:NSMakeRange(index1, index2 - index1 + 1)];
-                ++i;
-            }
-        }
-        self.topicTextView.attributedText = aText;
-        self.topicTextView.font = [UIFont systemFontOfSize:16.0];
-    }
-}
-
 /**
  *  得到话题Range数组
  *
  *  @return return value description
  */
 - (NSArray *)getTopicRangeArray:(NSAttributedString *)attributedString {
-    NSAttributedString *traveAStr = attributedString ?: self.topicTextView.attributedText;
+    NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
     __block NSMutableArray *rangeArray = [NSMutableArray array];
     static NSRegularExpression *iExpression;
     iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:@"#(.*?)#" options:0 error:NULL];
@@ -149,9 +115,10 @@
     }];
     return rangeArray;
 }
+
 - (IBAction)onActionGetInfo:(id)sender {
-    NSArray *results = [self getTopicRangeArray:self.topicTextView.attributedText];
-    NSLog(@"输出打印:\n");
+    NSArray *results = [self getTopicRangeArray:self.textView.attributedText];
+    NSLog(@"输出打印:");
     for (id obj in results) {
         NSLog(@"%@",obj);
     }
@@ -164,11 +131,46 @@
     vc.block = ^(NSInteger index, User * _Nonnull user) {
         
         NSString *insertText = [NSString stringWithFormat:@"#%@#", user.name];
-        [self.topicTextView insertText:insertText];
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.topicTextView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor, NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.topicTextView.selectedRange.location - insertText.length, insertText.length)];
-        self.topicTextView.attributedText = tmpAString;
+        [self.textView insertText:insertText];
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor, NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+        self.textView.attributedText = tmpAString;
         
     };
 }
+
+
+//- (void)setTextViewAttributed {
+//    NSMutableArray *indexArray = [NSMutableArray array];
+//    for (NSInteger i = 0; i < self.textView.text.length; i++) {
+//        NSString *indexString = [self.textView.text substringWithRange:NSMakeRange(i, 1)];
+//        if ([indexString isEqualToString:self.topicString]) {
+//            [indexArray addObject:@(i)];
+//        }
+//    }
+//    // reset
+//    NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.textView.text];
+//    self.textView.attributedText = aText;
+//    self.textView.font = [UIFont systemFontOfSize:16.0];
+//
+//    // change
+//    if (indexArray.count > 1) {
+//        NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.textView.text];
+//        for (NSInteger i = 0; i < indexArray.count; i++) {
+//            NSInteger index1 = [indexArray[i] integerValue];
+//            NSInteger index2 = 0;
+//            if ((i + 1) < indexArray.count) {
+//                index2 = [indexArray[i + 1] integerValue];
+//            }
+//            if (index2 - index1 > 1) {
+//                // 多余中间有值才显示
+//                [aText setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor } range:NSMakeRange(index1, index2 - index1 + 1)];
+//                ++i;
+//            }
+//        }
+//        self.textView.attributedText = aText;
+//        self.textView.font = [UIFont systemFontOfSize:16.0];
+//    }
+//}
+
 @end

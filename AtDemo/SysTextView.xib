@@ -11,7 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SysTextView">
             <connections>
-                <outlet property="topicTextView" destination="9Af-ZT-EVt" id="kOH-s3-Ygw"/>
+                <outlet property="textView" destination="9Af-ZT-EVt" id="kOH-s3-Ygw"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
