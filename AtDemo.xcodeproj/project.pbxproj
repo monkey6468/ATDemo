@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A6159C6726394F67007AE312 /* TCUITextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C6526394F67007AE312 /* TCUITextView.m */; };
 		A6159C6C26395754007AE312 /* SysTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C6A26395754007AE312 /* SysTextView.m */; };
 		A6159C6D26395754007AE312 /* SysTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6159C6B26395754007AE312 /* SysTextView.xib */; };
-		A6159C72263A5A6F007AE312 /* LJTextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */; };
+		A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C79263A95A6007AE312 /* TextViewBinding.m */; };
 		A6522622262D731200576F88 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522621262D731200576F88 /* User.m */; };
 		A652265E262E6A5500576F88 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262B262E6A5500576F88 /* YYTextView.m */; };
 		A652265F262E6A5500576F88 /* YYTextMagnifier.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262F262E6A5500576F88 /* YYTextMagnifier.m */; };
@@ -36,9 +35,6 @@
 		A6522673262E6A5500576F88 /* UIView+YYText.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522658262E6A5500576F88 /* UIView+YYText.m */; };
 		A6522674262E6A5500576F88 /* YYTextAsyncLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A652265B262E6A5500576F88 /* YYTextAsyncLayer.m */; };
 		A6522675262E6A5500576F88 /* YYTextWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A652265C262E6A5500576F88 /* YYTextWeakProxy.m */; };
-		A65B5E4B2639435700FAA677 /* UITextViewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A65B5E492639435700FAA677 /* UITextViewVC.m */; };
-		A65B5E4C2639435700FAA677 /* UITextViewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = A65B5E4A2639435700FAA677 /* UITextViewVC.xib */; };
-		A65B5E502639441900FAA677 /* UITextView+Extention.m in Sources */ = {isa = PBXBuildFile; fileRef = A65B5E4F2639441900FAA677 /* UITextView+Extention.m */; };
 		A69DC393262D160700A4ABF7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A69DC392262D160700A4ABF7 /* AppDelegate.m */; };
 		A69DC399262D160700A4ABF7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A69DC398262D160700A4ABF7 /* ViewController.m */; };
 		A69DC39C262D160700A4ABF7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A69DC39A262D160700A4ABF7 /* Main.storyboard */; };
@@ -56,13 +52,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A6159C6526394F67007AE312 /* TCUITextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCUITextView.m; sourceTree = "<group>"; };
-		A6159C6626394F67007AE312 /* TCUITextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCUITextView.h; sourceTree = "<group>"; };
 		A6159C6926395754007AE312 /* SysTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SysTextView.h; sourceTree = "<group>"; };
 		A6159C6A26395754007AE312 /* SysTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SysTextView.m; sourceTree = "<group>"; };
 		A6159C6B26395754007AE312 /* SysTextView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SysTextView.xib; sourceTree = "<group>"; };
-		A6159C70263A5A6F007AE312 /* LJTextViewBinding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LJTextViewBinding.h; sourceTree = "<group>"; };
-		A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LJTextViewBinding.m; sourceTree = "<group>"; };
+		A6159C78263A95A6007AE312 /* TextViewBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextViewBinding.h; sourceTree = "<group>"; };
+		A6159C79263A95A6007AE312 /* TextViewBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextViewBinding.m; sourceTree = "<group>"; };
 		A6522620262D731200576F88 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		A6522621262D731200576F88 /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		A652262A262E6A5500576F88 /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
@@ -114,11 +108,6 @@
 		A652265B262E6A5500576F88 /* YYTextAsyncLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextAsyncLayer.m; sourceTree = "<group>"; };
 		A652265C262E6A5500576F88 /* YYTextWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextWeakProxy.m; sourceTree = "<group>"; };
 		A652265D262E6A5500576F88 /* UIPasteboard+YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIPasteboard+YYText.h"; sourceTree = "<group>"; };
-		A65B5E482639435700FAA677 /* UITextViewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UITextViewVC.h; sourceTree = "<group>"; };
-		A65B5E492639435700FAA677 /* UITextViewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UITextViewVC.m; sourceTree = "<group>"; };
-		A65B5E4A2639435700FAA677 /* UITextViewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UITextViewVC.xib; sourceTree = "<group>"; };
-		A65B5E4E2639441900FAA677 /* UITextView+Extention.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITextView+Extention.h"; sourceTree = "<group>"; };
-		A65B5E4F2639441900FAA677 /* UITextView+Extention.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Extention.m"; sourceTree = "<group>"; };
 		A69DC38E262D160700A4ABF7 /* AtDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A69DC391262D160700A4ABF7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A69DC392262D160700A4ABF7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -155,6 +144,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A6159C7C263A95C3007AE312 /* TextViewBinding */ = {
+			isa = PBXGroup;
+			children = (
+				A6159C78263A95A6007AE312 /* TextViewBinding.h */,
+				A6159C79263A95A6007AE312 /* TextViewBinding.m */,
+			);
+			path = TextViewBinding;
+			sourceTree = "<group>";
+		};
 		A6522629262E6A5500576F88 /* YYText */ = {
 			isa = PBXGroup;
 			children = (
@@ -261,18 +259,10 @@
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
-				A65B5E4E2639441900FAA677 /* UITextView+Extention.h */,
-				A65B5E4F2639441900FAA677 /* UITextView+Extention.m */,
-				A6159C70263A5A6F007AE312 /* LJTextViewBinding.h */,
-				A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */,
-				A6159C6626394F67007AE312 /* TCUITextView.h */,
-				A6159C6526394F67007AE312 /* TCUITextView.m */,
 				A6159C6926395754007AE312 /* SysTextView.h */,
 				A6159C6A26395754007AE312 /* SysTextView.m */,
 				A6159C6B26395754007AE312 /* SysTextView.xib */,
-				A65B5E482639435700FAA677 /* UITextViewVC.h */,
-				A65B5E492639435700FAA677 /* UITextViewVC.m */,
-				A65B5E4A2639435700FAA677 /* UITextViewVC.xib */,
+				A6159C7C263A95C3007AE312 /* TextViewBinding */,
 				C9DFE30D262F20F2001FBAAE /* ListVC */,
 				C9DFE30B262F20DB001FBAAE /* YYTextViewVC */,
 				A69DC39A262D160700A4ABF7 /* Main.storyboard */,
@@ -394,7 +384,6 @@
 				A69DC3A1262D160A00A4ABF7 /* LaunchScreen.storyboard in Resources */,
 				C9DFE308262F1FEC001FBAAE /* YYTextViewVC.xib in Resources */,
 				A69DC39E262D160A00A4ABF7 /* Assets.xcassets in Resources */,
-				A65B5E4C2639435700FAA677 /* UITextViewVC.xib in Resources */,
 				C9BF91472633E01D005B25DB /* YYTextViewCell.xib in Resources */,
 				A69DC410262D50C800A4ABF7 /* ListViewController.xib in Resources */,
 				A69DC39C262D160700A4ABF7 /* Main.storyboard in Resources */,
@@ -418,17 +407,15 @@
 				A6522671262E6A5500576F88 /* UIPasteboard+YYText.m in Sources */,
 				A652265E262E6A5500576F88 /* YYTextView.m in Sources */,
 				A69DC399262D160700A4ABF7 /* ViewController.m in Sources */,
+				A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */,
 				A652266E262E6A5500576F88 /* YYTextUtilities.m in Sources */,
 				A6522667262E6A5500576F88 /* YYTextDebugOption.m in Sources */,
 				A6522668262E6A5500576F88 /* YYLabel.m in Sources */,
-				A65B5E4B2639435700FAA677 /* UITextViewVC.m in Sources */,
 				C9BF914D2633E61F005B25DB /* DataModel.m in Sources */,
-				A6159C6726394F67007AE312 /* TCUITextView.m in Sources */,
 				A6522662262E6A5500576F88 /* YYTextInput.m in Sources */,
 				A652266D262E6A5500576F88 /* YYTextRubyAnnotation.m in Sources */,
 				A6159C6C26395754007AE312 /* SysTextView.m in Sources */,
 				A652266F262E6A5500576F88 /* NSParagraphStyle+YYText.m in Sources */,
-				A65B5E502639441900FAA677 /* UITextView+Extention.m in Sources */,
 				A69DC393262D160700A4ABF7 /* AppDelegate.m in Sources */,
 				A6522672262E6A5500576F88 /* YYTextTransaction.m in Sources */,
 				A6522665262E6A5500576F88 /* YYTextSelectionView.m in Sources */,
@@ -442,7 +429,6 @@
 				A6522673262E6A5500576F88 /* UIView+YYText.m in Sources */,
 				C9BF91462633E01D005B25DB /* YYTextViewCell.m in Sources */,
 				A6522666262E6A5500576F88 /* YYTextKeyboardManager.m in Sources */,
-				A6159C72263A5A6F007AE312 /* LJTextViewBinding.m in Sources */,
 				A6522675262E6A5500576F88 /* YYTextWeakProxy.m in Sources */,
 				A6522664262E6A5500576F88 /* YYTextLine.m in Sources */,
 				A69DC3A4262D160A00A4ABF7 /* main.m in Sources */,

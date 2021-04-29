@@ -60,7 +60,8 @@
         _dataArray = [NSMutableArray array];
         for (int i = 0; i < 10; i++) {
             User *user = [[User alloc]init];
-            user.name = [NSString stringWithFormat:@"0%d",i];
+            user.name = [NSString stringWithFormat:@"0%d",i+1];
+            user.userId = i+1;
             [_dataArray addObject:user];
         }
     }

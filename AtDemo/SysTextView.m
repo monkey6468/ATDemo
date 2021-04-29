@@ -7,10 +7,11 @@
 
 #import "SysTextView.h"
 #import "ListViewController.h"
+#import "TextViewBinding.h"
+
 
 @interface SysTextView ()<UITextViewDelegate>
 @property (weak, nonatomic) IBOutlet UITextView *textView;
-//@property (copy, nonatomic) NSString *topicString;
 
 /// 改变Range
 @property (assign, nonatomic) NSRange changeRange;
@@ -27,22 +28,31 @@
     [super viewDidLoad];
 }
 
-#pragma mark - UITextView Delegate
+#pragma mark - UITextViewDelegate
 - (void)textViewDidChangeSelection:(UITextView *)textView {
-    NSArray *rangeArray = [self getTopicRangeArray:nil];
+    NSArray *results = [self getResultsListArray:nil];
     BOOL inRange = NO;
-    for (NSInteger i = 0; i < rangeArray.count; i++) {
-        NSRange range = NSRangeFromString(rangeArray[i]);
+//    NSRange tempRange = NSMakeRange(0, 0);
+    for (NSInteger i = 0; i < results.count; i++) {
+        TextViewBinding *model = results[i];
+        NSRange range = model.range;
         if (textView.selectedRange.location > range.location && textView.selectedRange.location < range.location + range.length) {
             inRange = YES;
+//            tempRange = range;
             break;
         }
     }
     if (inRange) {
         textView.selectedRange = NSMakeRange(self.cursorLocation, textView.selectedRange.length);
+//        NSInteger location = self.cursorLocation-tempRange.length;
+//        if (self.cursorLocation<textView.selectedRange.location) {
+//            location = self.cursorLocation+tempRange.length;
+//        }
+//        textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
         return;
     }
     self.cursorLocation = textView.selectedRange.location;
+
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -56,9 +66,10 @@
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([text isEqualToString:@""]) { // 删除
-        NSArray *rangeArray = [self getTopicRangeArray:nil];
-        for (NSInteger i = 0; i < rangeArray.count; i++) {
-            NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+        NSArray *results = [self getResultsListArray:nil];
+        for (NSInteger i = 0; i < results.count; i++) {
+            TextViewBinding *model = results[i];
+            NSRange tmpRange = model.range;
             if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
                 if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
                     // 第二次点击删除按钮 删除
@@ -71,10 +82,11 @@
             }
         }
     } else { // 增加
-        NSArray *rangeArray = [self getTopicRangeArray:nil];
-        if ([rangeArray count]) {
-            for (NSInteger i = 0; i < rangeArray.count; i++) {
-                NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+        NSArray *results = [self getResultsListArray:nil];
+        if ([results count]) {
+            for (NSInteger i = 0; i < results.count; i++) {
+                TextViewBinding *model = results[i];
+                NSRange tmpRange = model.range;
                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                     _changeRange = NSMakeRange(range.location, text.length);
                     _isChanged = YES;
@@ -82,7 +94,7 @@
                 }
             }
         } else {
-            // 话题在第一个删除后 重置text color
+            // 在第一个删除后 重置text color
             if (!range.location) {
                 _changeRange = NSMakeRange(range.location, text.length);
                 _isChanged = YES;
@@ -94,35 +106,31 @@
 }
 
 /**
- *  得到话题Range数组
+ *  得到数组
  *
  *  @return return value description
  */
-- (NSArray *)getTopicRangeArray:(NSAttributedString *)attributedString {
+- (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
     NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
-    __block NSMutableArray *rangeArray = [NSMutableArray array];
-    static NSRegularExpression *iExpression;
-    iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:@"#(.*?)#" options:0 error:NULL];
-    [iExpression enumerateMatchesInString:traveAStr.string
-                                  options:0
-                                    range:NSMakeRange(0, traveAStr.string.length)
-                               usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-        NSRange resultRange = result.range;
-        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
-        if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
-            [rangeArray addObject:NSStringFromRange(result.range)];
+    __block NSMutableArray *results = [NSMutableArray array];
+    [traveAStr enumerateAttributesInRange:NSMakeRange(0, traveAStr.length)
+                                  options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+                               usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+        if (attrs[TextBindingAttributeName]) {
+            TextViewBinding *bingdingModel = attrs[TextBindingAttributeName];
+            bingdingModel.range = range;
+            [results addObject:bingdingModel];
         }
     }];
-    return rangeArray;
+    return results;
 }
 
 - (IBAction)onActionGetInfo:(id)sender {
-    NSArray *results = [self getTopicRangeArray:self.textView.attributedText];
-    NSLog(@"输出打印:");
-    for (id obj in results) {
-        NSLog(@"%@",obj);
+    NSArray *results = [self getResultsListArray:self.textView.attributedText];
+    NSLog(@"\n输出打印:");
+    for (TextViewBinding *model in results) {
+        NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
     }
-    NSLog(@"\n\n");
 }
 
 - (IBAction)onActionInsert:(UIButton *)sender {
@@ -130,47 +138,19 @@
     [self presentViewController:vc animated:NO completion:nil];
     vc.block = ^(NSInteger index, User * _Nonnull user) {
         
-        NSString *insertText = [NSString stringWithFormat:@"#%@#", user.name];
+        NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
+        TextViewBinding *topicBinding = [[TextViewBinding alloc]initWithName:user.name
+                                                                      userId:user.userId];
+        
         [self.textView insertText:insertText];
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor, NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.redColor,
+                                     NSFontAttributeName : [UIFont systemFontOfSize:17],
+                                     TextBindingAttributeName:topicBinding }
+                            range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
         self.textView.attributedText = tmpAString;
-        
+
     };
 }
-
-
-//- (void)setTextViewAttributed {
-//    NSMutableArray *indexArray = [NSMutableArray array];
-//    for (NSInteger i = 0; i < self.textView.text.length; i++) {
-//        NSString *indexString = [self.textView.text substringWithRange:NSMakeRange(i, 1)];
-//        if ([indexString isEqualToString:self.topicString]) {
-//            [indexArray addObject:@(i)];
-//        }
-//    }
-//    // reset
-//    NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.textView.text];
-//    self.textView.attributedText = aText;
-//    self.textView.font = [UIFont systemFontOfSize:16.0];
-//
-//    // change
-//    if (indexArray.count > 1) {
-//        NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.textView.text];
-//        for (NSInteger i = 0; i < indexArray.count; i++) {
-//            NSInteger index1 = [indexArray[i] integerValue];
-//            NSInteger index2 = 0;
-//            if ((i + 1) < indexArray.count) {
-//                index2 = [indexArray[i + 1] integerValue];
-//            }
-//            if (index2 - index1 > 1) {
-//                // 多余中间有值才显示
-//                [aText setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor } range:NSMakeRange(index1, index2 - index1 + 1)];
-//                ++i;
-//            }
-//        }
-//        self.textView.attributedText = aText;
-//        self.textView.font = [UIFont systemFontOfSize:16.0];
-//    }
-//}
 
 @end

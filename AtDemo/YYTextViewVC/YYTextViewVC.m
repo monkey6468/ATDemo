@@ -242,7 +242,7 @@
 
         NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user1.name,NIMInputAtEndChar];
         User *newAtUser = [[User alloc]init];
-        newAtUser.atName = newAtUserName;
+//        newAtUser.atName = newAtUserName;
         newAtUser.range = NSMakeRange(range.location, newAtUserName.length);
 
 //        NSInteger insertIndex = 0;
