@@ -144,6 +144,7 @@
     // 普通字符串的中间插入，则需要更新插入后元素的location
     self.yyTextViewConstraintH.constant = h;
 //    [self.view layoutIfNeeded];
+   
     return YES;
     NSLog(@"变动打印:");
     [self showLogInfo];
@@ -237,11 +238,12 @@
 - (void)pushListVAtTextInRange:(NSRange)range {
     ListViewController *vc = [[ListViewController alloc]init];
     [self presentViewController:vc animated:NO completion:nil];
-    vc.block = ^(NSInteger index, User * _Nonnull user) {
+    vc.block = ^(NSInteger index, User * _Nonnull user1) {
 
-        NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user.name,NIMInputAtEndChar];
-        user.atName = newAtUserName;
-        user.range = NSMakeRange(range.location, newAtUserName.length);
+        NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user1.name,NIMInputAtEndChar];
+        User *newAtUser = [[User alloc]init];
+        newAtUser.atName = newAtUserName;
+        newAtUser.range = NSMakeRange(range.location, newAtUserName.length);
 
 //        NSInteger insertIndex = 0;
 //        for (int i = 0; i < self.usersList.count; i++) {
@@ -273,9 +275,9 @@
         // 若地方不对，则需更新usersList
         NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithAttributedString:self.yyTextView.attributedText];
         
-        [muAttriSting insertAttributedString:[[NSAttributedString alloc]initWithString:newAtUserName] atIndex:range.location];
+        [muAttriSting insertAttributedString:[[NSAttributedString alloc]initWithString:newAtUserName] atIndex:newAtUser.range.location];
         
-        NSRange bindlingRange = NSMakeRange(user.range.location, user.range.length);
+        NSRange bindlingRange = newAtUser.range;
         YYTextBinding *binding = [YYTextBinding bindingWithDeleteConfirm:YES];
        
         [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
@@ -284,7 +286,7 @@
         [muAttriSting yy_setFont:[UIFont systemFontOfSize:25] range:NSMakeRange(0, muAttriSting.length)];
         [self.yyTextView setAttributedText:muAttriSting];
         
-        self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
+//        self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
         
         NSLog(@"插入@打印:");
     };

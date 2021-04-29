@@ -10,6 +10,7 @@
 		A6159C6726394F67007AE312 /* TCUITextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C6526394F67007AE312 /* TCUITextView.m */; };
 		A6159C6C26395754007AE312 /* SysTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C6A26395754007AE312 /* SysTextView.m */; };
 		A6159C6D26395754007AE312 /* SysTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6159C6B26395754007AE312 /* SysTextView.xib */; };
+		A6159C72263A5A6F007AE312 /* LJTextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */; };
 		A6522622262D731200576F88 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522621262D731200576F88 /* User.m */; };
 		A652265E262E6A5500576F88 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262B262E6A5500576F88 /* YYTextView.m */; };
 		A652265F262E6A5500576F88 /* YYTextMagnifier.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262F262E6A5500576F88 /* YYTextMagnifier.m */; };
@@ -60,6 +61,8 @@
 		A6159C6926395754007AE312 /* SysTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SysTextView.h; sourceTree = "<group>"; };
 		A6159C6A26395754007AE312 /* SysTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SysTextView.m; sourceTree = "<group>"; };
 		A6159C6B26395754007AE312 /* SysTextView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SysTextView.xib; sourceTree = "<group>"; };
+		A6159C70263A5A6F007AE312 /* LJTextViewBinding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LJTextViewBinding.h; sourceTree = "<group>"; };
+		A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LJTextViewBinding.m; sourceTree = "<group>"; };
 		A6522620262D731200576F88 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		A6522621262D731200576F88 /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		A652262A262E6A5500576F88 /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
@@ -260,6 +263,8 @@
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
 				A65B5E4E2639441900FAA677 /* UITextView+Extention.h */,
 				A65B5E4F2639441900FAA677 /* UITextView+Extention.m */,
+				A6159C70263A5A6F007AE312 /* LJTextViewBinding.h */,
+				A6159C71263A5A6F007AE312 /* LJTextViewBinding.m */,
 				A6159C6626394F67007AE312 /* TCUITextView.h */,
 				A6159C6526394F67007AE312 /* TCUITextView.m */,
 				A6159C6926395754007AE312 /* SysTextView.h */,
@@ -437,6 +442,7 @@
 				A6522673262E6A5500576F88 /* UIView+YYText.m in Sources */,
 				C9BF91462633E01D005B25DB /* YYTextViewCell.m in Sources */,
 				A6522666262E6A5500576F88 /* YYTextKeyboardManager.m in Sources */,
+				A6159C72263A5A6F007AE312 /* LJTextViewBinding.m in Sources */,
 				A6522675262E6A5500576F88 /* YYTextWeakProxy.m in Sources */,
 				A6522664262E6A5500576F88 /* YYTextLine.m in Sources */,
 				A69DC3A4262D160A00A4ABF7 /* main.m in Sources */,

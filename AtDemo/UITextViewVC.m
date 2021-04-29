@@ -7,10 +7,10 @@
 
 #import "UITextViewVC.h"
 //#import "UITextView+Extention.h"
-#import "TCUITextView.h"
+//#import "TCUITextView.h"
 
 @interface UITextViewVC ()
-@property (weak, nonatomic) IBOutlet TCUITextView *textView;
+
 
 @end
 
@@ -20,8 +20,11 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
 
-    // Do any additional setup after loading the view from its nib.
 }
+
+/**
+ *  设置textview字体属性
+ */
 
 //- (void)observeValueForKeyPath:(NSString*) path
 //                      ofObject:(id)object

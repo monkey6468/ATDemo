@@ -6,22 +6,18 @@
 //
 
 #import "SysTextView.h"
-#import "TCUITextView.h"
 #import "ListViewController.h"
 
-#define kScreenWidth      [UIScreen mainScreen].bounds.size.width
-#define UIColorFromRGB(rgbValue)    [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
-#define kFontWithSize(size)      [UIFont systemFontOfSize:size]
-//#define kSystemColor          [UIColor colorWithHexString:@"#05d380"];
+@interface SysTextView ()<UITextViewDelegate>
+@property (weak, nonatomic) IBOutlet UITextView *topicTextView;
+@property (copy, nonatomic) NSString *topicString;
 
-static  CGFloat const headHight = 150;
-
-@interface SysTextView ()<TCUITextViewDelegate> {
-    NSInteger   _textViewNumbeAdd;      // 文本输入框数字统计
-}
-/// 动态文本输入框
-@property (nonatomic ,strong) TCUITextView *dynamicTextView;
-@property (nonatomic, assign) NSInteger  dynamicTextNumber;
+/// 改变Range
+@property (assign, nonatomic) NSRange changeRange;
+/// 是否改变
+@property (assign, nonatomic) BOOL isChanged;
+/// 光标位置
+@property (assign, nonatomic) NSInteger cursorLocation;
 
 @end
 
@@ -29,91 +25,150 @@ static  CGFloat const headHight = 150;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.dynamicTextNumber = 20;
-    _textViewNumbeAdd = 0;
-
-    self.view.backgroundColor = [UIColor whiteColor];
-//    self.dynamicTextView.in
-    [self.view addSubview:self.dynamicTextView];
 }
 
-- (TCUITextView *)dynamicTextView{
-    if (!_dynamicTextView) {
-        _dynamicTextView = [[TCUITextView alloc]initWithFrame:CGRectMake(18, 100, kScreenWidth - 35, headHight - 40)];
-        _dynamicTextView.font = kFontWithSize(16);
-        _dynamicTextView.textColor = UIColorFromRGB(0x313131);
-        _dynamicTextView.placeHoldString = @"分享你的营养控糖经验...";
-        _dynamicTextView.placeHoldTextFont = kFontWithSize(15);
-        _dynamicTextView.placeHoldTextColor = UIColorFromRGB(0xaaaaaa);
-        _dynamicTextView.myDelegate = self;
-        _dynamicTextView.backgroundColor = UIColor.lightGrayColor;
-        _dynamicTextView.specialTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1];
+#pragma mark - UITextView Delegate
+- (void)textViewDidChangeSelection:(UITextView *)textView {
+    NSArray *rangeArray = [self getTopicRangeArray:nil];
+    BOOL inRange = NO;
+    for (NSInteger i = 0; i < rangeArray.count; i++) {
+        NSRange range = NSRangeFromString(rangeArray[i]);
+        if (textView.selectedRange.location > range.location && textView.selectedRange.location < range.location + range.length) {
+            inRange = YES;
+            break;
+        }
     }
-    return _dynamicTextView;
+    if (inRange) {
+        textView.selectedRange = NSMakeRange(self.cursorLocation, textView.selectedRange.length);
+        return;
+    }
+    self.cursorLocation = textView.selectedRange.location;
 }
 
-#pragma mark ====== TCUITextViewDelegate =======
--(void)textViewDidBeginEditing:(TCUITextView *)textView{
-//    [MobClick event:@"105_002013"];
+- (void)textViewDidChange:(UITextView *)textView {
+    if (_isChanged) {
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.topicTextView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+        _topicTextView.attributedText = tmpAString;
+        _isChanged = NO;
+    }
 }
--(BOOL)textView:(TCUITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
-    if (_dynamicTextView.text.length+text.length > _dynamicTextNumber) {
-//        [self.view makeToast:[NSString stringWithFormat:@"动态文字不能超过%ld字",(long)_dynamicTextNumber] duration:1.0 position:CSToastPositionCenter];
-        return NO;
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if ([text isEqualToString:@""]) { // 删除
+        NSArray *rangeArray = [self getTopicRangeArray:nil];
+        for (NSInteger i = 0; i < rangeArray.count; i++) {
+            NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+            if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
+                if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
+                    // 第二次点击删除按钮 删除
+                    return YES;
+                } else {
+                    // 第一次点击删除按钮 选中
+                    textView.selectedRange = tmpRange;
+                    return NO;
+                }
+            }
+        }
+    } else { // 增加
+        NSArray *rangeArray = [self getTopicRangeArray:nil];
+        if ([rangeArray count]) {
+            for (NSInteger i = 0; i < rangeArray.count; i++) {
+                NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+                    _changeRange = NSMakeRange(range.location, text.length);
+                    _isChanged = YES;
+                    return YES;
+                }
+            }
+        } else {
+            // 话题在第一个删除后 重置text color
+            if (!range.location) {
+                _changeRange = NSMakeRange(range.location, text.length);
+                _isChanged = YES;
+                return YES;
+            }
+        }
     }
     return YES;
 }
-- (void)textViewDidChangeSelection:(TCUITextView *)textView{
-    
-    NSString *tString = [NSString stringWithFormat:@"%lu/%ld",(unsigned long)textView.text.length,(long)_dynamicTextNumber];
-//    _countLabel.text = tString;
-}
 
-#pragma mark ====== 设置特殊文本 =======
-- (void)setTextViewAttributedStrings:(NSString *)str{
-    [self.dynamicTextView becomeFirstResponder];
-    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:str];
-    [attrStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:14] range:NSMakeRange(0, str.length)];
-    [self.dynamicTextView insterSpecialTextAndGetSelectedRange:attrStr selectedRange:self.dynamicTextView.selectedRange text:self.dynamicTextView.attributedText];
-}
-#define kSelfWeak __weak typeof(self) weakSelf = self
-#pragma mark ====== @ 他人判断 =======
-- (void)textViewDidChange:(TCUITextView *)textView{
-    if ([textView.text length]!= 0) {
-        NSString *tString = [NSString stringWithFormat:@"%ld/%ld",(long)textView.text.length,_dynamicTextNumber];
-//        _countLabel.text = tString;
-    }
-    if (textView.text.length >= _textViewNumbeAdd) {
-        // 输入文本判断
-        NSString *textStr = [textView.text substringWithRange:NSMakeRange(textView.text.length - 1, 1)];
-        if ([textStr isEqualToString:@"@"] ){//&& _view_show == NO
-            textView.text = [textView.text substringToIndex:textView.text.length - 1];
-            
-            ListViewController *vc = [[ListViewController alloc]init];
-            [self presentViewController:vc animated:NO completion:nil];
-            kSelfWeak;
 
-            vc.block = ^(NSInteger index, User * _Nonnull user) {
-                if (weakSelf.dynamicTextView.text.length + user.name.length + 1 <= _dynamicTextNumber) {
-                    [weakSelf setTextViewAttributedStrings:[NSString stringWithFormat:@"@%@ ",user.name]];
-                }else{
-                    NSLog(@"%@",[NSString stringWithFormat:@"动态文字不能超过%ld字",(long)weakSelf.dynamicTextNumber]);
-//                    [weakSelf.view makeToast:[NSString stringWithFormat:@"动态文字不能超过%ld字",(long)weakSelf.dynamicTextNumber] duration:1.0 position:CSToastPositionCenter];
-                }
-            };
-////            TCRemindWhoSeeViewController *remindWhoSeeVC = [TCRemindWhoSeeViewController new];
-////            remindWhoSeeVC.remindUsersBlock = ^(NSString *userName, NSInteger userId,NSInteger role_type_ed) {
-//                if (weakSelf.dynamicTextView.text.length + userName.length + 1 <= _dynamicTextNumber) {
-//                    [weakSelf setTextViewAttributedStrings:[NSString stringWithFormat:@"%@ ",userName]];
-//                }else{
-//                    [weakSelf.view makeToast:[NSString stringWithFormat:@"动态文字不能超过%ld字",(long)weakSelf.dynamicTextNumber] duration:1.0 position:CSToastPositionCenter];
-//                }
-//                _view_show = NO;
-////            };
-//            _view_show = YES;
-//            [self.navigationController pushViewController:remindWhoSeeVC animated:YES];
+- (void)setTextViewAttributed {
+    NSMutableArray *indexArray = [NSMutableArray array];
+    for (NSInteger i = 0; i < self.topicTextView.text.length; i++) {
+        NSString *indexString = [self.topicTextView.text substringWithRange:NSMakeRange(i, 1)];
+        if ([indexString isEqualToString:self.topicString]) {
+            [indexArray addObject:@(i)];
         }
     }
-    _textViewNumbeAdd = textView.text.length;
+    // reset
+    NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.topicTextView.text];
+    self.topicTextView.attributedText = aText;
+    self.topicTextView.font = [UIFont systemFontOfSize:16.0];
+
+    // change
+    if (indexArray.count > 1) {
+        NSMutableAttributedString *aText = [[NSMutableAttributedString alloc] initWithString:self.topicTextView.text];
+        for (NSInteger i = 0; i < indexArray.count; i++) {
+            NSInteger index1 = [indexArray[i] integerValue];
+            NSInteger index2 = 0;
+            if ((i + 1) < indexArray.count) {
+                index2 = [indexArray[i + 1] integerValue];
+            }
+            if (index2 - index1 > 1) {
+                // 多余中间有值才显示
+                [aText setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor } range:NSMakeRange(index1, index2 - index1 + 1)];
+                ++i;
+            }
+        }
+        self.topicTextView.attributedText = aText;
+        self.topicTextView.font = [UIFont systemFontOfSize:16.0];
+    }
+}
+
+/**
+ *  得到话题Range数组
+ *
+ *  @return return value description
+ */
+- (NSArray *)getTopicRangeArray:(NSAttributedString *)attributedString {
+    NSAttributedString *traveAStr = attributedString ?: self.topicTextView.attributedText;
+    __block NSMutableArray *rangeArray = [NSMutableArray array];
+    static NSRegularExpression *iExpression;
+    iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:@"#(.*?)#" options:0 error:NULL];
+    [iExpression enumerateMatchesInString:traveAStr.string
+                                  options:0
+                                    range:NSMakeRange(0, traveAStr.string.length)
+                               usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSRange resultRange = result.range;
+        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
+        if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
+            [rangeArray addObject:NSStringFromRange(result.range)];
+        }
+    }];
+    return rangeArray;
+}
+- (IBAction)onActionGetInfo:(id)sender {
+    NSArray *results = [self getTopicRangeArray:self.topicTextView.attributedText];
+    NSLog(@"输出打印:\n");
+    for (id obj in results) {
+        NSLog(@"%@",obj);
+    }
+    NSLog(@"\n\n");
+}
+
+- (IBAction)onActionInsert:(UIButton *)sender {
+    ListViewController *vc = [[ListViewController alloc]init];
+    [self presentViewController:vc animated:NO completion:nil];
+    vc.block = ^(NSInteger index, User * _Nonnull user) {
+        
+        NSString *insertText = [NSString stringWithFormat:@"#%@#", user.name];
+        [self.topicTextView insertText:insertText];
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.topicTextView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: UIColor.redColor, NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.topicTextView.selectedRange.location - insertText.length, insertText.length)];
+        self.topicTextView.attributedText = tmpAString;
+        
+    };
 }
 @end
