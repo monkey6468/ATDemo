@@ -9,7 +9,7 @@
 #import "YYLabel.h"
 #import "YYText.h"
 
-#import "User.h"
+#import "TextViewBinding.h"
 
 @interface YYTextViewCell ()
 
@@ -30,18 +30,18 @@
     
     NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
     muAttriSting.yy_font = [UIFont systemFontOfSize:25];
-//    for (User *user in model.userList) {
-//        [muAttriSting yy_setTextHighlightRange:user.range color:[UIColor blueColor] backgroundColor:UIColor.redColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-//            
-//            for (User *tempUser in model.userList) {
-//                if (tempUser.range.location == range.location
-//                && tempUser.range.length == range.length) {
-//                    NSLog(@"点击了: %@",tempUser.name);
-//                }
-//            }
-//        }];
-//        
-//    }
+    for (TextViewBinding *bindingModel in model.userList) {
+        [muAttriSting yy_setTextHighlightRange:bindingModel.range color:[UIColor blueColor] backgroundColor:UIColor.redColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+            
+            for (TextViewBinding *tempBindingModel in model.userList) {
+                if (tempBindingModel.range.location == range.location
+                && tempBindingModel.range.length == range.length) {
+                    NSLog(@"点击了: %@",tempBindingModel.name);
+                }
+            }
+        }];
+        
+    }
     self.yyLabel.attributedText = muAttriSting;
 }
 

@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A6159C6C26395754007AE312 /* SysTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C6A26395754007AE312 /* SysTextView.m */; };
-		A6159C6D26395754007AE312 /* SysTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6159C6B26395754007AE312 /* SysTextView.xib */; };
 		A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C79263A95A6007AE312 /* TextViewBinding.m */; };
 		A6522622262D731200576F88 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522621262D731200576F88 /* User.m */; };
 		A652265E262E6A5500576F88 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262B262E6A5500576F88 /* YYTextView.m */; };
@@ -52,9 +50,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A6159C6926395754007AE312 /* SysTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SysTextView.h; sourceTree = "<group>"; };
-		A6159C6A26395754007AE312 /* SysTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SysTextView.m; sourceTree = "<group>"; };
-		A6159C6B26395754007AE312 /* SysTextView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SysTextView.xib; sourceTree = "<group>"; };
 		A6159C78263A95A6007AE312 /* TextViewBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextViewBinding.h; sourceTree = "<group>"; };
 		A6159C79263A95A6007AE312 /* TextViewBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextViewBinding.m; sourceTree = "<group>"; };
 		A6522620262D731200576F88 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
@@ -259,9 +254,6 @@
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
-				A6159C6926395754007AE312 /* SysTextView.h */,
-				A6159C6A26395754007AE312 /* SysTextView.m */,
-				A6159C6B26395754007AE312 /* SysTextView.xib */,
 				A6159C7C263A95C3007AE312 /* TextViewBinding */,
 				C9DFE30D262F20F2001FBAAE /* ListVC */,
 				C9DFE30B262F20DB001FBAAE /* YYTextViewVC */,
@@ -387,7 +379,6 @@
 				C9BF91472633E01D005B25DB /* YYTextViewCell.xib in Resources */,
 				A69DC410262D50C800A4ABF7 /* ListViewController.xib in Resources */,
 				A69DC39C262D160700A4ABF7 /* Main.storyboard in Resources */,
-				A6159C6D26395754007AE312 /* SysTextView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,7 +405,6 @@
 				C9BF914D2633E61F005B25DB /* DataModel.m in Sources */,
 				A6522662262E6A5500576F88 /* YYTextInput.m in Sources */,
 				A652266D262E6A5500576F88 /* YYTextRubyAnnotation.m in Sources */,
-				A6159C6C26395754007AE312 /* SysTextView.m in Sources */,
 				A652266F262E6A5500576F88 /* NSParagraphStyle+YYText.m in Sources */,
 				A69DC393262D160700A4ABF7 /* AppDelegate.m in Sources */,
 				A6522672262E6A5500576F88 /* YYTextTransaction.m in Sources */,

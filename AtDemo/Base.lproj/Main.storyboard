@@ -28,21 +28,11 @@
                                     <action selector="pushYYTextViewVC:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Yjb-BH-Tkn"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V45-KC-Ys4">
-                                <rect key="frame" x="114.5" y="346" width="185" height="48"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="UITextViewVC"/>
-                                <connections>
-                                    <action selector="pushUITextViewVC:" destination="BYZ-38-t0r" eventType="touchUpInside" id="url-gZ-I7i"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="MTw-Za-hdt" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Byk-Eg-F8J"/>
-                            <constraint firstItem="V45-KC-Ys4" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="EC5-vU-C6Y"/>
                             <constraint firstItem="MTw-Za-hdt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="It3-pu-cnV"/>
-                            <constraint firstItem="MTw-Za-hdt" firstAttribute="top" secondItem="V45-KC-Ys4" secondAttribute="bottom" constant="30" id="okH-Si-C3F"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Qty-4a-gTa"/>

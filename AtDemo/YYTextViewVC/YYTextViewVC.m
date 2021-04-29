@@ -8,23 +8,27 @@
 #import "YYTextViewVC.h"
 #import "ListViewController.h"
 
-#import "YYText.h"
 #import "YYTextViewCell.h"
+
+#import "TextViewBinding.h"
 
 #import "HNWKeyboardMonitor.h"
 
-#define NIMInputAtStartChar  @"@"
-#define NIMInputAtEndChar    @" " 
-
-@interface YYTextViewVC ()<YYTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface YYTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet YYTextView *yyTextView;
-//@property (strong, nonatomic) NSMutableArray<User *> *usersList;
+@property (weak, nonatomic) IBOutlet UITextView *textView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *yyTextViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
 
+/// 改变Range
+@property (assign, nonatomic) NSRange changeRange;
+/// 是否改变
+@property (assign, nonatomic) BOOL isChanged;
+/// 光标位置
+@property (assign, nonatomic) NSInteger cursorLocation;
 @property (strong, nonatomic) NSMutableArray *dataArray;
+
 @end
 
 @implementation YYTextViewVC
@@ -32,7 +36,6 @@
 #pragma mark - life
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    self.usersList = [NSMutableArray array];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"YYTextViewVC";
     
@@ -57,14 +60,9 @@
     }
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:@""];
-
-    self.yyTextView.delegate = self;
-    self.yyTextView.font = [UIFont systemFontOfSize:25];
-    self.yyTextView.attributedText = text;
-    self.yyTextView.selectedRange = NSMakeRange(0, 0);
-
-    [self.yyTextView becomeFirstResponder];
+    
+    self.textView.font = [UIFont systemFontOfSize:17];
+    [self.textView becomeFirstResponder];
 }
 
 - (void)initTableView {
@@ -75,32 +73,69 @@
          forCellReuseIdentifier:NSStringFromClass(YYTextViewCell.class)];
 }
 
+- (void)updateUI {
+    CGRect frame = [self.textView.attributedText boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width-85, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
+    CGFloat h = frame.size.height;
+    if (h <= 44) {
+        h = 44;
+    }
+    self.yyTextViewConstraintH.constant = h;
+}
+
 #pragma mark - other
-- (void)showLogInfo {
-//    if (self.usersList.count) {
-//        for (User *tempUser in self.usersList) {
-//            NSLog(@"user info - name:%@ - location:%ld",tempUser.atName, tempUser.range.location);
-//        }
-//    } else {
-//        NSLog(@"xwh list is a Empty");
-//    }
-//    NSLog(@"\n\n");
+- (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
+    NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
+    __block NSMutableArray *results = [NSMutableArray array];
+    [traveAStr enumerateAttributesInRange:NSMakeRange(0, traveAStr.length)
+                                  options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+                               usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+        if (attrs[TextBindingAttributeName]) {
+            TextViewBinding *bingdingModel = attrs[TextBindingAttributeName];
+            bingdingModel.range = range;
+            [results addObject:bingdingModel];
+        }
+    }];
+    return results;
+}
+
+- (IBAction)onActionInsert:(UIButton *)sender {
+    ListViewController *vc = [[ListViewController alloc]init];
+    [self presentViewController:vc animated:NO completion:nil];
+    vc.block = ^(NSInteger index, User * _Nonnull user) {
+        
+        NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
+        TextViewBinding *topicBinding = [[TextViewBinding alloc]initWithName:user.name
+                                                                      userId:user.userId];
+        
+        [self.textView insertText:insertText];
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.redColor,
+                                     NSFontAttributeName : [UIFont systemFontOfSize:17],
+                                     TextBindingAttributeName:topicBinding }
+                            range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+        self.textView.attributedText = tmpAString;
+
+    };
 }
 
 - (void)done {
     [self.view endEditing:YES];
     
-    [self showLogInfo];
+    NSArray *results = [self getResultsListArray:self.textView.attributedText];
+    NSLog(@"\n输出打印:");
+    for (TextViewBinding *model in results) {
+        NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
+    }
     
-//    DataModel *model = [[DataModel alloc]init];
-//    model.userList = self.usersList;
-//    model.text = self.yyTextView.text;
-//    [self.dataArray addObject:model];
-//
-//    [self.usersList removeAllObjects];
-    self.yyTextView.text = nil;
-//
-//    [self.tableView reloadData];
+    DataModel *model = [[DataModel alloc]init];
+    model.userList = results;
+    model.text = self.textView.text;
+    [self.dataArray addObject:model];
+    
+    self.textView.text = nil;
+    [self updateUI];
+
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
@@ -121,176 +156,86 @@
     return cell;
 }
 
-#pragma mark - YYTextViewDelegate
-- (void)textViewDidChange:(YYTextView *)textView {
-    //
+#pragma mark - UITextViewDelegate
+- (void)textViewDidChangeSelection:(UITextView *)textView {
+    NSArray *results = [self getResultsListArray:nil];
+    BOOL inRange = NO;
+//    NSRange tempRange = NSMakeRange(0, 0);
+    for (NSInteger i = 0; i < results.count; i++) {
+        TextViewBinding *model = results[i];
+        NSRange range = model.range;
+        if (textView.selectedRange.location > range.location && textView.selectedRange.location < range.location + range.length) {
+            inRange = YES;
+//            tempRange = range;
+            break;
+        }
+    }
+    if (inRange) {
+        textView.selectedRange = NSMakeRange(self.cursorLocation, textView.selectedRange.length);
+//        NSInteger location = self.cursorLocation-tempRange.length;
+//        if (self.cursorLocation<textView.selectedRange.location) {
+//            location = self.cursorLocation+tempRange.length;
+//        }
+//        textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
+        return;
+    }
+    self.cursorLocation = textView.selectedRange.location;
+
 }
 
-- (BOOL)textView:(YYTextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if ([text isEqualToString:@""]) {
-        return YES;
+- (void)textViewDidChange:(UITextView *)textView {
+    if (_isChanged) {
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+        _textView.attributedText = tmpAString;
+        _isChanged = NO;
     }
-    if ([text isEqualToString:NIMInputAtStartChar]) {
-        [self pushListVAtTextInRange:range];
-        return NO;
-    }
-    
-    CGRect frame = [textView.attributedText boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
-    CGFloat h = frame.size.height;
-    if (h <= 44) {
-        h = 44;
-    }
-#warning <#message#>
-    // 普通字符串的中间插入，则需要更新插入后元素的location
-    self.yyTextViewConstraintH.constant = h;
-//    [self.view layoutIfNeeded];
-   
-    return YES;
-    NSLog(@"变动打印:");
-    [self showLogInfo];
-    return YES;
-//#warning 删除，定位不准确
-//    if ([text isEqualToString:@""]) {
-//        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-//            NSMutableArray *userListCopy = [NSMutableArray arrayWithArray:self.usersList];
-//            // 寻找删除的index
-//            NSInteger deleteIndex = 0;
-//            User *deleteUser = nil;
-//            for (int i = 0; i < userListCopy.count; i++) {
-//                User *tempUser = userListCopy[i];
-//                NSInteger selectLocation = range.location;
-//                NSInteger tempLocation = tempUser.range.location;
-//                if (tempLocation == selectLocation) {
-//                    deleteIndex = i;
-//                    deleteUser = tempUser;
-//                    NSLog(@"单个删除: %@ - %ld",tempUser.atName, tempUser.range.location);
-//                    [self.usersList removeObject:tempUser];
-//                    break;
-//                }
-//            }
-//
-//            // 若有删除，则需要更新插入后元素的location
-//            if (deleteUser) {
-//                for (int i = 0; i < self.usersList.count; i++) {
-//                    User *tempUser = self.usersList[i];
-//                    if (i >= deleteIndex) {
-//                        tempUser.range = NSMakeRange(tempUser.range.location-deleteUser.range.length, tempUser.range.length);
-//                    }
-//                }
-//            } else {
-//                NSInteger deleteIndex = range.location;
-//                for (int i = 0; i < self.usersList.count; i++) {
-//                    User *tempUser = self.usersList[i];
-//                    if (tempUser.range.location > deleteIndex) {
-//                        tempUser.range = NSMakeRange(tempUser.range.location-range.length, tempUser.range.length);
-//                    }
-//                }
-//            }
-//            NSLog(@"删除打印:");
-//            [self showLogInfo];
-//        }];
-//    } else {
-//
-//
-//
-//        // 单个字符串处理
-//        NSRange effectiveRange;
-////        YYTextBinding *binding = [textView.attributedText attribute:YYTextBindingAttributeName atIndex:range.location longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, textView.attributedText.length-1)];
-////        if (binding == nil) {
-////            // 字符串插入
-////            NSInteger insertIndex = range.location;
-////            for (int i = 0; i < self.usersList.count; i++) {
-////                User *tempUser = self.usersList[i];
-////                if (tempUser.range.location >= insertIndex) {
-////                    tempUser.range = NSMakeRange(tempUser.range.location+range.length, tempUser.range.length);
-////                }
-////            }
-////
-////            NSLog(@"插入字符串打印:");
-////            [self showLogInfo];
-////        }
-//        NSRange insertRange = range;
-//        [textView.attributedText enumerateAttributesInRange:NSMakeRange(0, textView.attributedText.length)
-//                                                    options:NSAttributedStringEnumerationReverse
-//                                                 usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-//            if (attrs[YYTextBindingAttributeName] == nil) {
-//                // 字符串插入
-//                NSInteger insertIndex = insertRange.location;
-//                for (int i = 0; i < self.usersList.count; i++) {
-//                    User *tempUser = self.usersList[i];
-//                    if (tempUser.range.location >= insertIndex) {
-//                        tempUser.range = NSMakeRange(tempUser.range.location+insertRange.length, tempUser.range.length);
-//                    }
-//                }
-//
-//                NSLog(@"插入字符串打印:");
-//                [self showLogInfo];
-//            }
-//        }];
-////        [textView.attributedText enumerateAttribute:YYTextBindingAttributeName inRange:range options:NSAttributedStringEnumerationReverse usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-////            NSLog(@"插入字符串打印:");
-////
-////        }];
-//
-//    }
 }
 
-- (void)pushListVAtTextInRange:(NSRange)range {
-    ListViewController *vc = [[ListViewController alloc]init];
-    [self presentViewController:vc animated:NO completion:nil];
-    vc.block = ^(NSInteger index, User * _Nonnull user1) {
-
-        NSString *newAtUserName = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,user1.name,NIMInputAtEndChar];
-        User *newAtUser = [[User alloc]init];
-//        newAtUser.atName = newAtUserName;
-        newAtUser.range = NSMakeRange(range.location, newAtUserName.length);
-
-//        NSInteger insertIndex = 0;
-//        for (int i = 0; i < self.usersList.count; i++) {
-//            User *tempUser = self.usersList[i];
-//            NSInteger selectLocation = range.location;
-//            NSInteger tempLocation = tempUser.range.location;
-//            NSInteger tempLength = tempUser.range.length;
-//            if (selectLocation >= tempLocation) {
-//                insertIndex = i;
-//            }
-//            // 解决最后插入的问题
-//            if (tempLocation+tempLength <= selectLocation) {
-//                insertIndex = i+1;
-//            }
-//        }
-//
-//        // 中间插入，则需要更新插入后元素的location
-//        if (insertIndex < self.usersList.count) {
-//            for (int i = 0; i < self.usersList.count; i++) {
-//                User *tempUser = self.usersList[i];
-//                if (i >= insertIndex) {
-//                    tempUser.range = NSMakeRange(tempUser.range.location+user.range.length, tempUser.range.length);
-//                }
-//            }
-//        }
-//
-//        [self.usersList insertObject:user atIndex:insertIndex];
-
-        // 若地方不对，则需更新usersList
-        NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithAttributedString:self.yyTextView.attributedText];
-        
-        [muAttriSting insertAttributedString:[[NSAttributedString alloc]initWithString:newAtUserName] atIndex:newAtUser.range.location];
-        
-        NSRange bindlingRange = newAtUser.range;
-        YYTextBinding *binding = [YYTextBinding bindingWithDeleteConfirm:YES];
-       
-        [muAttriSting yy_setTextBinding:binding range:bindlingRange]; /// Text binding
-        [muAttriSting yy_setColor:UIColor.redColor range:bindlingRange];
-        
-        [muAttriSting yy_setFont:[UIFont systemFontOfSize:25] range:NSMakeRange(0, muAttriSting.length)];
-        [self.yyTextView setAttributedText:muAttriSting];
-        
-//        self.yyTextView.selectedRange = NSMakeRange(bindlingRange.location+bindlingRange.length, 0);
-        
-        NSLog(@"插入@打印:");
-    };
-    [self showLogInfo];
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if ([text isEqualToString:@""]) { // 删除
+        NSArray *results = [self getResultsListArray:nil];
+        for (NSInteger i = 0; i < results.count; i++) {
+            TextViewBinding *model = results[i];
+            NSRange tmpRange = model.range;
+            if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
+                if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
+                    // 第二次点击删除按钮 删除
+                    [self updateUI];
+                    return YES;
+                } else {
+                    // 第一次点击删除按钮 选中
+                    textView.selectedRange = tmpRange;
+                    [self updateUI];
+                    return NO;
+                }
+            }
+        }
+    } else { // 增加
+        NSArray *results = [self getResultsListArray:nil];
+        if ([results count]) {
+            for (NSInteger i = 0; i < results.count; i++) {
+                TextViewBinding *model = results[i];
+                NSRange tmpRange = model.range;
+                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+                    _changeRange = NSMakeRange(range.location, text.length);
+                    _isChanged = YES;
+                    [self updateUI];
+                    return YES;
+                }
+            }
+        } else {
+            // 在第一个删除后 重置text color
+            if (!range.location) {
+                _changeRange = NSMakeRange(range.location, text.length);
+                _isChanged = YES;
+                [self updateUI];
+                return YES;
+            }
+        }
+    }
+    [self updateUI];
+    return YES;
 }
 
 #pragma mark HNWKeyboardMonitorDelegate

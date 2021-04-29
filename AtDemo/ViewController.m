@@ -3,7 +3,7 @@
 
 #import "ViewController.h"
 #import "YYTextViewVC.h"
-#import "SysTextView.h"
+
 
 @interface ViewController ()
 
@@ -16,14 +16,8 @@
     
     self.navigationItem.title = @"ATDemo";
 
-    [self performSelector:@selector(pushUITextViewVC:) withObject:nil afterDelay:1];
+    [self performSelector:@selector(pushYYTextViewVC:) withObject:nil afterDelay:1];
 }
-
-- (IBAction)pushUITextViewVC:(UIButton *)sender {
-    SysTextView *vc = [[SysTextView alloc]init];
-    [self.navigationController pushViewController:vc animated:YES];
-}
-
 
 - (IBAction)pushYYTextViewVC:(UIButton *)sender {
     YYTextViewVC *vc = [[YYTextViewVC alloc]init];
