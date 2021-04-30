@@ -31,7 +31,7 @@
     NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
     muAttriSting.yy_font = [UIFont systemFontOfSize:25];
     for (TextViewBinding *bindingModel in model.userList) {
-        [muAttriSting yy_setTextHighlightRange:bindingModel.range color:[UIColor blueColor] backgroundColor:UIColor.redColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+        [muAttriSting yy_setTextHighlightRange:bindingModel.range color:UIColor.redColor backgroundColor:UIColor.darkGrayColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
             
             for (TextViewBinding *tempBindingModel in model.userList) {
                 if (tempBindingModel.range.location == range.location

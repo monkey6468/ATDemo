@@ -27,8 +27,11 @@
 @property (assign, nonatomic) BOOL isChanged;
 /// 光标位置
 @property (assign, nonatomic) NSInteger cursorLocation;
+/// 插入非特殊文本标记
+@property (assign, nonatomic) BOOL bInsertTextFlag;
+
 @property (strong, nonatomic) NSMutableArray *dataArray;
-@property (assign, nonatomic) BOOL bInsert; // 插入
+
 @end
 
 @implementation YYTextViewVC
@@ -113,8 +116,11 @@
                                      NSFontAttributeName : [UIFont systemFontOfSize:17],
                                      TextBindingAttributeName:topicBinding }
                             range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+        // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
+        NSInteger lastCursorLocation = self.cursorLocation;
         self.textView.attributedText = tmpAString;
-
+        self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
+        self.cursorLocation = lastCursorLocation;
     };
 }
 
@@ -173,9 +179,9 @@
     }
     if (inRange) {
         // 解决光标在‘特殊文本’左右时 无法左右移动的问题
-        NSInteger location = self.cursorLocation-tempRange.length;
+        NSInteger location = tempRange.location;
         if (self.cursorLocation<textView.selectedRange.location) {
-            location = self.cursorLocation+tempRange.length;
+            location = tempRange.location+tempRange.length;
         }
         textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
     }
@@ -188,10 +194,10 @@
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
         [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
         _textView.attributedText = tmpAString;
-        if (_bInsert) {
+        if (_bInsertTextFlag) {
             // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
             _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
-            self.bInsert = NO;
+            self.bInsertTextFlag = NO;
         }
         _isChanged = NO;
     }
@@ -225,7 +231,7 @@
                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                     _changeRange = NSMakeRange(range.location, text.length);
                     
-                    _bInsert = YES;
+                    _bInsertTextFlag = YES;
                     _isChanged = YES;
                     [self updateUI];
                     return YES;
