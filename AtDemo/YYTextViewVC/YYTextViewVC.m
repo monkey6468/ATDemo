@@ -28,7 +28,7 @@
 /// 光标位置
 @property (assign, nonatomic) NSInteger cursorLocation;
 @property (strong, nonatomic) NSMutableArray *dataArray;
-
+@property (assign, nonatomic) BOOL bInsert; // 插入
 @end
 
 @implementation YYTextViewVC
@@ -160,24 +160,24 @@
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSArray *results = [self getResultsListArray:nil];
     BOOL inRange = NO;
-//    NSRange tempRange = NSMakeRange(0, 0);
+    NSRange tempRange = NSMakeRange(0, 0);
     for (NSInteger i = 0; i < results.count; i++) {
         TextViewBinding *model = results[i];
         NSRange range = model.range;
-        if (textView.selectedRange.location > range.location && textView.selectedRange.location < range.location + range.length) {
+        if (textView.selectedRange.location > range.location
+            && textView.selectedRange.location < range.location + range.length) {
             inRange = YES;
-//            tempRange = range;
+            tempRange = range;
             break;
         }
     }
     if (inRange) {
-        textView.selectedRange = NSMakeRange(self.cursorLocation, textView.selectedRange.length);
-//        NSInteger location = self.cursorLocation-tempRange.length;
-//        if (self.cursorLocation<textView.selectedRange.location) {
-//            location = self.cursorLocation+tempRange.length;
-//        }
-//        textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
-        return;
+        // 解决光标在‘特殊文本’左右时 无法左右移动的问题
+        NSInteger location = self.cursorLocation-tempRange.length;
+        if (self.cursorLocation<textView.selectedRange.location) {
+            location = self.cursorLocation+tempRange.length;
+        }
+        textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
     }
     self.cursorLocation = textView.selectedRange.location;
 
@@ -188,6 +188,11 @@
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
         [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
         _textView.attributedText = tmpAString;
+        if (_bInsert) {
+            // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
+            _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
+            self.bInsert = NO;
+        }
         _isChanged = NO;
     }
 }
@@ -219,6 +224,8 @@
                 NSRange tmpRange = model.range;
                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                     _changeRange = NSMakeRange(range.location, text.length);
+                    
+                    _bInsert = YES;
                     _isChanged = YES;
                     [self updateUI];
                     return YES;
