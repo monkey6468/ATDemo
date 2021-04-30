@@ -1,5 +1,5 @@
 //
-//  YYTextViewVC.h
+//  SysTextViewVC.h
 //  AtDemo
 //
 //  Created by XWH on 2021/4/20.
@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YYTextViewVC : UIViewController
+@interface SysTextViewVC : UIViewController
 
 @end
 

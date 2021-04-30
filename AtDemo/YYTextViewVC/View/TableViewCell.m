@@ -1,23 +1,23 @@
 //
-//  YYTextViewCell.m
+//  TableViewCell.m
 //  AtDemo
 //
 //  Created by XWH on 2021/4/24.
 //
 
-#import "YYTextViewCell.h"
+#import "TableViewCell.h"
 #import "YYLabel.h"
 #import "YYText.h"
 
 #import "TextViewBinding.h"
 
-@interface YYTextViewCell ()
+@interface TableViewCell ()
 
 @property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
 
 @end
 
-@implementation YYTextViewCell
+@implementation TableViewCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];

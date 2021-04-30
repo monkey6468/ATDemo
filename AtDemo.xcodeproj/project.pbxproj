@@ -42,11 +42,11 @@
 		A69DC40F262D50C800A4ABF7 /* ListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A69DC40D262D50C800A4ABF7 /* ListViewController.m */; };
 		A69DC410262D50C800A4ABF7 /* ListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A69DC40E262D50C800A4ABF7 /* ListViewController.xib */; };
 		C971A7882633CAC90099608D /* HNWKeyboardMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C971A7872633CAC90099608D /* HNWKeyboardMonitor.m */; };
-		C9BF91462633E01D005B25DB /* YYTextViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BF91442633E01D005B25DB /* YYTextViewCell.m */; };
-		C9BF91472633E01D005B25DB /* YYTextViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9BF91452633E01D005B25DB /* YYTextViewCell.xib */; };
+		C9BF91462633E01D005B25DB /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BF91442633E01D005B25DB /* TableViewCell.m */; };
+		C9BF91472633E01D005B25DB /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9BF91452633E01D005B25DB /* TableViewCell.xib */; };
 		C9BF914D2633E61F005B25DB /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BF914C2633E61F005B25DB /* DataModel.m */; };
-		C9DFE307262F1FEC001FBAAE /* YYTextViewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C9DFE305262F1FEC001FBAAE /* YYTextViewVC.m */; };
-		C9DFE308262F1FEC001FBAAE /* YYTextViewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9DFE306262F1FEC001FBAAE /* YYTextViewVC.xib */; };
+		C9DFE307262F1FEC001FBAAE /* SysTextViewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */; };
+		C9DFE308262F1FEC001FBAAE /* SysTextViewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,14 +118,14 @@
 		A69DC40E262D50C800A4ABF7 /* ListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListViewController.xib; sourceTree = "<group>"; };
 		C971A7862633CAC90099608D /* HNWKeyboardMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HNWKeyboardMonitor.h; sourceTree = "<group>"; };
 		C971A7872633CAC90099608D /* HNWKeyboardMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HNWKeyboardMonitor.m; sourceTree = "<group>"; };
-		C9BF91432633E01D005B25DB /* YYTextViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYTextViewCell.h; sourceTree = "<group>"; };
-		C9BF91442633E01D005B25DB /* YYTextViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYTextViewCell.m; sourceTree = "<group>"; };
-		C9BF91452633E01D005B25DB /* YYTextViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = YYTextViewCell.xib; sourceTree = "<group>"; };
+		C9BF91432633E01D005B25DB /* TableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TableViewCell.h; sourceTree = "<group>"; };
+		C9BF91442633E01D005B25DB /* TableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TableViewCell.m; sourceTree = "<group>"; };
+		C9BF91452633E01D005B25DB /* TableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
 		C9BF914B2633E61F005B25DB /* DataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataModel.h; sourceTree = "<group>"; };
 		C9BF914C2633E61F005B25DB /* DataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
-		C9DFE304262F1FEC001FBAAE /* YYTextViewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYTextViewVC.h; sourceTree = "<group>"; };
-		C9DFE305262F1FEC001FBAAE /* YYTextViewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYTextViewVC.m; sourceTree = "<group>"; };
-		C9DFE306262F1FEC001FBAAE /* YYTextViewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = YYTextViewVC.xib; sourceTree = "<group>"; };
+		C9DFE304262F1FEC001FBAAE /* SysTextViewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SysTextViewVC.h; sourceTree = "<group>"; };
+		C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SysTextViewVC.m; sourceTree = "<group>"; };
+		C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SysTextViewVC.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -269,9 +269,9 @@
 		C9BF91422633E008005B25DB /* View */ = {
 			isa = PBXGroup;
 			children = (
-				C9BF91432633E01D005B25DB /* YYTextViewCell.h */,
-				C9BF91442633E01D005B25DB /* YYTextViewCell.m */,
-				C9BF91452633E01D005B25DB /* YYTextViewCell.xib */,
+				C9BF91432633E01D005B25DB /* TableViewCell.h */,
+				C9BF91442633E01D005B25DB /* TableViewCell.m */,
+				C9BF91452633E01D005B25DB /* TableViewCell.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -290,9 +290,9 @@
 			children = (
 				C9BF91492633E608005B25DB /* Model */,
 				C9BF91422633E008005B25DB /* View */,
-				C9DFE304262F1FEC001FBAAE /* YYTextViewVC.h */,
-				C9DFE305262F1FEC001FBAAE /* YYTextViewVC.m */,
-				C9DFE306262F1FEC001FBAAE /* YYTextViewVC.xib */,
+				C9DFE304262F1FEC001FBAAE /* SysTextViewVC.h */,
+				C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */,
+				C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */,
 			);
 			path = YYTextViewVC;
 			sourceTree = "<group>";
@@ -374,9 +374,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A69DC3A1262D160A00A4ABF7 /* LaunchScreen.storyboard in Resources */,
-				C9DFE308262F1FEC001FBAAE /* YYTextViewVC.xib in Resources */,
+				C9DFE308262F1FEC001FBAAE /* SysTextViewVC.xib in Resources */,
 				A69DC39E262D160A00A4ABF7 /* Assets.xcassets in Resources */,
-				C9BF91472633E01D005B25DB /* YYTextViewCell.xib in Resources */,
+				C9BF91472633E01D005B25DB /* TableViewCell.xib in Resources */,
 				A69DC410262D50C800A4ABF7 /* ListViewController.xib in Resources */,
 				A69DC39C262D160700A4ABF7 /* Main.storyboard in Resources */,
 			);
@@ -392,7 +392,7 @@
 				A6522622262D731200576F88 /* User.m in Sources */,
 				A652266A262E6A5500576F88 /* YYTextParser.m in Sources */,
 				A6522669262E6A5500576F88 /* YYTextRunDelegate.m in Sources */,
-				C9DFE307262F1FEC001FBAAE /* YYTextViewVC.m in Sources */,
+				C9DFE307262F1FEC001FBAAE /* SysTextViewVC.m in Sources */,
 				A652265F262E6A5500576F88 /* YYTextMagnifier.m in Sources */,
 				A6522661262E6A5500576F88 /* YYTextEffectWindow.m in Sources */,
 				A6522671262E6A5500576F88 /* UIPasteboard+YYText.m in Sources */,
@@ -417,7 +417,7 @@
 				A652266C262E6A5500576F88 /* YYTextArchiver.m in Sources */,
 				A6522663262E6A5500576F88 /* YYTextLayout.m in Sources */,
 				A6522673262E6A5500576F88 /* UIView+YYText.m in Sources */,
-				C9BF91462633E01D005B25DB /* YYTextViewCell.m in Sources */,
+				C9BF91462633E01D005B25DB /* TableViewCell.m in Sources */,
 				A6522666262E6A5500576F88 /* YYTextKeyboardManager.m in Sources */,
 				A6522675262E6A5500576F88 /* YYTextWeakProxy.m in Sources */,
 				A6522664262E6A5500576F88 /* YYTextLine.m in Sources */,

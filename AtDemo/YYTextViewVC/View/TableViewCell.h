@@ -1,5 +1,5 @@
 //
-//  YYTextViewCell.h
+//  TableViewCell.h
 //  AtDemo
 //
 //  Created by XWH on 2021/4/24.
@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YYTextViewCell : UITableViewCell
+@interface TableViewCell : UITableViewCell
 
 @property (strong, nonatomic) DataModel *model;
 

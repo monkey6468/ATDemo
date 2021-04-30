@@ -1,24 +1,24 @@
 //
-//  YYTextViewVC.m
+//  SysTextViewVC.m
 //  AtDemo
 //
 //  Created by XWH on 2021/4/20.
 //
 
-#import "YYTextViewVC.h"
+#import "SysTextViewVC.h"
 #import "ListViewController.h"
 
-#import "YYTextViewCell.h"
+#import "TableViewCell.h"
 
 #import "TextViewBinding.h"
 
 #import "HNWKeyboardMonitor.h"
 
-@interface YYTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface SysTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *yyTextViewConstraintH;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
 
 /// 改变Range
@@ -34,13 +34,13 @@
 
 @end
 
-@implementation YYTextViewVC
+@implementation SysTextViewVC
 
 #pragma mark - life
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"YYTextViewVC";
+    self.navigationItem.title = @"TextViewVC";
     
     [self settingUI];
     [self initTableView];
@@ -71,9 +71,9 @@
 - (void)initTableView {
     self.tableView.tableFooterView = UIView.new;
     
-    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([YYTextViewCell class])
+    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([TableViewCell class])
                                                bundle:nil]
-         forCellReuseIdentifier:NSStringFromClass(YYTextViewCell.class)];
+         forCellReuseIdentifier:NSStringFromClass(TableViewCell.class)];
 }
 
 - (void)updateUI {
@@ -82,7 +82,7 @@
     if (h <= 44) {
         h = 44;
     }
-    self.yyTextViewConstraintH.constant = h;
+    self.textViewConstraintH.constant = h;
 }
 
 #pragma mark - other
@@ -151,12 +151,12 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     DataModel *model = self.dataArray[indexPath.row];
-    return [YYTextViewCell rowHeightWithModel:model];
+    return [TableViewCell rowHeightWithModel:model];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    YYTextViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(YYTextViewCell.class)];
+    TableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(TableViewCell.class)];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.model = self.dataArray[indexPath.row];
     return cell;

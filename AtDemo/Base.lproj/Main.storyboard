@@ -21,11 +21,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MTw-Za-hdt">
-                                <rect key="frame" x="130" y="424" width="154" height="48"/>
+                                <rect key="frame" x="127" y="424" width="160" height="48"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal" title="YYTextView"/>
+                                <state key="normal" title="SysTextView"/>
                                 <connections>
-                                    <action selector="pushYYTextViewVC:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Yjb-BH-Tkn"/>
+                                    <action selector="pushSysTextViewVC:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Wir-2x-DLp"/>
                                 </connections>
                             </button>
                         </subviews>
