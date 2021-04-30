@@ -112,7 +112,7 @@
         
         [self.textView insertText:insertText];
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.redColor,
+        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.blackColor,
                                      NSFontAttributeName : [UIFont systemFontOfSize:17],
                                      TextBindingAttributeName:topicBinding }
                             range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
@@ -190,6 +190,17 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
+    UITextRange *selectedRange = [textView markedTextRange];
+    if (selectedRange) {
+        _isChanged = NO;
+        
+//        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+//        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.cursorLocation-1, 1)];
+//        NSRange oldRange = textView.selectedRange;
+//        textView.attributedText = tmpAString;
+//        [textView setMarkedText:@"a" selectedRange:NSMakeRange(self.cursorLocation-1, 1)];
+    }
+
     if (_isChanged) {
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
         [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
