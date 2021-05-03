@@ -190,24 +190,50 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    UITextRange *range = [textView markedTextRange];
-    UITextPosition *position = [textView positionFromPosition:range.start offset:0];
-    if (!position) {
-        if (_isChanged) {
-            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-            [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
-            _textView.attributedText = tmpAString;
-            if (_bInsertTextFlag) {
-                // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
-                _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
-                self.bInsertTextFlag = NO;
-            }
-            _isChanged = NO;
+    if (_isChanged) {
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+        _textView.attributedText = tmpAString;
+        if (_bInsertTextFlag) {
+            // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
+            _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
+            self.bInsertTextFlag = NO;
         }
+        _isChanged = NO;
     }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
+    if (NSMaxRange(range) == textView.textStorage.length) {
+        if(textView.textStorage.length != 0) {
+            UIFont * defaultFont = [UIFont systemFontOfSize:17];
+            UIColor * defaultColor = [UIColor blackColor];
+            
+            __block BOOL isOld = YES;
+            [textView.textStorage enumerateAttributesInRange:NSMakeRange(textView.textStorage.length - 1, 1) options:NSAttributedStringEnumerationReverse usingBlock:^(NSDictionary<NSString *,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+                
+                if(attrs.allKeys.count > 2) {
+                    isOld = NO;
+                    *stop = YES;
+                }
+                
+                UIFont * fontL = attrs[NSFontAttributeName];
+                UIColor * colorL = attrs[NSForegroundColorAttributeName];
+                if(![fontL.fontName isEqualToString:defaultFont.fontName] ||
+                   fontL.pointSize != defaultFont.pointSize ||
+                   ![colorL isEqual:defaultColor]) {
+                    isOld = NO;
+                    *stop = YES;
+                }
+            }];
+            
+            if(!isOld) {
+                self.textView.typingAttributes = @{NSFontAttributeName:defaultFont,NSForegroundColorAttributeName:defaultColor};
+            }
+        }
+    }
+    
     if ([text isEqualToString:@""]) { // 删除
         NSArray *results = [self getResultsListArray:nil];
         for (NSInteger i = 0; i < results.count; i++) {
