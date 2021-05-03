@@ -112,7 +112,7 @@
         
         [self.textView insertText:insertText];
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.blackColor,
+        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.redColor,
                                      NSFontAttributeName : [UIFont systemFontOfSize:17],
                                      TextBindingAttributeName:topicBinding }
                             range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
@@ -190,27 +190,20 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    UITextRange *selectedRange = [textView markedTextRange];
-    if (selectedRange) {
-        _isChanged = NO;
-        
-//        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-//        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:NSMakeRange(self.cursorLocation-1, 1)];
-//        NSRange oldRange = textView.selectedRange;
-//        textView.attributedText = tmpAString;
-//        [textView setMarkedText:@"a" selectedRange:NSMakeRange(self.cursorLocation-1, 1)];
-    }
-
-    if (_isChanged) {
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
-        _textView.attributedText = tmpAString;
-        if (_bInsertTextFlag) {
-            // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
-            _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
-            self.bInsertTextFlag = NO;
+    UITextRange *range = [textView markedTextRange];
+    UITextPosition *position = [textView positionFromPosition:range.start offset:0];
+    if (!position) {
+        if (_isChanged) {
+            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+            [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+            _textView.attributedText = tmpAString;
+            if (_bInsertTextFlag) {
+                // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
+                _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
+                self.bInsertTextFlag = NO;
+            }
+            _isChanged = NO;
         }
-        _isChanged = NO;
     }
 }
 
