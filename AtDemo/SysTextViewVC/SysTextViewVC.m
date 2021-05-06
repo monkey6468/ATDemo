@@ -14,6 +14,10 @@
 
 #import "HNWKeyboardMonitor.h"
 
+#define k_defaultFont   [UIFont systemFontOfSize:17]
+#define k_defaultColor  [UIColor blackColor]
+#define k_hightColor    [UIColor redColor]
+
 @interface SysTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
@@ -21,14 +25,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
 
-/// 改变Range
-@property (assign, nonatomic) NSRange changeRange;
-/// 是否改变
-@property (assign, nonatomic) BOOL isChanged;
 /// 光标位置
 @property (assign, nonatomic) NSInteger cursorLocation;
-/// 插入非特殊文本标记
-@property (assign, nonatomic) BOOL bInsertTextFlag;
 
 @property (strong, nonatomic) NSMutableArray *dataArray;
 
@@ -64,7 +62,7 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
-    self.textView.font = [UIFont systemFontOfSize:17];
+    self.textView.font = k_defaultFont;
     [self.textView becomeFirstResponder];
 }
 
@@ -104,23 +102,25 @@
 - (IBAction)onActionInsert:(UIButton *)sender {
     ListViewController *vc = [[ListViewController alloc]init];
     [self presentViewController:vc animated:NO completion:nil];
+    
+    __weak typeof(self) weakSelf = self;
     vc.block = ^(NSInteger index, User * _Nonnull user) {
         
         NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
         TextViewBinding *topicBinding = [[TextViewBinding alloc]initWithName:user.name
                                                                       userId:user.userId];
         
-        [self.textView insertText:insertText];
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes: @{NSForegroundColorAttributeName: UIColor.redColor,
-                                     NSFontAttributeName : [UIFont systemFontOfSize:17],
+        [weakSelf.textView insertText:insertText];
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:weakSelf.textView.attributedText];
+        [tmpAString setAttributes: @{NSForegroundColorAttributeName:k_hightColor,
+                                     NSFontAttributeName:k_defaultFont,
                                      TextBindingAttributeName:topicBinding }
-                            range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+                            range:NSMakeRange(weakSelf.textView.selectedRange.location - insertText.length, insertText.length)];
         // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-        NSInteger lastCursorLocation = self.cursorLocation;
-        self.textView.attributedText = tmpAString;
-        self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
-        self.cursorLocation = lastCursorLocation;
+        NSInteger lastCursorLocation = weakSelf.cursorLocation;
+        weakSelf.textView.attributedText = tmpAString;
+        weakSelf.textView.selectedRange = NSMakeRange(lastCursorLocation, weakSelf.textView.selectedRange.length);
+        weakSelf.cursorLocation = lastCursorLocation;
     };
 }
 
@@ -167,71 +167,52 @@
     NSArray *results = [self getResultsListArray:nil];
     BOOL inRange = NO;
     NSRange tempRange = NSMakeRange(0, 0);
+    NSInteger textSelectedLocation = textView.selectedRange.location;
+    NSInteger textSelectedLength = textView.selectedRange.length;
+    
     for (NSInteger i = 0; i < results.count; i++) {
         TextViewBinding *model = results[i];
         NSRange range = model.range;
-        if (textView.selectedRange.location > range.location
-            && textView.selectedRange.location < range.location + range.length) {
-            inRange = YES;
-            tempRange = range;
-            break;
+        if (textSelectedLength == 0) {
+            if (textSelectedLocation > range.location
+                && textSelectedLocation < range.location + range.length) {
+                inRange = YES;
+                tempRange = range;
+                break;
+            }
+        } else {
+            if ((textSelectedLocation > range.location && textSelectedLocation < range.location + range.length)
+                || (textSelectedLocation+textSelectedLength > range.location && textSelectedLocation+textSelectedLength < range.location + range.length)) {
+                inRange = YES;
+                break;
+            }
         }
     }
+    
     if (inRange) {
         // 解决光标在‘特殊文本’左右时 无法左右移动的问题
         NSInteger location = tempRange.location;
-        if (self.cursorLocation<textView.selectedRange.location) {
+        if (self.cursorLocation < textSelectedLocation) {
             location = tempRange.location+tempRange.length;
         }
-        textView.selectedRange = NSMakeRange(location, textView.selectedRange.length);
+        textView.selectedRange = NSMakeRange(location, textSelectedLength);
+        if (textSelectedLength) { // 解决光标在‘特殊文本’内时，文本选中问题
+            textView.selectedRange = NSMakeRange(textSelectedLocation, 0);
+        }
     }
     self.cursorLocation = textView.selectedRange.location;
-
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (_isChanged) {
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
-        _textView.attributedText = tmpAString;
-        if (_bInsertTextFlag) {
-            // 解决光标在‘特殊文本’之后 插入文本 移动到文本最后的问题
-            _textView.selectedRange = NSMakeRange(_changeRange.location+_changeRange.length, self.textView.selectedRange.length);
-            self.bInsertTextFlag = NO;
-        }
-        _isChanged = NO;
+    if (!textView.markedTextRange) {
+        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
     }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
-    if (NSMaxRange(range) == textView.textStorage.length) {
-        if(textView.textStorage.length != 0) {
-            UIFont * defaultFont = [UIFont systemFontOfSize:17];
-            UIColor * defaultColor = [UIColor blackColor];
-            
-            __block BOOL isOld = YES;
-            [textView.textStorage enumerateAttributesInRange:NSMakeRange(textView.textStorage.length - 1, 1) options:NSAttributedStringEnumerationReverse usingBlock:^(NSDictionary<NSString *,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-                
-                if(attrs.allKeys.count > 2) {
-                    isOld = NO;
-                    *stop = YES;
-                }
-                
-                UIFont * fontL = attrs[NSFontAttributeName];
-                UIColor * colorL = attrs[NSForegroundColorAttributeName];
-                if(![fontL.fontName isEqualToString:defaultFont.fontName] ||
-                   fontL.pointSize != defaultFont.pointSize ||
-                   ![colorL isEqual:defaultColor]) {
-                    isOld = NO;
-                    *stop = YES;
-                }
-            }];
-            
-            if(!isOld) {
-                self.textView.typingAttributes = @{NSFontAttributeName:defaultFont,NSForegroundColorAttributeName:defaultColor};
-            }
-        }
+    if (textView.textStorage.length != 0) {
+        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
     }
     
     if ([text isEqualToString:@""]) { // 删除
@@ -252,31 +233,8 @@
                 }
             }
         }
-    } else { // 增加
-        NSArray *results = [self getResultsListArray:nil];
-        if ([results count]) {
-            for (NSInteger i = 0; i < results.count; i++) {
-                TextViewBinding *model = results[i];
-                NSRange tmpRange = model.range;
-                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
-                    _changeRange = NSMakeRange(range.location, text.length);
-                    
-                    _bInsertTextFlag = YES;
-                    _isChanged = YES;
-                    [self updateUI];
-                    return YES;
-                }
-            }
-        } else {
-            // 在第一个删除后 重置text color
-            if (!range.location) {
-                _changeRange = NSMakeRange(range.location, text.length);
-                _isChanged = YES;
-                [self updateUI];
-                return YES;
-            }
-        }
     }
+    
     [self updateUI];
     return YES;
 }

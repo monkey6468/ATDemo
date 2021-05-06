@@ -256,7 +256,7 @@
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
 				A6159C7C263A95C3007AE312 /* TextViewBinding */,
 				C9DFE30D262F20F2001FBAAE /* ListVC */,
-				C9DFE30B262F20DB001FBAAE /* YYTextViewVC */,
+				C9DFE30B262F20DB001FBAAE /* SysTextViewVC */,
 				A69DC39A262D160700A4ABF7 /* Main.storyboard */,
 				A69DC39D262D160A00A4ABF7 /* Assets.xcassets */,
 				A69DC39F262D160A00A4ABF7 /* LaunchScreen.storyboard */,
@@ -285,7 +285,7 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		C9DFE30B262F20DB001FBAAE /* YYTextViewVC */ = {
+		C9DFE30B262F20DB001FBAAE /* SysTextViewVC */ = {
 			isa = PBXGroup;
 			children = (
 				C9BF91492633E608005B25DB /* Model */,
@@ -294,7 +294,7 @@
 				C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */,
 				C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */,
 			);
-			path = YYTextViewVC;
+			path = SysTextViewVC;
 			sourceTree = "<group>";
 		};
 		C9DFE30C262F20E5001FBAAE /* Model */ = {
