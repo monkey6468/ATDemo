@@ -105,23 +105,27 @@
     
     __weak typeof(self) weakSelf = self;
     vc.block = ^(NSInteger index, User * _Nonnull user) {
-        
-        NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-        TextViewBinding *topicBinding = [[TextViewBinding alloc]initWithName:user.name
-                                                                      userId:user.userId];
-        
-        [weakSelf.textView insertText:insertText];
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:weakSelf.textView.attributedText];
-        [tmpAString setAttributes: @{NSForegroundColorAttributeName:k_hightColor,
-                                     NSFontAttributeName:k_defaultFont,
-                                     TextBindingAttributeName:topicBinding }
-                            range:NSMakeRange(weakSelf.textView.selectedRange.location - insertText.length, insertText.length)];
-        // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-        NSInteger lastCursorLocation = weakSelf.cursorLocation;
-        weakSelf.textView.attributedText = tmpAString;
-        weakSelf.textView.selectedRange = NSMakeRange(lastCursorLocation, weakSelf.textView.selectedRange.length);
-        weakSelf.cursorLocation = lastCursorLocation;
+        [weakSelf updateUIWithUser:user];
     };
+}
+
+- (void)updateUIWithUser:(User *)user
+{
+    NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
+    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
+                                                                  userId:user.userId];
+    
+    [self.textView insertText:insertText];
+    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+    [tmpAString setAttributes: @{NSForegroundColorAttributeName:k_hightColor,
+                                 NSFontAttributeName:k_defaultFont,
+                                 TextBindingAttributeName:bindingModel}
+                        range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+    // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
+    NSInteger lastCursorLocation = self.cursorLocation;
+    self.textView.attributedText = tmpAString;
+    self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
+    self.cursorLocation = lastCursorLocation;
 }
 
 - (void)done {
