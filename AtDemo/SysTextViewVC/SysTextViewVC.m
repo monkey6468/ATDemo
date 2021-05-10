@@ -106,6 +106,8 @@
         NSRange resultRange = result.range;
         NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
         if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
+            TextViewBinding *bindingModel = attributedDict[@"test"];
+            bindingModel.range = result.range;
             [rangeArray addObject:NSStringFromRange(result.range)];
         }
     }];
@@ -126,17 +128,21 @@
 
 - (void)updateUIWithUser:(User *)user
 {
-    [self.userListArray addObject:user];
     
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-//    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
-//                                                                  userId:user.userId];
+    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
+                                                                  userId:user.userId];
 
     [self.textView insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-    [tmpAString setAttributes: @{NSForegroundColorAttributeName:k_hightColor,
-                                 NSFontAttributeName:k_defaultFont}
-                        range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
+    NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);
+    [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
+                                NSFontAttributeName:k_defaultFont,
+                                @"test":bindingModel}
+                        range:range];
+    user.range = range;
+    [self.userListArray addObject:user];
+
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
     NSInteger lastCursorLocation = self.cursorLocation;
     self.textView.attributedText = tmpAString;
