@@ -95,7 +95,7 @@
 #pragma mark - other
 #define kATRegular @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 - (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
-    NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
+    __block NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
     __block NSMutableArray *rangeArray = [NSMutableArray array];
     static NSRegularExpression *iExpression;
     iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
@@ -104,9 +104,11 @@
                                     range:NSMakeRange(0, traveAStr.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
+        NSString *ss = [self.textView.text substringWithRange:result.range];
+        NSLog(@"xwh: %@", ss);
         NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
         if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
-            TextViewBinding *bindingModel = attributedDict[@"test"];
+            TextViewBinding *bindingModel = [traveAStr attribute:@"test" atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, ss.length)];
             bindingModel.range = result.range;
             [rangeArray addObject:NSStringFromRange(result.range)];
         }
