@@ -9,6 +9,7 @@
 #import "ListViewController.h"
 
 #import "TableViewCell.h"
+#import "SZTextView.h"
 
 #import "TextViewBinding.h"
 
@@ -20,7 +21,8 @@
 
 @interface SysTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UITextView *textView;
+@property (weak, nonatomic) IBOutlet UITextView *textViewBg;
+@property (strong, nonatomic) UITextView *textView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
@@ -29,6 +31,10 @@
 @property (assign, nonatomic) NSInteger cursorLocation;
 
 @property (strong, nonatomic) NSMutableArray *dataArray;
+/// 改变Range
+@property (assign, nonatomic) NSRange changeRange;
+/// 是否改变
+@property (assign, nonatomic) BOOL isChanged;
 
 @end
 
@@ -56,9 +62,9 @@
 
 #pragma mark - UI
 - (void)settingUI {
-    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
+//    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+//        self.automaticallyAdjustsScrollViewInsets = NO;
+//    }
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
@@ -84,24 +90,61 @@
 }
 
 #pragma mark - other
+#define kATRegular @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 - (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
     NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
-    __block NSMutableArray *results = [NSMutableArray array];
-    [traveAStr enumerateAttributesInRange:NSMakeRange(0, traveAStr.length)
-                                  options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
-                               usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
-        if (attrs[TextBindingAttributeName]) {
-            TextViewBinding *bingdingModel = attrs[TextBindingAttributeName];
-            bingdingModel.range = range;
-            [results addObject:bingdingModel];
+    __block NSMutableArray *rangeArray = [NSMutableArray array];
+    static NSRegularExpression *iExpression;
+    iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
+    [iExpression enumerateMatchesInString:traveAStr.string
+                                  options:0
+                                    range:NSMakeRange(0, traveAStr.string.length)
+                               usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSRange resultRange = result.range;
+        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
+        if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
+            [rangeArray addObject:NSStringFromRange(result.range)];
         }
     }];
-    return results;
+    return rangeArray;
+//    NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
+//    __block NSMutableArray *results = [NSMutableArray array];
+//    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:kATRegular options:NSRegularExpressionCaseInsensitive error:nil];
+//    [traveAStr enumerateAttributesInRange:NSMakeRange(0, traveAStr.length)
+//                                  options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+//                               usingBlock:^(NSDictionary<NSAttributedStringKey,id> * _Nonnull attrs, NSRange range, BOOL * _Nonnull stop) {
+//        if (attrs[TextBindingAttributeName]) {
+//            TextViewBinding *bingdingModel = attrs[TextBindingAttributeName];
+//            bingdingModel.range = NSMakeRange(range.location, bingdingModel.name.length+2);
+//            [results addObject:bingdingModel];
+//        }
+//    }];
+//
+//    [regex enumerateMatchesInString:traveAStr.string
+//                            options:0
+//                              range:NSMakeRange(0, traveAStr.string.length)
+//                         usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+//        NSRange resultRange = result.range;
+//        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
+//        if ([attributedDict[NSForegroundColorAttributeName] isEqual:k_hightColor]) {
+////        if (attrs[TextBindingAttributeName]) {
+//            [results addObject:NSStringFromRange(resultRange)];
+////            TextViewBinding *bingdingModel = nil;//attrs[TextBindingAttributeName];
+////            bingdingModel.range = range;
+////            if (bingdingModel) {
+////                [results addObject:bingdingModel];
+////            }
+//        }
+//    }];
+//    NSArray *newResult = [results valueForKeyPath:@"@distinctUnionOfObjects.self"];
+//    return results;
 }
 
 - (IBAction)onActionInsert:(UIButton *)sender {
     ListViewController *vc = [[ListViewController alloc]init];
-    [self presentViewController:vc animated:NO completion:nil];
+    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
+//    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:nav animated:NO completion:nil];
     
     __weak typeof(self) weakSelf = self;
     vc.block = ^(NSInteger index, User * _Nonnull user) {
@@ -112,14 +155,13 @@
 - (void)updateUIWithUser:(User *)user
 {
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
-                                                                  userId:user.userId];
-    
+//    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
+//                                                                  userId:user.userId];
+
     [self.textView insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
     [tmpAString setAttributes: @{NSForegroundColorAttributeName:k_hightColor,
-                                 NSFontAttributeName:k_defaultFont,
-                                 TextBindingAttributeName:bindingModel}
+                                 NSFontAttributeName:k_defaultFont}
                         range:NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length)];
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
     NSInteger lastCursorLocation = self.cursorLocation;
@@ -132,18 +174,25 @@
     [self.view endEditing:YES];
     
     NSArray *results = [self getResultsListArray:self.textView.attributedText];
-    NSLog(@"\n输出打印:");
-    for (TextViewBinding *model in results) {
-        NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
+    NSLog(@"输出打印:");
+
+    for (id obj in results) {
+        NSLog(@"%@",obj);
     }
+    NSLog(@"\n\n");
     
-    DataModel *model = [[DataModel alloc]init];
-    model.userList = results;
-    model.text = self.textView.text;
-    [self.dataArray addObject:model];
+//    for (TextViewBinding *model in results) {
+//        NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
+//    }
+//
+//    DataModel *model = [[DataModel alloc]init];
+//    model.userList = results;
+//    model.text = self.textView.text;
+//    [self.dataArray addObject:model];
     
     self.textView.text = nil;
     [self updateUI];
+    self.textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
 
     [self.tableView reloadData];
 }
@@ -167,16 +216,34 @@
 }
 
 #pragma mark - UITextViewDelegate
+//- (void)textViewDidChangeSelection:(UITextView *)textView {
+//    NSArray *rangeArray = [self getResultsListArray:nil];
+//    BOOL inRange = NO;
+//    for (NSInteger i = 0; i < rangeArray.count; i++) {
+//        NSRange range = NSRangeFromString(rangeArray[i]);
+//        if (textView.selectedRange.location > range.location && textView.selectedRange.location < range.location + range.length) {
+//            inRange = YES;
+//            break;
+//        }
+//    }
+//    if (inRange) {
+//        textView.selectedRange = NSMakeRange(self.cursorLocation, textView.selectedRange.length);
+//        return;
+//    }
+//    self.cursorLocation = textView.selectedRange.location;
+//}
+
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSArray *results = [self getResultsListArray:nil];
     BOOL inRange = NO;
     NSRange tempRange = NSMakeRange(0, 0);
     NSInteger textSelectedLocation = textView.selectedRange.location;
     NSInteger textSelectedLength = textView.selectedRange.length;
-    
+
     for (NSInteger i = 0; i < results.count; i++) {
-        TextViewBinding *model = results[i];
-        NSRange range = model.range;
+//        TextViewBinding *model = results[i];
+//        NSRange range = model.range;
+        NSRange range = NSRangeFromString(results[i]);
         if (textSelectedLength == 0) {
             if (textSelectedLocation > range.location
                 && textSelectedLocation < range.location + range.length) {
@@ -192,7 +259,7 @@
             }
         }
     }
-    
+
     if (inRange) {
         // 解决光标在‘特殊文本’左右时 无法左右移动的问题
         NSInteger location = tempRange.location;
@@ -211,19 +278,74 @@
     if (!textView.markedTextRange) {
         textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
     }
+//    if (_isChanged) {
+//        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+//        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+//        _textView.attributedText = tmpAString;
+//        _isChanged = NO;
+//    }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
-    if (textView.textStorage.length != 0) {
-        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+   // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
+   if (textView.textStorage.length != 0) {
+       textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+   }
+    
+    if ([text isEqualToString:@""]) { // 删除
+        NSArray *rangeArray = [self getResultsListArray:nil];
+        for (NSInteger i = 0; i < rangeArray.count; i++) {
+            NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+            if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
+                if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
+                    // 第二次点击删除按钮 删除
+                    return YES;
+                } else {
+                    // 第一次点击删除按钮 选中
+                    textView.selectedRange = tmpRange;
+                    return NO;
+                }
+            }
+        }
+    } else { // 增加
+        NSArray *rangeArray = [self getResultsListArray:nil];
+        if ([rangeArray count]) {
+            for (NSInteger i = 0; i < rangeArray.count; i++) {
+                NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+                    _changeRange = NSMakeRange(range.location, text.length);
+                    _isChanged = YES;
+                    [self updateUI];
+                    return YES;
+                }
+            }
+        } else {
+            // 话题在第一个删除后 重置text color
+            if (!range.location) {
+                _changeRange = NSMakeRange(range.location, text.length);
+                _isChanged = YES;
+                [self updateUI];
+                return YES;
+            }
+        }
     }
+    
+    [self updateUI];
+    return YES;
+}
+
+- (BOOL)textView2:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
+//    if (textView.textStorage.length != 0) {
+//        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+//    }
     
     if ([text isEqualToString:@""]) { // 删除
         NSArray *results = [self getResultsListArray:nil];
         for (NSInteger i = 0; i < results.count; i++) {
-            TextViewBinding *model = results[i];
-            NSRange tmpRange = model.range;
+//            TextViewBinding *model = results[i];
+            NSRange range = NSRangeFromString(results[i]);
+            NSRange tmpRange = range;
             if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
                 if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
                     // 第二次点击删除按钮 删除
@@ -235,6 +357,25 @@
                     [self updateUI];
                     return NO;
                 }
+            }
+        }
+    } else {
+        NSArray *rangeArray = [self getResultsListArray:nil];
+        if ([rangeArray count]) {
+            for (NSInteger i = 0; i < rangeArray.count; i++) {
+                NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+                    _changeRange = NSMakeRange(range.location, text.length);
+                    _isChanged = YES;
+                    return YES;
+                }
+            }
+        } else {
+            // 话题在第一个删除后 重置text color
+            if (!range.location) {
+                _changeRange = NSMakeRange(range.location, text.length);
+                _isChanged = YES;
+                return YES;
             }
         }
     }

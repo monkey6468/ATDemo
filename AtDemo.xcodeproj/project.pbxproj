@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C79263A95A6007AE312 /* TextViewBinding.m */; };
+		A648505C26490E3800E72412 /* SZTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A648505B26490E3800E72412 /* SZTextView.m */; };
 		A6522622262D731200576F88 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522621262D731200576F88 /* User.m */; };
 		A652265E262E6A5500576F88 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262B262E6A5500576F88 /* YYTextView.m */; };
 		A652265F262E6A5500576F88 /* YYTextMagnifier.m in Sources */ = {isa = PBXBuildFile; fileRef = A652262F262E6A5500576F88 /* YYTextMagnifier.m */; };
@@ -52,6 +53,8 @@
 /* Begin PBXFileReference section */
 		A6159C78263A95A6007AE312 /* TextViewBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextViewBinding.h; sourceTree = "<group>"; };
 		A6159C79263A95A6007AE312 /* TextViewBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextViewBinding.m; sourceTree = "<group>"; };
+		A648505A26490E3800E72412 /* SZTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZTextView.h; sourceTree = "<group>"; };
+		A648505B26490E3800E72412 /* SZTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZTextView.m; sourceTree = "<group>"; };
 		A6522620262D731200576F88 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		A6522621262D731200576F88 /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		A652262A262E6A5500576F88 /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
@@ -250,6 +253,8 @@
 		A69DC390262D160700A4ABF7 /* AtDemo */ = {
 			isa = PBXGroup;
 			children = (
+				A648505A26490E3800E72412 /* SZTextView.h */,
+				A648505B26490E3800E72412 /* SZTextView.m */,
 				A69DC391262D160700A4ABF7 /* AppDelegate.h */,
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
@@ -400,6 +405,7 @@
 				A69DC399262D160700A4ABF7 /* ViewController.m in Sources */,
 				A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */,
 				A652266E262E6A5500576F88 /* YYTextUtilities.m in Sources */,
+				A648505C26490E3800E72412 /* SZTextView.m in Sources */,
 				A6522667262E6A5500576F88 /* YYTextDebugOption.m in Sources */,
 				A6522668262E6A5500576F88 /* YYLabel.m in Sources */,
 				C9BF914D2633E61F005B25DB /* DataModel.m in Sources */,
@@ -567,7 +573,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = AtDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -585,7 +591,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = AtDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
