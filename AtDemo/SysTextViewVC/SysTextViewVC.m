@@ -190,7 +190,7 @@
 //    model.text = self.textView.text;
 //    [self.dataArray addObject:model];
     
-    self.textView.text = nil;
+//    self.textView.text = nil;
     [self updateUI];
     self.textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
 
@@ -275,15 +275,15 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (!textView.markedTextRange) {
-        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
-    }
-//    if (_isChanged) {
-//        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-//        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
-//        _textView.attributedText = tmpAString;
-//        _isChanged = NO;
+//    if (!textView.markedTextRange) {
+//        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
 //    }
+    if (_isChanged) {
+        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+        _textView.attributedText = tmpAString;
+        _isChanged = NO;
+    }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -299,6 +299,7 @@
             if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
                 if ([NSStringFromRange(tmpRange) isEqualToString:NSStringFromRange(textView.selectedRange)]) {
                     // 第二次点击删除按钮 删除
+                    [self updateUI];
                     return YES;
                 } else {
                     // 第一次点击删除按钮 选中
