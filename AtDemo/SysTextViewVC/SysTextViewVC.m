@@ -9,7 +9,6 @@
 #import "ListViewController.h"
 
 #import "TableViewCell.h"
-#import "SZTextView.h"
 
 #import "TextViewBinding.h"
 
@@ -59,9 +58,9 @@
 
 #pragma mark - UI
 - (void)settingUI {
-//    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-//        self.automaticallyAdjustsScrollViewInsets = NO;
-//    }
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
@@ -99,7 +98,7 @@
         NSRange resultRange = result.range;
         NSString *atString = [self.textView.text substringWithRange:result.range];
         NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
-        if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
+        if ([attributedDict[NSForegroundColorAttributeName] isEqual:k_hightColor]) {
             TextViewBinding *bindingModel = [traveAStr attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
             if (bindingModel) {
                 bindingModel.range = result.range;
@@ -146,8 +145,8 @@
     [self.view endEditing:YES];
     
     NSArray *results = [self getResultsListArray:self.textView.attributedText];
-    NSLog(@"输出打印:");
 
+    NSLog(@"输出打印:");
     for (TextViewBinding *model in results) {
         NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
     }
@@ -211,8 +210,8 @@
 //        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
         if (_isChanged) {
             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-            [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName:k_defaultFont} range:_changeRange];
-            _textView.attributedText = tmpAString;
+            [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:k_defaultFont} range:_changeRange];
+            textView.attributedText = tmpAString;
             _isChanged = NO;
         }
     }
@@ -221,7 +220,7 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
    if (textView.textStorage.length != 0) {
-       textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+       textView.typingAttributes = @{NSFontAttributeName:k_defaultFont, NSForegroundColorAttributeName:k_defaultColor};
    }
     
     if ([text isEqualToString:@""]) { // 删除
@@ -230,9 +229,11 @@
             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
             [tmpAString deleteCharactersInRange:selectedRange];
             textView.attributedText = tmpAString;
+            
             [self updateUI];
             return NO;
         } else {
+            
             [self updateUI];
             return YES;
         }
@@ -245,6 +246,7 @@
                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                     _changeRange = NSMakeRange(range.location, text.length);
                     _isChanged = YES;
+                    
                     [self updateUI];
                     return YES;
                 }
@@ -254,6 +256,7 @@
             if (!range.location) {
                 _changeRange = NSMakeRange(range.location, text.length);
                 _isChanged = YES;
+                
                 [self updateUI];
                 return YES;
             }

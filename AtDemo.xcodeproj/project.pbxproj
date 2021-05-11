@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = A6159C79263A95A6007AE312 /* TextViewBinding.m */; };
-		A648505C26490E3800E72412 /* SZTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = A648505B26490E3800E72412 /* SZTextView.m */; };
 		A6522622262D731200576F88 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = A6522621262D731200576F88 /* User.m */; };
 		A69DC393262D160700A4ABF7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A69DC392262D160700A4ABF7 /* AppDelegate.m */; };
 		A69DC399262D160700A4ABF7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A69DC398262D160700A4ABF7 /* ViewController.m */; };
@@ -53,8 +52,6 @@
 /* Begin PBXFileReference section */
 		A6159C78263A95A6007AE312 /* TextViewBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextViewBinding.h; sourceTree = "<group>"; };
 		A6159C79263A95A6007AE312 /* TextViewBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextViewBinding.m; sourceTree = "<group>"; };
-		A648505A26490E3800E72412 /* SZTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SZTextView.h; sourceTree = "<group>"; };
-		A648505B26490E3800E72412 /* SZTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SZTextView.m; sourceTree = "<group>"; };
 		A6522620262D731200576F88 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		A6522621262D731200576F88 /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		A69DC38E262D160700A4ABF7 /* AtDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -173,8 +170,6 @@
 		A69DC390262D160700A4ABF7 /* AtDemo */ = {
 			isa = PBXGroup;
 			children = (
-				A648505A26490E3800E72412 /* SZTextView.h */,
-				A648505B26490E3800E72412 /* SZTextView.m */,
 				A69DC391262D160700A4ABF7 /* AppDelegate.h */,
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
@@ -404,7 +399,6 @@
 				C9D8155A264A9D8E009E4F7B /* YYTextRubyAnnotation.m in Sources */,
 				A69DC399262D160700A4ABF7 /* ViewController.m in Sources */,
 				A6159C7A263A95A6007AE312 /* TextViewBinding.m in Sources */,
-				A648505C26490E3800E72412 /* SZTextView.m in Sources */,
 				C9D8154B264A9D8E009E4F7B /* YYTextView.m in Sources */,
 				C9BF914D2633E61F005B25DB /* DataModel.m in Sources */,
 				C9D8155E264A9D8E009E4F7B /* UIPasteboard+YYText.m in Sources */,
