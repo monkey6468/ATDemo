@@ -225,19 +225,16 @@
    }
     
     if ([text isEqualToString:@""]) { // 删除
-        NSArray *results = [self getResultsListArray:nil];
-        for (NSInteger i = 0; i < results.count; i++) {
-            TextViewBinding *bindingModel = results[i];
-            NSRange tmpRange = bindingModel.range;
-            if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
-
-                NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-                [tmpAString deleteCharactersInRange:tmpRange];
-                textView.attributedText = tmpAString;
-                
-                [self updateUI];
-                return NO;
-            }
+        NSRange selectedRange = textView.selectedRange;
+        if (selectedRange.length) {
+            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+            [tmpAString deleteCharactersInRange:selectedRange];
+            textView.attributedText = tmpAString;
+            [self updateUI];
+            return NO;
+        } else {
+            [self updateUI];
+            return YES;
         }
     } else { // 增加
         NSArray *results = [self getResultsListArray:nil];
