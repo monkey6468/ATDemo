@@ -6,14 +6,13 @@
 //
 
 #import "TableViewCell.h"
-#import "YYLabel.h"
-#import "YYText.h"
 
+#import "M80AttributedLabel.h"
 #import "TextViewBinding.h"
 
-@interface TableViewCell ()
+@interface TableViewCell () <M80AttributedLabelDelegate>
 
-@property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
+@property (weak, nonatomic) IBOutlet M80AttributedLabel *yyLabel;
 
 @end
 
@@ -23,26 +22,25 @@
     [super awakeFromNib];
     // Initialization code
     self.yyLabel.numberOfLines = 0;
+    self.yyLabel.delegate = self;
+    self.yyLabel.font = [UIFont systemFontOfSize:25];
 }
 
 - (void)setModel:(DataModel *)model {
     _model = model;
-    
-    NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
-    muAttriSting.yy_font = [UIFont systemFontOfSize:25];
+    self.yyLabel.text = model.text;
+
     for (TextViewBinding *bindingModel in model.userList) {
-        [muAttriSting yy_setTextHighlightRange:bindingModel.range color:UIColor.redColor backgroundColor:UIColor.darkGrayColor tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-            
-            for (TextViewBinding *tempBindingModel in model.userList) {
-                if (tempBindingModel.range.location == range.location
-                && tempBindingModel.range.length == range.length) {
-                    NSLog(@"点击了: %@",tempBindingModel.name);
-                }
-            }
-        }];
-        
+        [self.yyLabel addCustomLink:bindingModel forRange:bindingModel.range linkColor:UIColor.redColor];
+        self.yyLabel.underLineForLink = NO;
     }
-    self.yyLabel.attributedText = muAttriSting;
+}
+
+#pragma mark - M80AttributedLabelDelegate
+- (void)m80AttributedLabel:(M80AttributedLabel *)label
+             clickedOnLink:(id)linkData{
+    TextViewBinding *tempBindingModel = (TextViewBinding *)linkData;
+    NSLog(@"点击了: %@",tempBindingModel.name);
 }
 
 + (CGFloat)rowHeightWithModel:(DataModel *)model {
