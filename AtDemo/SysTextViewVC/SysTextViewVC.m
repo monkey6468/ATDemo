@@ -18,6 +18,7 @@
 #define k_defaultFont   [UIFont systemFontOfSize:17]
 #define k_defaultColor  [UIColor blackColor]
 #define k_hightColor    [UIColor redColor]
+#define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 
 @interface SysTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -27,16 +28,10 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
 
-/// 光标位置
-@property (assign, nonatomic) NSInteger cursorLocation;
-
+@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
+@property (assign, nonatomic) NSRange changeRange; /// 改变Range
+@property (assign, nonatomic) BOOL isChanged; /// 是否改变
 @property (strong, nonatomic) NSMutableArray *dataArray;
-@property (strong, nonatomic) NSMutableArray *userListArray;
-
-/// 改变Range
-@property (assign, nonatomic) NSRange changeRange;
-/// 是否改变
-@property (assign, nonatomic) BOOL isChanged;
 
 @end
 
@@ -48,7 +43,6 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"TextViewVC";
     
-    self.userListArray = [NSMutableArray array];
     [self settingUI];
     [self initTableView];
 }
@@ -93,7 +87,6 @@
 }
 
 #pragma mark - other
-#define kATRegular @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 - (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
     __block NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
     __block NSMutableArray *resultArray = [NSMutableArray array];
@@ -129,9 +122,7 @@
     };
 }
 
-- (void)updateUIWithUser:(User *)user
-{
-    
+- (void)updateUIWithUser:(User *)user {
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
     TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
                                                                   userId:user.userId];
@@ -143,7 +134,6 @@
                                 NSFontAttributeName:k_defaultFont,
                                 TextBindingAttributeName:bindingModel}
                         range:range];
-    [self.userListArray addObject:user];
 
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
     NSInteger lastCursorLocation = self.cursorLocation;
@@ -174,23 +164,6 @@
     [self.tableView reloadData];
 }
 
-#pragma mark - UITableViewDataSource
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.dataArray.count;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    DataModel *model = self.dataArray[indexPath.row];
-    return [TableViewCell rowHeightWithModel:model];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    TableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(TableViewCell.class)];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.model = self.dataArray[indexPath.row];
-    return cell;
-}
 
 #pragma mark - UITextViewDelegate
 - (void)textViewDidChangeSelection:(UITextView *)textView {
@@ -237,6 +210,7 @@
 //    if (!textView.markedTextRange) {
 //        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
 //    }
+    
     if (_isChanged) {
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
         [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
@@ -308,6 +282,27 @@
 
 
 
+
+
+
+
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.dataArray.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    DataModel *model = self.dataArray[indexPath.row];
+    return [TableViewCell rowHeightWithModel:model];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    TableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(TableViewCell.class)];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.model = self.dataArray[indexPath.row];
+    return cell;
+}
 
 #pragma mark HNWKeyboardMonitorDelegate
 - (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillShow:(HNWKeyboardInfo *)info {
