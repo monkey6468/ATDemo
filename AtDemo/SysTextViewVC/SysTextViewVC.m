@@ -213,7 +213,7 @@
     
     if (_isChanged) {
         NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: [UIFont systemFontOfSize:17] } range:_changeRange];
+        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName:k_defaultFont} range:_changeRange];
         _textView.attributedText = tmpAString;
         _isChanged = NO;
     }
