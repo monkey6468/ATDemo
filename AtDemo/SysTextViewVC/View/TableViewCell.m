@@ -24,6 +24,18 @@
     self.yyLabel.numberOfLines = 0;
     self.yyLabel.delegate = self;
     self.yyLabel.font = [UIFont systemFontOfSize:25];
+    
+//    [self setupGesture];
+}
+
+- (void)setupGesture
+{
+    UITapGestureRecognizer *contentTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapReply:)];
+    [self addGestureRecognizer:contentTap];
+}
+
+- (void)onTapReply:(UITapGestureRecognizer *)sender {
+    NSLog(@"点击了cell");
 }
 
 - (void)setModel:(DataModel *)model {
@@ -38,7 +50,7 @@
 
 #pragma mark - M80AttributedLabelDelegate
 - (void)m80AttributedLabel:(M80AttributedLabel *)label
-             clickedOnLink:(id)linkData{
+             clickedOnLink:(id)linkData {
     TextViewBinding *tempBindingModel = (TextViewBinding *)linkData;
     NSLog(@"点击了: %@",tempBindingModel.name);
 }

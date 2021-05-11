@@ -207,15 +207,14 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-//    if (!textView.markedTextRange) {
+    if (!textView.markedTextRange) {
 //        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
-//    }
-    
-    if (_isChanged) {
-        NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-        [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName:k_defaultFont} range:_changeRange];
-        _textView.attributedText = tmpAString;
-        _isChanged = NO;
+        if (_isChanged) {
+            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+            [tmpAString setAttributes:@{ NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName:k_defaultFont} range:_changeRange];
+            _textView.attributedText = tmpAString;
+            _isChanged = NO;
+        }
     }
 }
 
@@ -302,6 +301,13 @@
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.model = self.dataArray[indexPath.row];
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    NSLog(@"点击了cell");
 }
 
 #pragma mark HNWKeyboardMonitorDelegate
