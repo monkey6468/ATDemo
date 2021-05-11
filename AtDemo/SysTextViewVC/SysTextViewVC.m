@@ -96,7 +96,7 @@
 #define kATRegular @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 - (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
     __block NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
-    __block NSMutableArray *rangeArray = [NSMutableArray array];
+    __block NSMutableArray *resultArray = [NSMutableArray array];
     static NSRegularExpression *iExpression;
     iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
     [iExpression enumerateMatchesInString:traveAStr.string
@@ -104,16 +104,17 @@
                                     range:NSMakeRange(0, traveAStr.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
-        NSString *ss = [self.textView.text substringWithRange:result.range];
-        NSLog(@"xwh: %@", ss);
+        NSString *atString = [self.textView.text substringWithRange:result.range];
         NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
         if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
-            TextViewBinding *bindingModel = [traveAStr attribute:@"test" atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, ss.length)];
-            bindingModel.range = result.range;
-            [rangeArray addObject:NSStringFromRange(result.range)];
+            TextViewBinding *bindingModel = [traveAStr attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+            if (bindingModel) {
+                bindingModel.range = result.range;
+                [resultArray addObject:bindingModel];
+            }
         }
     }];
-    return rangeArray;
+    return resultArray;
 }
 
 - (IBAction)onActionInsert:(UIButton *)sender {
@@ -140,9 +141,8 @@
     NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);
     [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
                                 NSFontAttributeName:k_defaultFont,
-                                @"test":bindingModel}
+                                TextBindingAttributeName:bindingModel}
                         range:range];
-    user.range = range;
     [self.userListArray addObject:user];
 
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
@@ -158,36 +158,18 @@
     NSArray *results = [self getResultsListArray:self.textView.attributedText];
     NSLog(@"输出打印:");
 
-    NSMutableArray *data = [NSMutableArray array];
-    for (id obj in results) {
-        NSRange range = NSRangeFromString(obj);
-        NSString *name = [self.textView.text substringWithRange:range];
-        
-        for (User *user in self.userListArray) {
-            NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-            if ([name isEqualToString:insertText]) {
-                NSMutableDictionary *dictInfo = [NSMutableDictionary dictionary];
-                dictInfo[@"range"] = obj;
-                dictInfo[@"name"] = user.name;
-                
-                [data addObject:dictInfo];
-                NSLog(@"%@",dictInfo);
-            }
-        }
+    for (TextViewBinding *model in results) {
+        NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
     }
     
-    NSArray *newdata = [data valueForKeyPath:@"@distinctUnionOfObjects.self"];
-
-    NSLog(@"\n\n：%@",newdata);
+    DataModel *model = [[DataModel alloc]init];
+    model.userList = results;
+    model.text = self.textView.text;
+    [self.dataArray addObject:model];
     
-//    DataModel *model = [[DataModel alloc]init];
-//    model.userList = results;
-//    model.text = self.textView.text;
-//    [self.dataArray addObject:model];
-    
-//    self.textView.text = nil;
+    self.textView.text = nil;
     [self updateUI];
-    self.textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+    self.textView.typingAttributes = @{NSFontAttributeName:k_defaultFont, NSForegroundColorAttributeName:k_defaultColor};
 
     [self.tableView reloadData];
 }
@@ -219,7 +201,8 @@
     NSInteger textSelectedLength = textView.selectedRange.length;
 
     for (NSInteger i = 0; i < results.count; i++) {
-        NSRange range = NSRangeFromString(results[i]);
+        TextViewBinding *bindingModel = results[i];
+        NSRange range = bindingModel.range;
         if (textSelectedLength == 0) {
             if (textSelectedLocation > range.location
                 && textSelectedLocation < range.location + range.length) {
@@ -269,11 +252,12 @@
    }
     
     if ([text isEqualToString:@""]) { // 删除
-        NSArray *rangeArray = [self getResultsListArray:nil];
-        for (NSInteger i = 0; i < rangeArray.count; i++) {
-            NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+        NSArray *results = [self getResultsListArray:nil];
+        for (NSInteger i = 0; i < results.count; i++) {
+            TextViewBinding *bindingModel = results[i];
+            NSRange tmpRange = bindingModel.range;
             if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
-                // 第一次点击删除按钮 选中
+
                 NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
                 [tmpAString deleteCharactersInRange:tmpRange];
                 textView.attributedText = tmpAString;
@@ -283,10 +267,11 @@
             }
         }
     } else { // 增加
-        NSArray *rangeArray = [self getResultsListArray:nil];
-        if ([rangeArray count]) {
-            for (NSInteger i = 0; i < rangeArray.count; i++) {
-                NSRange tmpRange = NSRangeFromString(rangeArray[i]);
+        NSArray *results = [self getResultsListArray:nil];
+        if ([results count]) {
+            for (NSInteger i = 0; i < results.count; i++) {
+                TextViewBinding *bindingModel = results[i];
+                NSRange tmpRange = bindingModel.range;
                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                     _changeRange = NSMakeRange(range.location, text.length);
                     _isChanged = YES;
