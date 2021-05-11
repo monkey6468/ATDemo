@@ -54,7 +54,7 @@
         NSRange resultRange = result.range;
         NSString *atString = [self.textView.text substringWithRange:result.range];
         NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
-        if ([attributedDict[NSForegroundColorAttributeName] isEqual:UIColor.redColor]) {
+        if ([attributedDict[NSForegroundColorAttributeName] isEqual:k_hightColor]) {
             TextViewBinding *bindingModel = [traveAStr attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
             if (bindingModel) {
                 bindingModel.range = result.range;
