@@ -7,12 +7,13 @@
 
 #import "TableViewCell.h"
 
-#import "M80AttributedLabel.h"
+#import "YYText.h"
 #import "TextViewBinding.h"
+#import "YYLabel.h"
 
-@interface TableViewCell () <M80AttributedLabelDelegate>
+@interface TableViewCell ()
 
-@property (weak, nonatomic) IBOutlet M80AttributedLabel *yyLabel;
+@property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
 
 @end
 
@@ -22,9 +23,6 @@
     [super awakeFromNib];
     // Initialization code
     self.yyLabel.numberOfLines = 0;
-    self.yyLabel.delegate = self;
-    self.yyLabel.font = [UIFont systemFontOfSize:25];
-    
 //    [self setupGesture];
 }
 
@@ -35,24 +33,32 @@
 }
 
 - (void)onTapReply:(UITapGestureRecognizer *)sender {
-    NSLog(@"点击了cell");
+    NSLog(@"点击了cell22");
 }
 
 - (void)setModel:(DataModel *)model {
     _model = model;
     self.yyLabel.text = model.text;
 
-    for (TextViewBinding *bindingModel in model.userList) {
-        [self.yyLabel addCustomLink:bindingModel forRange:bindingModel.range linkColor:UIColor.redColor];
-        self.yyLabel.underLineForLink = NO;
-    }
-}
+    NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
+    muAttriSting.yy_font = [UIFont systemFontOfSize:25];
 
-#pragma mark - M80AttributedLabelDelegate
-- (void)m80AttributedLabel:(M80AttributedLabel *)label
-             clickedOnLink:(id)linkData {
-    TextViewBinding *tempBindingModel = (TextViewBinding *)linkData;
-    NSLog(@"点击了: %@",tempBindingModel.name);
+    for (TextViewBinding *bindingModel in model.userList) {
+        [muAttriSting yy_setTextHighlightRange:bindingModel.range
+                                         color:UIColor.redColor
+                               backgroundColor:UIColor.darkGrayColor
+                                     tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+            
+            for (TextViewBinding *tempBindingModel in model.userList) {
+                if (tempBindingModel.range.location == range.location
+                && tempBindingModel.range.length == range.length) {
+                    NSLog(@"点击了: %@",tempBindingModel.name);
+                }
+            }
+        }];
+    }
+    
+    self.yyLabel.attributedText = muAttriSting;
 }
 
 + (CGFloat)rowHeightWithModel:(DataModel *)model {
