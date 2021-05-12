@@ -73,7 +73,6 @@
 
 - (void)textViewDidChange:(UITextView *)textView {
     if (!textView.markedTextRange) {
-//        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
         if (_isChanged) {
             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
             NSInteger changeLocation = _changeRange.location;
@@ -86,6 +85,8 @@
             textView.attributedText = tmpAString;
             _isChanged = NO;
         }
+    } else {
+        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
     }
     
     if ([self.atDeleagate respondsToSelector:@selector(atTextViewDidChange:)]) {

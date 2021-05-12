@@ -258,7 +258,6 @@
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
-				A6159C7C263A95C3007AE312 /* TextViewBinding */,
 				C9DFE30D262F20F2001FBAAE /* ListVC */,
 				C9DFE30B262F20DB001FBAAE /* SysTextViewVC */,
 				A69DC39A262D160700A4ABF7 /* Main.storyboard */,
@@ -273,6 +272,7 @@
 		C9807CBD264C135600AB55F8 /* ATTextView */ = {
 			isa = PBXGroup;
 			children = (
+				A6159C7C263A95C3007AE312 /* TextViewBinding */,
 				C9807CA9264C01EA00AB55F8 /* ATTextView.h */,
 				C9807CAA264C01EA00AB55F8 /* ATTextView.m */,
 			);
