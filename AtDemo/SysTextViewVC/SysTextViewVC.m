@@ -9,27 +9,19 @@
 #import "ListViewController.h"
 
 #import "TableViewCell.h"
+#import "ATTextView.h"
 
 #import "TextViewBinding.h"
 
 #import "HNWKeyboardMonitor.h"
 
-#define k_defaultFont   [UIFont systemFontOfSize:17]
-#define k_defaultColor  [UIColor blackColor]
-#define k_hightColor    [UIColor redColor]
-#define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
-
-@interface SysTextViewVC ()<UITextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface SysTextViewVC ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UITextView *textViewBg;
-@property (strong, nonatomic) UITextView *textView;
+@property (weak, nonatomic) IBOutlet ATTextView *textView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
 
-@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
-@property (assign, nonatomic) NSRange changeRange; /// 改变Range
-@property (assign, nonatomic) BOOL isChanged; /// 是否改变
 @property (strong, nonatomic) NSMutableArray *dataArray;
 
 @end
@@ -64,7 +56,8 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
-    self.textView.font = k_defaultFont;
+    self.textView.atDeleagate = self;
+    
     [self.textView becomeFirstResponder];
 }
 
@@ -86,24 +79,6 @@
 }
 
 #pragma mark - other
-- (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
-    __block NSMutableArray *resultArray = [NSMutableArray array];
-    NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
-    [iExpression enumerateMatchesInString:attributedString.string
-                                  options:0
-                                    range:NSMakeRange(0, attributedString.string.length)
-                               usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-        NSRange resultRange = result.range;
-        NSString *atString = [self.textView.text substringWithRange:result.range];
-        TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
-        if (bindingModel) {
-            bindingModel.range = result.range;
-            [resultArray addObject:bindingModel];
-        }
-    }];
-    return resultArray;
-}
-
 - (IBAction)onActionInsert:(UIButton *)sender {
     ListViewController *vc = [[ListViewController alloc]init];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
@@ -130,16 +105,16 @@
                         range:range];
 
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-    NSInteger lastCursorLocation = self.cursorLocation;
+    NSInteger lastCursorLocation = self.textView.cursorLocation;
     self.textView.attributedText = tmpAString;
     self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
-    self.cursorLocation = lastCursorLocation;
+    self.textView.cursorLocation = lastCursorLocation;
 }
 
 - (void)done {
     [self.view endEditing:YES];
     
-    NSArray *results = [self getResultsListArrayWithTextView:self.textView.attributedText];
+    NSArray *results = self.textView.atUserList;
 
     NSLog(@"输出打印:");
     for (TextViewBinding *model in results) {
@@ -158,107 +133,9 @@
     [self.tableView reloadData];
 }
 
-#pragma mark - UITextViewDelegate
-- (void)textViewDidChangeSelection:(UITextView *)textView {
-    NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
-    BOOL inRange = NO;
-    NSRange tempRange = NSMakeRange(0, 0);
-    NSInteger textSelectedLocation = textView.selectedRange.location;
-    NSInteger textSelectedLength = textView.selectedRange.length;
-
-    for (NSInteger i = 0; i < results.count; i++) {
-        TextViewBinding *bindingModel = results[i];
-        NSRange range = bindingModel.range;
-        if (textSelectedLength == 0) {
-            if (textSelectedLocation > range.location
-                && textSelectedLocation < range.location + range.length) {
-                inRange = YES;
-                tempRange = range;
-                break;
-            }
-        } else {
-            if ((textSelectedLocation > range.location && textSelectedLocation < range.location + range.length)
-                || (textSelectedLocation+textSelectedLength > range.location && textSelectedLocation+textSelectedLength < range.location + range.length)) {
-                inRange = YES;
-                break;
-            }
-        }
-    }
-
-    if (inRange) {
-        // 解决光标在‘特殊文本’左右时 无法左右移动的问题
-        NSInteger location = tempRange.location;
-        if (self.cursorLocation < textSelectedLocation) {
-            location = tempRange.location+tempRange.length;
-        }
-        textView.selectedRange = NSMakeRange(location, textSelectedLength);
-        if (textSelectedLength) { // 解决光标在‘特殊文本’内时，文本选中问题
-            textView.selectedRange = NSMakeRange(textSelectedLocation, 0);
-        }
-    }
-    self.cursorLocation = textView.selectedRange.location;
-}
-
-- (void)textViewDidChange:(UITextView *)textView {
-    if (!textView.markedTextRange) {
-//        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
-        if (_isChanged) {
-            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-            [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:k_defaultFont} range:_changeRange];
-            textView.attributedText = tmpAString;
-            _isChanged = NO;
-        }
-    }
-}
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-   // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
-   if (textView.textStorage.length != 0) {
-       textView.typingAttributes = @{NSFontAttributeName:k_defaultFont, NSForegroundColorAttributeName:k_defaultColor};
-   }
-    
-    if ([text isEqualToString:@""]) { // 删除
-        NSRange selectedRange = textView.selectedRange;
-        if (selectedRange.length) {
-            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-            [tmpAString deleteCharactersInRange:selectedRange];
-            textView.attributedText = tmpAString;
-            
-            [self updateUI];
-            return NO;
-        } else {
-            
-            [self updateUI];
-            return YES;
-        }
-    } else { // 增加
-        NSArray *results = [self getResultsListArrayWithTextView:self.textView.attributedText];
-        if ([results count]) {
-            for (NSInteger i = 0; i < results.count; i++) {
-                TextViewBinding *bindingModel = results[i];
-                NSRange tmpRange = bindingModel.range;
-                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
-                    _changeRange = NSMakeRange(range.location, text.length);
-                    _isChanged = YES;
-                    
-                    [self updateUI];
-                    return YES;
-                }
-            }
-        } else {
-            // 在第一个删除后 重置text color
-            if (!range.location) {
-                _changeRange = NSMakeRange(range.location, text.length);
-                _isChanged = YES;
-                
-                [self updateUI];
-                return YES;
-            }
-        }
-    }
-    
-    [self updateUI];
-    return YES;
+#pragma mark - ATTextViewDelegate
+- (void)atTextViewDidChange:(ATTextView *)textView {
+    NSLog(@"%@",textView.text);
 }
 
 
