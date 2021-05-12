@@ -86,24 +86,19 @@
 }
 
 #pragma mark - other
-- (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
-    __block NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
+- (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
-    static NSRegularExpression *iExpression;
-    iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
-    [iExpression enumerateMatchesInString:traveAStr.string
+    NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
+    [iExpression enumerateMatchesInString:attributedString.string
                                   options:0
-                                    range:NSMakeRange(0, traveAStr.string.length)
+                                    range:NSMakeRange(0, attributedString.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
         NSString *atString = [self.textView.text substringWithRange:result.range];
-        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
-        if ([attributedDict[NSForegroundColorAttributeName] isEqual:k_hightColor]) {
-            TextViewBinding *bindingModel = [traveAStr attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
-            if (bindingModel) {
-                bindingModel.range = result.range;
-                [resultArray addObject:bindingModel];
-            }
+        TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        if (bindingModel) {
+            bindingModel.range = result.range;
+            [resultArray addObject:bindingModel];
         }
     }];
     return resultArray;
@@ -144,7 +139,7 @@
 - (void)done {
     [self.view endEditing:YES];
     
-    NSArray *results = [self getResultsListArray:self.textView.attributedText];
+    NSArray *results = [self getResultsListArrayWithTextView:self.textView.attributedText];
 
     NSLog(@"输出打印:");
     for (TextViewBinding *model in results) {
@@ -163,10 +158,9 @@
     [self.tableView reloadData];
 }
 
-
 #pragma mark - UITextViewDelegate
 - (void)textViewDidChangeSelection:(UITextView *)textView {
-    NSArray *results = [self getResultsListArray:nil];
+    NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
     BOOL inRange = NO;
     NSRange tempRange = NSMakeRange(0, 0);
     NSInteger textSelectedLocation = textView.selectedRange.location;
@@ -209,7 +203,7 @@
     if (!textView.markedTextRange) {
 //        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
         if (_isChanged) {
-            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
+            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
             [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:k_defaultFont} range:_changeRange];
             textView.attributedText = tmpAString;
             _isChanged = NO;
@@ -238,7 +232,7 @@
             return YES;
         }
     } else { // 增加
-        NSArray *results = [self getResultsListArray:nil];
+        NSArray *results = [self getResultsListArrayWithTextView:self.textView.attributedText];
         if ([results count]) {
             for (NSInteger i = 0; i < results.count; i++) {
                 TextViewBinding *bindingModel = results[i];
