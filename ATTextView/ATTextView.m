@@ -133,8 +133,6 @@
             textView.attributedText = tmpAString;
             _isChanged = NO;
         }
-    } else {
-        textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
     }
     
     if ([self.atDeleagate respondsToSelector:@selector(atTextViewDidChange:)]) {
@@ -156,6 +154,7 @@
             textView.attributedText = tmpAString;
             
             [self textViewDidChange:textView];
+            textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
             return NO;
         } else {
             NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
@@ -169,6 +168,7 @@
                     textView.attributedText = tmpAString;
                     
                     [self textViewDidChange:textView];
+                    textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
                     return NO;
                 }
             }
