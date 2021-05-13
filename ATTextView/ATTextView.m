@@ -31,7 +31,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 @property (assign, nonatomic) BOOL isChanged; /// 是否改变
 
 @property (strong, nonatomic) UITextView *placeholderTextView;
-@property (assign, nonatomic) NSInteger maxText_Length;
+@property (assign, nonatomic) NSInteger max_TextLength;
 //@property (assign, nonatomic) UIColor *attributed_TextColor;
 
 @end
@@ -42,7 +42,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    self.maxTextLength = CGFLOAT_MAX;
+    self.maxTextLength = 100000;
 //    self.attributedTextColor = k_defaultColor;
     self.delegate = self;
 }
@@ -347,9 +347,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-//    if ([self checkAndFilterTextByLength:self.maxText_Length] == NO)
-    {
-//        return;
+    if ([self checkAndFilterTextByLength:self.max_TextLength]) {
+        return;
     }
 
     if (!textView.markedTextRange) {
@@ -361,8 +360,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             if (tmpAString.length == changeLocation) {
                 changeLength = 0;
             }
-            if (changeLength > self.maxTextLength) {
-                changeLength = self.maxTextLength;
+            if (changeLength > self.max_TextLength) {
+                changeLength = self.max_TextLength;
             }
             [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
             textView.attributedText = tmpAString;
@@ -490,7 +489,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 #pragma mark - set data
 - (void)setMaxTextLength:(NSInteger)maxTextLength {
-    _maxText_Length = maxTextLength;
+    _max_TextLength = maxTextLength;
 }
 
 //- (void)setAttributedTextColor:(UIColor *)attributedTextColor {
