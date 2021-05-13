@@ -34,10 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
 @property (nonatomic) IBInspectable double fadeTime;
 @property (copy, nonatomic) NSAttributedString *attributedPlaceholder;
-@property (assign, nonatomic) UIColor *placeholderTextColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *placeholderTextColor UI_APPEARANCE_SELECTOR;
 
 @property (assign, nonatomic) NSInteger maxTextLength; // 最大长度设置，默认1000
-//@property (assign, nonatomic) UIColor *attributedTextColor;
+@property (strong, nonatomic) UIColor *attributedTextColor;
 
 @property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
 

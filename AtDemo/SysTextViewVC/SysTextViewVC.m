@@ -63,7 +63,7 @@
     self.textView.placeholder = @"我是测试placeholder";
     self.textView.placeholderTextColor = [UIColor colorWithRed:0 green:1 blue:0 alpha:0.75];
     self.textView.font = k_defaultFont;
-//    self.textView.attributedTextColor = [UIColor colorWithRed:0.7 green:1 blue:0 alpha:0.75];
+    self.textView.attributedTextColor = [UIColor colorWithRed:0.7 green:1 blue:0 alpha:0.75];
     [self.textView becomeFirstResponder];
 }
 
@@ -149,6 +149,7 @@
 #pragma mark - ATTextViewDelegate
 - (void)atTextViewDidChange:(ATTextView *)textView {
     NSLog(@"%@",textView.text);
+    [self updateUI];
 }
 
 

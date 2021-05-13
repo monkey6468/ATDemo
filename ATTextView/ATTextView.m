@@ -32,7 +32,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 @property (strong, nonatomic) UITextView *placeholderTextView;
 @property (assign, nonatomic) NSInteger max_TextLength;
-//@property (assign, nonatomic) UIColor *attributed_TextColor;
+@property (strong, nonatomic) UIColor *attributed_TextColor;
 
 @end
 
@@ -43,7 +43,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     [super awakeFromNib];
     
     self.maxTextLength = 100000;
-//    self.attributedTextColor = k_defaultColor;
+    self.attributed_TextColor = k_defaultColor;
     self.delegate = self;
 }
 
@@ -363,7 +363,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             if (changeLength > self.max_TextLength) {
                 changeLength = self.max_TextLength;
             }
-            [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
+            [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.attributed_TextColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
             textView.attributedText = tmpAString;
             _isChanged = NO;
         }
@@ -377,7 +377,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
    if (textView.textStorage.length != 0) {
-       textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:k_defaultColor};
+       textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
    }
     
     if ([text isEqualToString:@""]) { // 删除
@@ -387,8 +387,11 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             [tmpAString deleteCharactersInRange:selectedRange];
             textView.attributedText = tmpAString;
             
+            NSInteger lastCursorLocation = selectedRange.location;
             [self textViewDidChange:textView];
-            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:k_defaultColor};
+            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+            self.cursorLocation = lastCursorLocation;
+            textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
             return NO;
         } else {
             NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
@@ -402,7 +405,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                     textView.attributedText = tmpAString;
                     
                     [self textViewDidChange:textView];
-                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:k_defaultColor};
+                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
                     return NO;
                 }
             }
@@ -492,8 +495,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     _max_TextLength = maxTextLength;
 }
 
-//- (void)setAttributedTextColor:(UIColor *)attributedTextColor {
-//    _attributed_TextColor = attributedTextColor;
-//}
+- (void)setAttributedTextColor:(UIColor *)attributedTextColor {
+    _attributed_TextColor = attributedTextColor;
+}
 
 @end
