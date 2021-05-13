@@ -11,7 +11,7 @@
 #import "TextViewBinding.h"
 #import "YYLabel.h"
 
-@interface TableViewCell ()
+@interface TableViewCell ()<UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
 
@@ -23,17 +23,32 @@
     [super awakeFromNib];
     // Initialization code
     self.yyLabel.numberOfLines = 0;
-//    [self setupGesture];
+    [self setupGesture];
 }
 
 - (void)setupGesture
 {
     UITapGestureRecognizer *contentTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapReply:)];
+    contentTap.delegate = self;
     [self addGestureRecognizer:contentTap];
 }
 
 - (void)onTapReply:(UITapGestureRecognizer *)sender {
     NSLog(@"点击了cell22");
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if ([touch.view isKindOfClass:[YYLabel class]]) {
+        YYLabel *label = (YYLabel *)touch.view;
+        NSRange highlightRange;
+        YYTextHighlight *highlight = [label _getHighlightAtPoint:[touch locationInView:label] range:&highlightRange];
+        if (highlight) {
+            return NO;
+        }
+        return YES;
+    }
+    return YES;
 }
 
 - (void)setModel:(DataModel *)model {

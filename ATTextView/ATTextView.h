@@ -22,9 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 - (void)atTextViewDidChange:(ATTextView *)textView;
 
-- (void)atTextViewDidBeginEditing:(UITextView *)textView;
+- (void)atTextViewDidBeginEditing:(ATTextView *)textView;
 
-- (void)atTextViewDidEndEditing:(UITextView *)textView;
+- (void)atTextViewDidEndEditing:(ATTextView *)textView;
 
 @end
 
