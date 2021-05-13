@@ -135,8 +135,8 @@
         }
     }
     
-    if ([self.atDeleagate respondsToSelector:@selector(atTextViewDidChange:)]) {
-        [self.atDeleagate atTextViewDidChange:self];
+    if ([self.atDelegate respondsToSelector:@selector(atTextViewDidChange:)]) {
+        [self.atDelegate atTextViewDidChange:self];
     }
 }
 
@@ -200,6 +200,17 @@
     return YES;
 }
 
+- (void)textViewDidBeginEditing:(UITextView *)textView {
+    if ([self.atDelegate respondsToSelector:@selector(atTextViewDidBeginEditing:)]) {
+        [self.atDelegate atTextViewDidBeginEditing:self];
+    }
+}
+
+- (void)textViewDidEndEditing:(UITextView *)textView {
+    if ([self.atDelegate respondsToSelector:@selector(atTextViewDidEndEditing:)]) {
+        [self.atDelegate atTextViewDidEndEditing:self];
+    }
+}
 
 - (void)updateChangeTextView {
     if (self.placeholder.length == 0 || [self.placeholder isEqualToString:@""]) {

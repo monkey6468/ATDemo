@@ -56,7 +56,7 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
-    self.textView.atDeleagate = self;
+    self.textView.atDelegate = self;
 //    self.textView.maxTextLength = 10;
     self.textView.placeholder = @"我是测试placeholder";
     self.textView.placeholderColor = UIColor.greenColor;

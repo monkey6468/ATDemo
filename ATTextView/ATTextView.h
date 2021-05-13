@@ -19,7 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 @class ATTextView;
 @protocol ATTextViewDelegate <NSObject>
 
+@optional
 - (void)atTextViewDidChange:(ATTextView *)textView;
+
+- (void)atTextViewDidBeginEditing:(UITextView *)textView;
+
+- (void)atTextViewDidEndEditing:(UITextView *)textView;
 
 @end
 
@@ -34,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIFont *placeholderFont; // 设置Placeholder 字体
 @property (assign, nonatomic) NSInteger maxTextLength; // 最大长度设置，默认1000
 
-@property (nonatomic, weak) id<ATTextViewDelegate> atDeleagate;
+@property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
 
 @end
 
