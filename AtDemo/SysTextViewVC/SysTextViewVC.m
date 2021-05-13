@@ -63,7 +63,7 @@
     self.textView.placeholder = @"我是测试placeholder";
     self.textView.placeholderTextColor = [UIColor colorWithRed:0 green:1 blue:0 alpha:0.75];
     self.textView.font = k_defaultFont;
-    self.textView.textColor = [UIColor colorWithRed:0.7 green:1 blue:0 alpha:0.75];
+//    self.textView.attributedTextColor = [UIColor colorWithRed:0.7 green:1 blue:0 alpha:0.75];
     [self.textView becomeFirstResponder];
 }
 
