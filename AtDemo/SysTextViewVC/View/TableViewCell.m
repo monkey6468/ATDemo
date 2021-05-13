@@ -53,11 +53,11 @@
 
 - (void)setModel:(DataModel *)model {
     _model = model;
-    self.yyLabel.text = model.text;
 
     NSMutableAttributedString *muAttriSting = [[NSMutableAttributedString alloc]initWithString:model.text];
     muAttriSting.yy_font = [UIFont systemFontOfSize:25];
-
+    muAttriSting.yy_color = UIColor.purpleColor;
+    
     for (TextViewBinding *bindingModel in model.userList) {
         [muAttriSting yy_setTextHighlightRange:bindingModel.range
                                          color:UIColor.redColor
