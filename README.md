@@ -86,24 +86,19 @@
 #define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 ```
 ```
-- (NSArray<TextViewBinding *> *)getResultsListArray:(NSAttributedString *)attributedString {
-    __block NSAttributedString *traveAStr = attributedString ?: self.textView.attributedText;
+- (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
-    static NSRegularExpression *iExpression;
-    iExpression = iExpression ?: [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
-    [iExpression enumerateMatchesInString:traveAStr.string
+    NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
+    [iExpression enumerateMatchesInString:attributedString.string
                                   options:0
-                                    range:NSMakeRange(0, traveAStr.string.length)
+                                    range:NSMakeRange(0, attributedString.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
-        NSString *atString = [self.textView.text substringWithRange:result.range];
-        NSDictionary *attributedDict = [traveAStr attributesAtIndex:resultRange.location effectiveRange:&resultRange];
-        if ([attributedDict[NSForegroundColorAttributeName] isEqual:k_hightColor]) {
-            TextViewBinding *bindingModel = [traveAStr attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
-            if (bindingModel) {
-                bindingModel.range = result.range;
-                [resultArray addObject:bindingModel];
-            }
+        NSString *atString = [self.text substringWithRange:result.range];
+        TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        if (bindingModel) {
+            bindingModel.range = result.range;
+            [resultArray addObject:bindingModel];
         }
     }];
     return resultArray;
