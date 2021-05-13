@@ -15,6 +15,10 @@
 
 #import "HNWKeyboardMonitor.h"
 
+//#define k_defaultColor  [UIColor blackColor]
+//#define k_hightColor    [UIColor redColor]
+
+
 @interface SysTextViewVC ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet ATTextView *textView;
@@ -57,9 +61,10 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
     self.textView.atDelegate = self;
-//    self.textView.maxTextLength = 10;
+    self.textView.maxTextLength = 10;
     self.textView.placeholder = @"我是测试placeholder";
-    self.textView.placeholderColor = UIColor.greenColor;
+    self.textView.placeholderTextColor = [UIColor colorWithRed:0 green:1 blue:0 alpha:0.75];
+    self.textView.font = k_defaultFont;
     
     [self.textView becomeFirstResponder];
 }
@@ -95,10 +100,17 @@
 }
 
 - (void)updateUIWithUser:(User *)user {
+        
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
     TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
                                                                   userId:user.userId];
 
+    // 插入前手动判断
+    if (self.textView.text.length+insertText.length > 10) {
+        NSLog(@"已经超出最大输入限制了....");
+        return;
+    }
+    
     [self.textView insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
     NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);

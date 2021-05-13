@@ -7,19 +7,30 @@
 
 #import "ATTextView.h"
 
-#define kTopY 7.0
-#define kLeftX 5.0
+#define kTopY   7.0
+#define kLeftX  5.0
+
+#define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
+
+#define HAS_TEXT_CONTAINER [self respondsToSelector:@selector(textContainer)]
+#define HAS_TEXT_CONTAINER_INSETS(x) [(x) respondsToSelector:@selector(textContainerInset)]
+
+static NSString * const kAttributedPlaceholderKey = @"attributedPlaceholder";
+static NSString * const kPlaceholderKey = @"placeholder";
+static NSString * const kFontKey = @"font";
+static NSString * const kAttributedTextKey = @"attributedText";
+static NSString * const kTextKey = @"text";
+static NSString * const kExclusionPathsKey = @"exclusionPaths";
+static NSString * const kLineFragmentPaddingKey = @"lineFragmentPadding";
+static NSString * const kTextContainerInsetKey = @"textContainerInset";
+static NSString * const kTextAlignmentKey = @"textAlignment";
 
 @interface ATTextView ()<UITextViewDelegate>
 
 @property (assign, nonatomic) NSRange changeRange; /// 改变Range
 @property (assign, nonatomic) BOOL isChanged; /// 是否改变
 
-@property (strong, nonatomic) UIColor *placeholder_color;
-@property (strong, nonatomic) UIFont *placeholder_font;
-@property (strong, nonatomic, readonly) UILabel *placeholderLabel; // 显示 Placeholder
-
-@property(assign, nonatomic) float placeholdeWidth;
+@property (strong, nonatomic) UITextView *_placeholderTextView;
 
 @end
 
@@ -29,10 +40,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    self.font = k_defaultFont;
     self.delegate = self;
-    
-    [self setttingUI];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -42,39 +50,256 @@
     return self;
 }
 
-- (void)setttingUI {
-    float left=kLeftX,top=kTopY,hegiht=30;
-    
-    self.placeholdeWidth=CGRectGetWidth(self.frame)-2*left;
-    
-    _placeholderLabel=[[UILabel alloc] initWithFrame:CGRectMake(left, top
-                                                                , _placeholdeWidth, hegiht)];
-   
-    _placeholderLabel.numberOfLines=0;
-    _placeholderLabel.lineBreakMode=NSLineBreakByCharWrapping|NSLineBreakByWordWrapping;
-    [self addSubview:_placeholderLabel];
-    
-    
-    [self defaultConfig];
-
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self preparePlaceholder];
+    }
+    return self;
 }
 
-- (void)layoutSubviews {
-    float left=kLeftX,top=kTopY,hegiht=self.bounds.size.height;
-    self.placeholdeWidth=CGRectGetWidth(self.frame)-2*left;
-    CGRect frame=_placeholderLabel.frame;
-    frame.origin.x=left;
-    frame.origin.y=top;
-    frame.size.height=hegiht;
-    frame.size.width=self.placeholdeWidth;
-    _placeholderLabel.frame=frame;
-    
-    [_placeholderLabel sizeToFit];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 70000
+- (instancetype)initWithFrame:(CGRect)frame textContainer:(NSTextContainer *)textContainer
+{
+    self = [super initWithFrame:frame textContainer:textContainer];
+    if (self) {
+        [self preparePlaceholder];
+    }
+    return self;
+}
+#else
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self preparePlaceholder];
+    }
+    return self;
+}
+#endif
+
+- (void)preparePlaceholder
+{
+    NSAssert(!self._placeholderTextView, @"placeholder has been prepared already: %@", self._placeholderTextView);
+    // the label which displays the placeholder
+    // needs to inherit some properties from its parent text view
+
+    // account for standard UITextViewPadding
+
+    CGRect frame = self.bounds;
+    self._placeholderTextView = [[UITextView alloc] initWithFrame:frame];
+    self._placeholderTextView.opaque = NO;
+    self._placeholderTextView.backgroundColor = [UIColor clearColor];
+    self._placeholderTextView.textColor = [UIColor colorWithWhite:0.7f alpha:0.7f];
+    self._placeholderTextView.textAlignment = self.textAlignment;
+    self._placeholderTextView.editable = NO;
+    self._placeholderTextView.scrollEnabled = NO;
+    self._placeholderTextView.userInteractionEnabled = NO;
+    self._placeholderTextView.font = self.font;
+    self._placeholderTextView.isAccessibilityElement = NO;
+    self._placeholderTextView.contentOffset = self.contentOffset;
+    self._placeholderTextView.contentInset = self.contentInset;
+
+    if ([self._placeholderTextView respondsToSelector:@selector(setSelectable:)]) {
+        self._placeholderTextView.selectable = NO;
+    }
+
+    if (HAS_TEXT_CONTAINER) {
+        self._placeholderTextView.textContainer.exclusionPaths = self.textContainer.exclusionPaths;
+        self._placeholderTextView.textContainer.lineFragmentPadding = self.textContainer.lineFragmentPadding;
+    }
+
+    if (HAS_TEXT_CONTAINER_INSETS(self)) {
+        self._placeholderTextView.textContainerInset = self.textContainerInset;
+    }
+
+    if (_attributedPlaceholder) {
+        self._placeholderTextView.attributedText = _attributedPlaceholder;
+    } else if (_placeholder) {
+        self._placeholderTextView.text = _placeholder;
+    }
+
+    [self setPlaceholderVisibleForText:self.text];
+
+    self.clipsToBounds = YES;
+
+    // some observations
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+    [defaultCenter addObserver:self selector:@selector(textDidChange:)
+                          name:UITextViewTextDidChangeNotification object:self];
+
+    [self addObserver:self forKeyPath:kAttributedPlaceholderKey
+              options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:kPlaceholderKey
+              options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:kFontKey
+              options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:kAttributedTextKey
+              options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:kTextKey
+              options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:kTextAlignmentKey
+              options:NSKeyValueObservingOptionNew context:nil];
+
+    if (HAS_TEXT_CONTAINER) {
+        [self.textContainer addObserver:self forKeyPath:kExclusionPathsKey
+                                options:NSKeyValueObservingOptionNew context:nil];
+        [self.textContainer addObserver:self forKeyPath:kLineFragmentPaddingKey
+                                options:NSKeyValueObservingOptionNew context:nil];
+    }
+
+    if (HAS_TEXT_CONTAINER_INSETS(self)) {
+        [self addObserver:self forKeyPath:kTextContainerInsetKey
+                  options:NSKeyValueObservingOptionNew context:nil];
+    }
 }
 
-- (void)dealloc {
-    [_placeholderLabel removeFromSuperview];
+- (void)setPlaceholder:(NSString *)placeholderText
+{
+    _placeholder = [placeholderText copy];
+    _attributedPlaceholder = [[NSAttributedString alloc] initWithString:placeholderText];
+
+    [self resizePlaceholderFrame];
 }
+
+- (void)setAttributedPlaceholder:(NSAttributedString *)attributedPlaceholderText
+{
+    _placeholder = attributedPlaceholderText.string;
+    _attributedPlaceholder = [attributedPlaceholderText copy];
+
+    [self resizePlaceholderFrame];
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self resizePlaceholderFrame];
+}
+
+- (void)resizePlaceholderFrame
+{
+    CGRect frame = self._placeholderTextView.frame;
+    frame.size = self.bounds.size;
+    self._placeholderTextView.frame = frame;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString:kAttributedPlaceholderKey]) {
+        self._placeholderTextView.attributedText = [change valueForKey:NSKeyValueChangeNewKey];
+    }
+    else if ([keyPath isEqualToString:kPlaceholderKey]) {
+        self._placeholderTextView.text = [change valueForKey:NSKeyValueChangeNewKey];
+    }
+    else if ([keyPath isEqualToString:kFontKey]) {
+        self._placeholderTextView.font = [change valueForKey:NSKeyValueChangeNewKey];
+    }
+    else if ([keyPath isEqualToString:kAttributedTextKey]) {
+        NSAttributedString *newAttributedText = [change valueForKey:NSKeyValueChangeNewKey];
+        [self setPlaceholderVisibleForText:newAttributedText.string];
+    }
+    else if ([keyPath isEqualToString:kTextKey]) {
+        NSString *newText = [change valueForKey:NSKeyValueChangeNewKey];
+        [self setPlaceholderVisibleForText:newText];
+    }
+    else if ([keyPath isEqualToString:kExclusionPathsKey]) {
+        self._placeholderTextView.textContainer.exclusionPaths = [change objectForKey:NSKeyValueChangeNewKey];
+        [self resizePlaceholderFrame];
+    }
+    else if ([keyPath isEqualToString:kLineFragmentPaddingKey]) {
+        self._placeholderTextView.textContainer.lineFragmentPadding = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+        [self resizePlaceholderFrame];
+    }
+    else if ([keyPath isEqualToString:kTextContainerInsetKey]) {
+        NSValue *value = [change objectForKey:NSKeyValueChangeNewKey];
+        self._placeholderTextView.textContainerInset = value.UIEdgeInsetsValue;
+    }
+    else if ([keyPath isEqualToString:kTextAlignmentKey]) {
+        NSNumber *alignment = [change objectForKey:NSKeyValueChangeNewKey];
+        self._placeholderTextView.textAlignment = alignment.intValue;
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void)setPlaceholderTextColor:(UIColor *)placeholderTextColor
+{
+    self._placeholderTextView.textColor = placeholderTextColor;
+}
+
+- (UIColor *)placeholderTextColor
+{
+    return self._placeholderTextView.textColor;
+}
+
+- (void)textDidChange:(NSNotification *)aNotification
+{
+    [self setPlaceholderVisibleForText:self.text];
+}
+
+- (BOOL)becomeFirstResponder
+{
+    [self setPlaceholderVisibleForText:self.text];
+
+    return [super becomeFirstResponder];
+}
+
+- (void)setPlaceholderVisibleForText:(NSString *)text
+{
+    if (text.length < 1) {
+        if (self.fadeTime > 0.0) {
+            if (![self._placeholderTextView isDescendantOfView:self]) {
+                self._placeholderTextView.alpha = 0;
+                [self addSubview:self._placeholderTextView];
+                [self sendSubviewToBack:self._placeholderTextView];
+            }
+            [UIView animateWithDuration:_fadeTime animations:^{
+                self._placeholderTextView.alpha = 1;
+            }];
+        }
+        else {
+            [self addSubview:self._placeholderTextView];
+            [self sendSubviewToBack:self._placeholderTextView];
+            self._placeholderTextView.alpha = 1;
+        }
+    }
+    else {
+        if (self.fadeTime > 0.0) {
+            [UIView animateWithDuration:_fadeTime animations:^{
+                self._placeholderTextView.alpha = 0;
+            }];
+        }
+        else {
+            [self._placeholderTextView removeFromSuperview];
+        }
+    }
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self removeObserver:self forKeyPath:kAttributedPlaceholderKey];
+    [self removeObserver:self forKeyPath:kPlaceholderKey];
+    [self removeObserver:self forKeyPath:kFontKey];
+    [self removeObserver:self forKeyPath:kAttributedTextKey];
+    [self removeObserver:self forKeyPath:kTextKey];
+    [self removeObserver:self forKeyPath:kTextAlignmentKey];
+
+    if (HAS_TEXT_CONTAINER) {
+        [self.textContainer removeObserver:self forKeyPath:kExclusionPathsKey];
+        [self.textContainer removeObserver:self forKeyPath:kLineFragmentPaddingKey];
+    }
+
+    if (HAS_TEXT_CONTAINER_INSETS(self)) {
+        [self removeObserver:self forKeyPath:kTextContainerInsetKey];
+    }
+}
+
 
 #pragma mark - UITextViewDelegate
 - (void)textViewDidChangeSelection:(UITextView *)textView {
@@ -118,7 +343,8 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    [self updateChangeTextView];
+    
+    [self checkAndFilterTextByLength:self.maxTextLength];
     
     if (!textView.markedTextRange) {
         if (_isChanged) {
@@ -212,42 +438,26 @@
     }
 }
 
-- (void)updateChangeTextView {
-    if (self.placeholder.length == 0 || [self.placeholder isEqualToString:@""]) {
-        _placeholderLabel.hidden=YES;
-    }
+
+- (BOOL)checkAndFilterTextByLength:(NSUInteger)limitMaxLength {
+    BOOL beyondLimits = NO;
     
-    if (self.text.length > 0) {
-        _placeholderLabel.hidden=YES;
-    }
-    else{
-        _placeholderLabel.hidden=NO;
-    }
-    
-    NSString *lang = [[self.nextResponder textInputMode] primaryLanguage]; // 键盘输入模式
-    
-    if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入，包括简体拼音，健体五笔，简体手写
-        UITextRange *selectedRange = [self markedTextRange];
-        //获取高亮部分
-        UITextPosition *position = [self positionFromPosition:selectedRange.start offset:0];
-        // 没有高亮选择的字，则对已输入的文字进行字数统计和限制
-        if (!position) {
-            if (self.text.length > self.maxTextLength) {
-                self.text = [self.text substringToIndex:self.maxTextLength];
+    if (self && limitMaxLength > 0) {
+        NSString *oldText = self.text;
+        //         NSAttributedString *oldText = self.attributedText;
+        // 没有标记的文本，则对已输入的文字进行字数统计和限制
+        if (!self.markedTextRange && oldText.length > limitMaxLength) {
+            beyondLimits = YES;
+            NSRange rangeIndex = [oldText rangeOfComposedCharacterSequenceAtIndex:limitMaxLength];
+            if (rangeIndex.length == 1) {
+                self.text = [oldText substringToIndex:limitMaxLength];
+            } else {
+                self.text = [oldText substringToIndex:rangeIndex.location];
             }
         }
-        // 有高亮选择的字符串，则暂不对文字进行统计和限制
-        else{
-            
-        }
-    }
-    // 中文输入法以外的直接对其统计限制即可，不考虑其他语种情况
-    else{
-        if (self.text.length > self.maxTextLength) {
-             self.text = [ self.text substringToIndex:self.maxTextLength];
-        }
     }
     
+    return beyondLimits;
 }
 
 #pragma mark - other
@@ -276,54 +486,11 @@
 }
 
 #pragma mark - set data
-- (void)defaultConfig {
-    self.placeholder_color = [UIColor lightGrayColor];
-    self.placeholder_font = k_defaultFont;
-    self.maxTextLength = 1000;
-    self.layoutManager.allowsNonContiguousLayout = NO;
-}
-
-- (void)setText:(NSString *)tex {
-    if (tex.length>0) {
-        _placeholderLabel.hidden=YES;
-    }
-    [super setText:tex];
-}
-
-- (void)setPlaceholder:(NSString *)placeholder{
-    if (placeholder.length == 0 || [placeholder isEqualToString:@""]) {
-        _placeholderLabel.hidden = YES;
-    } else {
-        _placeholderLabel.text = placeholder;
-        _placeholder = placeholder;
-    }
-}
-
-- (void)setPlaceholder_font:(UIFont *)placeholder_font {
-    _placeholder_font = placeholder_font;
-    _placeholderLabel.font = placeholder_font;
-}
-
-- (void)setPlaceholder_color:(UIColor *)placeholder_color {
-    _placeholder_color = placeholder_color;
-    _placeholderLabel.textColor = placeholder_color;
-}
-
-
-//供外部使用的 api
-- (void)setPlaceholderFont:(UIFont *)font {
-   self.placeholder_font = font;
-}
-
-- (void)setPlaceholderColor:(UIColor *)color {
-   self.placeholder_color=color;
-}
-
-- (void)setPlaceholderOpacity:(CGFloat)opacity {
-   if (opacity<0) {
-       opacity=1;
-   }
-   self.placeholderLabel.layer.opacity=opacity;
-}
+//- (void)defaultConfig {
+//    self.placeholder_color = [UIColor lightGrayColor];
+//    self.font = k_defaultFont;
+//    self.maxTextLength = 1000;
+//    self.layoutManager.allowsNonContiguousLayout = NO;
+//}
 
 @end
