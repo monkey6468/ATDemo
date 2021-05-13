@@ -30,8 +30,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 @property (assign, nonatomic) NSRange changeRange; /// 改变Range
 @property (assign, nonatomic) BOOL isChanged; /// 是否改变
 
-@property (strong, nonatomic) UITextView *_placeholderTextView;
-
+@property (strong, nonatomic) UITextView *placeholderTextView;
+@property (nonatomic, assign) NSInteger maxText_Length;
 @end
 
 @implementation ATTextView
@@ -40,6 +40,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (void)awakeFromNib {
     [super awakeFromNib];
     
+    self.maxTextLength = CGFLOAT_MAX;
+    self.textColor = k_defaultColor;
     self.delegate = self;
 }
 
@@ -81,43 +83,43 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 - (void)preparePlaceholder
 {
-    NSAssert(!self._placeholderTextView, @"placeholder has been prepared already: %@", self._placeholderTextView);
+    NSAssert(!self.placeholderTextView, @"placeholder has been prepared already: %@", self.placeholderTextView);
     // the label which displays the placeholder
     // needs to inherit some properties from its parent text view
 
     // account for standard UITextViewPadding
 
     CGRect frame = self.bounds;
-    self._placeholderTextView = [[UITextView alloc] initWithFrame:frame];
-    self._placeholderTextView.opaque = NO;
-    self._placeholderTextView.backgroundColor = [UIColor clearColor];
-    self._placeholderTextView.textColor = [UIColor colorWithWhite:0.7f alpha:0.7f];
-    self._placeholderTextView.textAlignment = self.textAlignment;
-    self._placeholderTextView.editable = NO;
-    self._placeholderTextView.scrollEnabled = NO;
-    self._placeholderTextView.userInteractionEnabled = NO;
-    self._placeholderTextView.font = self.font;
-    self._placeholderTextView.isAccessibilityElement = NO;
-    self._placeholderTextView.contentOffset = self.contentOffset;
-    self._placeholderTextView.contentInset = self.contentInset;
+    self.placeholderTextView = [[UITextView alloc] initWithFrame:frame];
+    self.placeholderTextView.opaque = NO;
+    self.placeholderTextView.backgroundColor = [UIColor clearColor];
+    self.placeholderTextView.textColor = [UIColor colorWithWhite:0.7f alpha:0.7f];
+    self.placeholderTextView.textAlignment = self.textAlignment;
+    self.placeholderTextView.editable = NO;
+    self.placeholderTextView.scrollEnabled = NO;
+    self.placeholderTextView.userInteractionEnabled = NO;
+    self.placeholderTextView.font = self.font;
+    self.placeholderTextView.isAccessibilityElement = NO;
+    self.placeholderTextView.contentOffset = self.contentOffset;
+    self.placeholderTextView.contentInset = self.contentInset;
 
-    if ([self._placeholderTextView respondsToSelector:@selector(setSelectable:)]) {
-        self._placeholderTextView.selectable = NO;
+    if ([self.placeholderTextView respondsToSelector:@selector(setSelectable:)]) {
+        self.placeholderTextView.selectable = NO;
     }
 
     if (HAS_TEXT_CONTAINER) {
-        self._placeholderTextView.textContainer.exclusionPaths = self.textContainer.exclusionPaths;
-        self._placeholderTextView.textContainer.lineFragmentPadding = self.textContainer.lineFragmentPadding;
+        self.placeholderTextView.textContainer.exclusionPaths = self.textContainer.exclusionPaths;
+        self.placeholderTextView.textContainer.lineFragmentPadding = self.textContainer.lineFragmentPadding;
     }
 
     if (HAS_TEXT_CONTAINER_INSETS(self)) {
-        self._placeholderTextView.textContainerInset = self.textContainerInset;
+        self.placeholderTextView.textContainerInset = self.textContainerInset;
     }
 
     if (_attributedPlaceholder) {
-        self._placeholderTextView.attributedText = _attributedPlaceholder;
+        self.placeholderTextView.attributedText = _attributedPlaceholder;
     } else if (_placeholder) {
-        self._placeholderTextView.text = _placeholder;
+        self.placeholderTextView.text = _placeholder;
     }
 
     [self setPlaceholderVisibleForText:self.text];
@@ -179,9 +181,9 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 - (void)resizePlaceholderFrame
 {
-    CGRect frame = self._placeholderTextView.frame;
+    CGRect frame = self.placeholderTextView.frame;
     frame.size = self.bounds.size;
-    self._placeholderTextView.frame = frame;
+    self.placeholderTextView.frame = frame;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -190,13 +192,13 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                        context:(void *)context
 {
     if ([keyPath isEqualToString:kAttributedPlaceholderKey]) {
-        self._placeholderTextView.attributedText = [change valueForKey:NSKeyValueChangeNewKey];
+        self.placeholderTextView.attributedText = [change valueForKey:NSKeyValueChangeNewKey];
     }
     else if ([keyPath isEqualToString:kPlaceholderKey]) {
-        self._placeholderTextView.text = [change valueForKey:NSKeyValueChangeNewKey];
+        self.placeholderTextView.text = [change valueForKey:NSKeyValueChangeNewKey];
     }
     else if ([keyPath isEqualToString:kFontKey]) {
-        self._placeholderTextView.font = [change valueForKey:NSKeyValueChangeNewKey];
+        self.placeholderTextView.font = [change valueForKey:NSKeyValueChangeNewKey];
     }
     else if ([keyPath isEqualToString:kAttributedTextKey]) {
         NSAttributedString *newAttributedText = [change valueForKey:NSKeyValueChangeNewKey];
@@ -207,20 +209,20 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         [self setPlaceholderVisibleForText:newText];
     }
     else if ([keyPath isEqualToString:kExclusionPathsKey]) {
-        self._placeholderTextView.textContainer.exclusionPaths = [change objectForKey:NSKeyValueChangeNewKey];
+        self.placeholderTextView.textContainer.exclusionPaths = [change objectForKey:NSKeyValueChangeNewKey];
         [self resizePlaceholderFrame];
     }
     else if ([keyPath isEqualToString:kLineFragmentPaddingKey]) {
-        self._placeholderTextView.textContainer.lineFragmentPadding = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+        self.placeholderTextView.textContainer.lineFragmentPadding = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
         [self resizePlaceholderFrame];
     }
     else if ([keyPath isEqualToString:kTextContainerInsetKey]) {
         NSValue *value = [change objectForKey:NSKeyValueChangeNewKey];
-        self._placeholderTextView.textContainerInset = value.UIEdgeInsetsValue;
+        self.placeholderTextView.textContainerInset = value.UIEdgeInsetsValue;
     }
     else if ([keyPath isEqualToString:kTextAlignmentKey]) {
         NSNumber *alignment = [change objectForKey:NSKeyValueChangeNewKey];
-        self._placeholderTextView.textAlignment = alignment.intValue;
+        self.placeholderTextView.textAlignment = alignment.intValue;
     }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -229,12 +231,12 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 - (void)setPlaceholderTextColor:(UIColor *)placeholderTextColor
 {
-    self._placeholderTextView.textColor = placeholderTextColor;
+    self.placeholderTextView.textColor = placeholderTextColor;
 }
 
 - (UIColor *)placeholderTextColor
 {
-    return self._placeholderTextView.textColor;
+    return self.placeholderTextView.textColor;
 }
 
 - (void)textDidChange:(NSNotification *)aNotification
@@ -253,29 +255,29 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 {
     if (text.length < 1) {
         if (self.fadeTime > 0.0) {
-            if (![self._placeholderTextView isDescendantOfView:self]) {
-                self._placeholderTextView.alpha = 0;
-                [self addSubview:self._placeholderTextView];
-                [self sendSubviewToBack:self._placeholderTextView];
+            if (![self.placeholderTextView isDescendantOfView:self]) {
+                self.placeholderTextView.alpha = 0;
+                [self addSubview:self.placeholderTextView];
+                [self sendSubviewToBack:self.placeholderTextView];
             }
             [UIView animateWithDuration:_fadeTime animations:^{
-                self._placeholderTextView.alpha = 1;
+                self.placeholderTextView.alpha = 1;
             }];
         }
         else {
-            [self addSubview:self._placeholderTextView];
-            [self sendSubviewToBack:self._placeholderTextView];
-            self._placeholderTextView.alpha = 1;
+            [self addSubview:self.placeholderTextView];
+            [self sendSubviewToBack:self.placeholderTextView];
+            self.placeholderTextView.alpha = 1;
         }
     }
     else {
         if (self.fadeTime > 0.0) {
             [UIView animateWithDuration:_fadeTime animations:^{
-                self._placeholderTextView.alpha = 0;
+                self.placeholderTextView.alpha = 0;
             }];
         }
         else {
-            [self._placeholderTextView removeFromSuperview];
+            [self.placeholderTextView removeFromSuperview];
         }
     }
 }
@@ -343,9 +345,11 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    
-    [self checkAndFilterTextByLength:self.maxTextLength];
-    
+//    if ([self checkAndFilterTextByLength:self.maxText_Length] == NO)
+    {
+//        return;
+    }
+
     if (!textView.markedTextRange) {
         if (_isChanged) {
             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
@@ -355,7 +359,10 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             if (tmpAString.length == changeLocation) {
                 changeLength = 0;
             }
-            [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_defaultColor, NSFontAttributeName:k_defaultFont} range:NSMakeRange(changeLocation, changeLength)];
+            if (changeLength > self.maxTextLength) {
+                changeLength = self.maxTextLength;
+            }
+            [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.textColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
             textView.attributedText = tmpAString;
             _isChanged = NO;
         }
@@ -369,7 +376,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
    if (textView.textStorage.length != 0) {
-       textView.typingAttributes = @{NSFontAttributeName:k_defaultFont, NSForegroundColorAttributeName:k_defaultColor};
+       textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.textColor};
    }
     
     if ([text isEqualToString:@""]) { // 删除
@@ -380,7 +387,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             textView.attributedText = tmpAString;
             
             [self textViewDidChange:textView];
-            textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.textColor};
             return NO;
         } else {
             NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
@@ -394,7 +401,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                     textView.attributedText = tmpAString;
                     
                     [self textViewDidChange:textView];
-                    textView.typingAttributes = @{NSFontAttributeName:k_defaultFont,NSForegroundColorAttributeName:k_defaultColor};
+                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.textColor};
                     return NO;
                 }
             }
@@ -439,21 +446,15 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 
-- (BOOL)checkAndFilterTextByLength:(NSUInteger)limitMaxLength {
+- (BOOL)checkAndFilterTextByLength:(NSInteger)limitMaxLength {
     BOOL beyondLimits = NO;
     
     if (self && limitMaxLength > 0) {
-        NSString *oldText = self.text;
-        //         NSAttributedString *oldText = self.attributedText;
+        NSAttributedString *oldText = self.attributedText;
         // 没有标记的文本，则对已输入的文字进行字数统计和限制
         if (!self.markedTextRange && oldText.length > limitMaxLength) {
             beyondLimits = YES;
-            NSRange rangeIndex = [oldText rangeOfComposedCharacterSequenceAtIndex:limitMaxLength];
-            if (rangeIndex.length == 1) {
-                self.text = [oldText substringToIndex:limitMaxLength];
-            } else {
-                self.text = [oldText substringToIndex:rangeIndex.location];
-            }
+            self.attributedText = [oldText attributedSubstringFromRange:NSMakeRange(0, limitMaxLength)];
         }
     }
     
@@ -485,12 +486,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     return results;
 }
 
-#pragma mark - set data
-//- (void)defaultConfig {
-//    self.placeholder_color = [UIColor lightGrayColor];
-//    self.font = k_defaultFont;
-//    self.maxTextLength = 1000;
-//    self.layoutManager.allowsNonContiguousLayout = NO;
-//}
+- (void)setMaxTextLength:(NSInteger)maxTextLength {
+    _maxText_Length = maxTextLength;
+}
 
 @end

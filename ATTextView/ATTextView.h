@@ -9,7 +9,6 @@
 
 #import "TextViewBinding.h"
 
-#define k_defaultFont   [UIFont systemFontOfSize:20]
 #define k_defaultColor  [UIColor blackColor]
 #define k_hightColor    [UIColor redColor]
 

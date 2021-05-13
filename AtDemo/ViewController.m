@@ -4,7 +4,6 @@
 #import "ViewController.h"
 #import "SysTextViewVC.h"
 
-
 @interface ViewController ()
 
 @end
