@@ -11,11 +11,9 @@
 #import "TableViewCell.h"
 #import "ATTextView.h"
 
-#import "TextViewBinding.h"
-
 #import "HNWKeyboardMonitor.h"
 
-#define k_defaultFont   [UIFont systemFontOfSize:30]
+#define k_defaultFont   [UIFont systemFontOfSize:25]
 
 @interface SysTextViewVC ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -59,11 +57,11 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
     self.textView.atDelegate = self;
-//    self.textView.maxTextLength = 10;
+//    self.textView.maxTextLength = 20;
     self.textView.placeholder = @"我是测试placeholder";
-    self.textView.placeholderTextColor = [UIColor colorWithRed:0 green:1 blue:0 alpha:0.75];
+    self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
     self.textView.font = k_defaultFont;
-    self.textView.attributedTextColor = [UIColor colorWithRed:0.7 green:1 blue:0 alpha:0.75];
+    self.textView.attributedTextColor = UIColor.darkGrayColor;
     [self.textView becomeFirstResponder];
 }
 
@@ -104,7 +102,7 @@
                                                                   userId:user.userId];
 
     // 插入前手动判断
-//    if (self.textView.text.length+insertText.length > 10) {
+//    if (self.textView.text.length+insertText.length > 20) {
 //        NSLog(@"已经超出最大输入限制了....");
 //        return;
 //    }

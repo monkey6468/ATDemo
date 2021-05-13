@@ -234,10 +234,8 @@
 		A69DC385262D160700A4ABF7 = {
 			isa = PBXGroup;
 			children = (
-				C971A7862633CAC90099608D /* HNWKeyboardMonitor.h */,
-				C971A7872633CAC90099608D /* HNWKeyboardMonitor.m */,
+				C9FF3F55264D740300C2D0F9 /* Lib */,
 				C9807CBD264C135600AB55F8 /* ATTextView */,
-				A652BEDD264B5DD9002F1904 /* YYText */,
 				A69DC390262D160700A4ABF7 /* AtDemo */,
 				A69DC38F262D160700A4ABF7 /* Products */,
 			);
@@ -328,6 +326,24 @@
 				A69DC40E262D50C800A4ABF7 /* ListViewController.xib */,
 			);
 			path = ListVC;
+			sourceTree = "<group>";
+		};
+		C9FF3F54264D73F800C2D0F9 /* HNWKeyboardMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				C971A7862633CAC90099608D /* HNWKeyboardMonitor.h */,
+				C971A7872633CAC90099608D /* HNWKeyboardMonitor.m */,
+			);
+			path = HNWKeyboardMonitor;
+			sourceTree = "<group>";
+		};
+		C9FF3F55264D740300C2D0F9 /* Lib */ = {
+			isa = PBXGroup;
+			children = (
+				C9FF3F54264D73F800C2D0F9 /* HNWKeyboardMonitor */,
+				A652BEDD264B5DD9002F1904 /* YYText */,
+			);
+			path = Lib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
