@@ -7,9 +7,6 @@
 
 #import "ATTextView.h"
 
-#define kTopY   7.0
-#define kLeftX  5.0
-
 #define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 
 #define HAS_TEXT_CONTAINER [self respondsToSelector:@selector(textContainer)]
@@ -474,7 +471,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                                     range:NSMakeRange(0, attributedString.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
-        NSString *atString = [self.text substringWithRange:result.range];
+        NSString *atString = [attributedString.string substringWithRange:result.range];
         TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
         if (bindingModel) {
             bindingModel.range = result.range;

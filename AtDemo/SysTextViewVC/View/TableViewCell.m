@@ -30,7 +30,7 @@
 {
     UITapGestureRecognizer *contentTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapReply:)];
     contentTap.delegate = self;
-    [self addGestureRecognizer:contentTap];
+    [self.yyLabel addGestureRecognizer:contentTap];
 }
 
 - (void)onTapReply:(UITapGestureRecognizer *)sender {
