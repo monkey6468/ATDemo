@@ -62,17 +62,20 @@
         [muAttriSting yy_setTextHighlightRange:bindingModel.range
                                          color:UIColor.redColor
                                backgroundColor:UIColor.darkGrayColor
+                                      userInfo:@{@"id":@(bindingModel.userId)}
                                      tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-            
-            for (TextViewBinding *tempBindingModel in model.userList) {
-                if (tempBindingModel.range.location == range.location
-                && tempBindingModel.range.length == range.length) {
-                    NSLog(@"点击了: %@",tempBindingModel.name);
-                }
+            YYLabel *yyLabel = (YYLabel *)containerView;
+            YYTextHighlight *highlight = (YYTextHighlight *)[yyLabel valueForKey:@"_highlight"];
+            NSDictionary *dictInfo = highlight.userInfo;
+            if (dictInfo == nil) {
+                return;
             }
-        }];
+
+            NSInteger toUserId = [dictInfo[@"id"] intValue];
+            NSLog(@"点击了: %ld",toUserId);
+        } longPressAction:nil];
     }
-    
+
     self.yyLabel.attributedText = muAttriSting;
 }
 
