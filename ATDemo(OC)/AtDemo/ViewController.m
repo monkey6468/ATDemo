@@ -18,7 +18,7 @@
 @property (weak, nonatomic) IBOutlet ATTextView *textView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *textViewConstraintH;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomLineConstraintB;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomViewConstraintB;
 
 @property (strong, nonatomic) NSMutableArray *dataArray;
 
@@ -194,9 +194,9 @@
 #pragma mark HNWKeyboardMonitorDelegate
 - (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillShow:(HNWKeyboardInfo *)info {
     if (@available(iOS 11.0, *)) {
-        self.bottomLineConstraintB.constant = info.keyboardEndFrame.size.height-self.view.safeAreaInsets.bottom;
+        self.bottomViewConstraintB.constant = info.keyboardEndFrame.size.height-self.view.safeAreaInsets.bottom;
     } else {
-        self.bottomLineConstraintB.constant = info.keyboardEndFrame.size.height;
+        self.bottomViewConstraintB.constant = info.keyboardEndFrame.size.height;
     }
     [UIView animateWithDuration:info.animationDuration animations:^{
         [self.view layoutIfNeeded];
@@ -204,7 +204,7 @@
 }
 
 - (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillHide:(HNWKeyboardInfo *)info {
-    self.bottomLineConstraintB.constant = 0;
+    self.bottomViewConstraintB.constant = 0;
     [UIView animateWithDuration:info.animationDuration animations:^{
         [self.view layoutIfNeeded];
     }];

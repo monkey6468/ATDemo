@@ -116,7 +116,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="Qty-4a-gTa"/>
                     <connections>
-                        <outlet property="bottomLineConstraintB" destination="5IG-1H-3WG" id="Zsd-eZ-Z4N"/>
+                        <outlet property="bottomViewConstraintB" destination="5IG-1H-3WG" id="Zsd-eZ-Z4N"/>
                         <outlet property="tableView" destination="kJo-NS-Twd" id="eOW-po-u6R"/>
                         <outlet property="textView" destination="Vsh-IS-fgu" id="UwZ-OE-WGc"/>
                         <outlet property="textViewConstraintH" destination="RAI-U4-d13" id="d4v-1K-Odb"/>

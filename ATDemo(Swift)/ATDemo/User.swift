@@ -17,7 +17,7 @@ class User: NSObject {
         userId: Int
     ) {
         super.init()
-            self.name = name
-            self.userId = userId
+        self.name = name
+        self.userId = userId
     }
 }
