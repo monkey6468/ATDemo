@@ -46,8 +46,6 @@
 		C9BF91462633E01D005B25DB /* TableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BF91442633E01D005B25DB /* TableViewCell.m */; };
 		C9BF91472633E01D005B25DB /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9BF91452633E01D005B25DB /* TableViewCell.xib */; };
 		C9BF914D2633E61F005B25DB /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C9BF914C2633E61F005B25DB /* DataModel.m */; };
-		C9DFE307262F1FEC001FBAAE /* SysTextViewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */; };
-		C9DFE308262F1FEC001FBAAE /* SysTextViewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -126,9 +124,6 @@
 		C9BF91452633E01D005B25DB /* TableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewCell.xib; sourceTree = "<group>"; };
 		C9BF914B2633E61F005B25DB /* DataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataModel.h; sourceTree = "<group>"; };
 		C9BF914C2633E61F005B25DB /* DataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
-		C9DFE304262F1FEC001FBAAE /* SysTextViewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SysTextViewVC.h; sourceTree = "<group>"; };
-		C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SysTextViewVC.m; sourceTree = "<group>"; };
-		C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SysTextViewVC.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -256,8 +251,9 @@
 				A69DC392262D160700A4ABF7 /* AppDelegate.m */,
 				A69DC397262D160700A4ABF7 /* ViewController.h */,
 				A69DC398262D160700A4ABF7 /* ViewController.m */,
+				C9BF91492633E608005B25DB /* Model */,
+				C9BF91422633E008005B25DB /* View */,
 				C9DFE30D262F20F2001FBAAE /* ListVC */,
-				C9DFE30B262F20DB001FBAAE /* SysTextViewVC */,
 				A69DC39A262D160700A4ABF7 /* Main.storyboard */,
 				A69DC39D262D160A00A4ABF7 /* Assets.xcassets */,
 				A69DC39F262D160A00A4ABF7 /* LaunchScreen.storyboard */,
@@ -284,7 +280,8 @@
 				C9BF91442633E01D005B25DB /* TableViewCell.m */,
 				C9BF91452633E01D005B25DB /* TableViewCell.xib */,
 			);
-			path = View;
+			name = View;
+			path = SysTextViewVC/View;
 			sourceTree = "<group>";
 		};
 		C9BF91492633E608005B25DB /* Model */ = {
@@ -293,19 +290,8 @@
 				C9BF914B2633E61F005B25DB /* DataModel.h */,
 				C9BF914C2633E61F005B25DB /* DataModel.m */,
 			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		C9DFE30B262F20DB001FBAAE /* SysTextViewVC */ = {
-			isa = PBXGroup;
-			children = (
-				C9BF91492633E608005B25DB /* Model */,
-				C9BF91422633E008005B25DB /* View */,
-				C9DFE304262F1FEC001FBAAE /* SysTextViewVC.h */,
-				C9DFE305262F1FEC001FBAAE /* SysTextViewVC.m */,
-				C9DFE306262F1FEC001FBAAE /* SysTextViewVC.xib */,
-			);
-			path = SysTextViewVC;
+			name = Model;
+			path = SysTextViewVC/Model;
 			sourceTree = "<group>";
 		};
 		C9DFE30C262F20E5001FBAAE /* Model */ = {
@@ -403,7 +389,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A69DC3A1262D160A00A4ABF7 /* LaunchScreen.storyboard in Resources */,
-				C9DFE308262F1FEC001FBAAE /* SysTextViewVC.xib in Resources */,
 				A69DC39E262D160A00A4ABF7 /* Assets.xcassets in Resources */,
 				C9BF91472633E01D005B25DB /* TableViewCell.xib in Resources */,
 				A69DC410262D50C800A4ABF7 /* ListViewController.xib in Resources */,
@@ -425,7 +410,6 @@
 				A652BF28264B5DD9002F1904 /* YYTextAsyncLayer.m in Sources */,
 				A652BF13264B5DD9002F1904 /* YYTextMagnifier.m in Sources */,
 				A652BF27264B5DD9002F1904 /* UIView+YYText.m in Sources */,
-				C9DFE307262F1FEC001FBAAE /* SysTextViewVC.m in Sources */,
 				A69DC399262D160700A4ABF7 /* ViewController.m in Sources */,
 				A652BF21264B5DD9002F1904 /* YYTextRubyAnnotation.m in Sources */,
 				A652BF1E264B5DD9002F1904 /* YYTextParser.m in Sources */,
