@@ -7,6 +7,8 @@
 
 import UIKit
 
+let k_defaultColor = UIColor.blue
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var textView: ATTextView!
@@ -16,14 +18,7 @@ class ViewController: UIViewController {
         
         textView.atDelegate = self;
         textView.font = k_defaultFont;
-        textView.attributed_TextColor = UIColor.darkGray;
-
-        let str = "123456u"
-        print(str.count)
-        
-        let range = NSMakeRange(2, 3)
-        let str2 = str[2, 3]
-        print(str2)
+        textView.attributed_TextColor = k_defaultColor;
     }
     
     @IBAction func onActionInsert(_ sender: UIButton) {

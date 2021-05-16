@@ -40,8 +40,9 @@ class ATTextView: UITextView {
     private var isChanged = false // 是否改变
     private var placeholderTextView: UITextView?
     private var max_TextLength = 0
-    public var attributed_TextColor: UIColor?
     
+    public var attributed_TextColor: UIColor = k_default_attributedTextColor
+        
     public weak var atDelegate: ATTextViewDelegate?
     public var cursorLocation = 0
     public var atUserList : [TextViewBinding] {
@@ -60,8 +61,6 @@ class ATTextView: UITextView {
         super.awakeFromNib()
         
 //        maxTextLength = 100000
-//        attributed_TextColor = k_defaultColor
-//        delegate = self
     }
     
     func getResultsListArray(withTextView attributedString: NSAttributedString) -> [TextViewBinding]? {
@@ -100,8 +99,8 @@ extension ATTextView: UITextViewDelegate {
         let textSelectedLength = textView.selectedRange.length
 
         for i in 0..<results.count {
-            let bindingModel = results[i] as? TextViewBinding
-            let range = bindingModel?.range
+            let bindingModel = results[i] as TextViewBinding
+            let range = bindingModel.range
             if textSelectedLength == 0 {
                 if textSelectedLocation > (range?.location ?? 0) && textSelectedLocation < (range?.location ?? 0) + (range?.length ?? 0) {
                     inRange = true
@@ -148,12 +147,12 @@ extension ATTextView: UITextViewDelegate {
                 if tmpAString.length == changeLocation {
                     changeLength = 0
                 }
-                if changeLength > max_TextLength {
-                    changeLength = max_TextLength
-                }
+//                if changeLength > max_TextLength {
+//                    changeLength = max_TextLength
+//                }
                 tmpAString.setAttributes([
                     NSAttributedString.Key.foregroundColor: attributed_TextColor,
-                    NSAttributedString.Key.font: font
+                    NSAttributedString.Key.font: font!
                 ], range: NSRange(location: changeLocation ?? 0, length: changeLength))
                 textView.attributedText = tmpAString
                 isChanged = false
@@ -169,7 +168,7 @@ extension ATTextView: UITextViewDelegate {
         // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
         if textView.textStorage.length != 0 {
             textView.typingAttributes = [
-                NSAttributedString.Key.font: font,
+                NSAttributedString.Key.font: font!,
                 NSAttributedString.Key.foregroundColor: attributed_TextColor
             ]
         }
@@ -185,7 +184,7 @@ extension ATTextView: UITextViewDelegate {
                 let lastCursorLocation = selectedRange.location
                 textViewDidChange(textView)
                 textView.typingAttributes = [
-                    NSAttributedString.Key.font: font,
+                    NSAttributedString.Key.font: font!,
                     NSAttributedString.Key.foregroundColor: attributed_TextColor
                 ]
                 cursorLocation = lastCursorLocation
@@ -194,8 +193,8 @@ extension ATTextView: UITextViewDelegate {
             } else {
                 let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
                 for i in 0..<results.count {
-                    let bindingModel = results[i] as? TextViewBinding
-                    let tmpRange = bindingModel?.range
+                    let bindingModel = results[i] as TextViewBinding
+                    let tmpRange = bindingModel.range
                     if (range.location + range.length) == ((tmpRange?.location ?? 0) + (tmpRange?.length ?? 0)) {
                         
                         let tmpAString = NSMutableAttributedString(attributedString: textView.attributedText)
@@ -206,7 +205,7 @@ extension ATTextView: UITextViewDelegate {
                         
                         textViewDidChange(textView)
                         textView.typingAttributes = [
-                            NSAttributedString.Key.font: font,
+                            NSAttributedString.Key.font: font!,
                             NSAttributedString.Key.foregroundColor: attributed_TextColor
                         ]
                         return false
@@ -217,9 +216,9 @@ extension ATTextView: UITextViewDelegate {
             let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
             if results.count != 0 {
                 for i in 0..<results.count {
-                    let bindingModel = results[i] as? TextViewBinding
-                    let tmpRange = bindingModel?.range
-                    if ((range.location + range.length) == ((tmpRange?.location ?? 0) + (tmpRange?.length ?? 0)) || !(range.location == 0)) {
+                    let bindingModel = results[i] as TextViewBinding
+                    let tmpRange = bindingModel.range
+                    if ((range.location + range.length) == ((tmpRange?.location ?? 0) + (tmpRange?.length ?? 0)) || range.location == 0) {
                         changeRange = NSRange(location: range.location, length: text.count)
                         isChanged = true
                         
@@ -228,7 +227,7 @@ extension ATTextView: UITextViewDelegate {
                 }
             } else {
                 // 在第一个删除后 重置text color
-                if !(range.location == 0) {
+                if range.location == 0 {
                     changeRange = NSRange(location: range.location, length: text.count)
                     isChanged = true
                     
