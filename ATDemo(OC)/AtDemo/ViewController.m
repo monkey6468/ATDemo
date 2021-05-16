@@ -193,9 +193,9 @@
 #pragma mark HNWKeyboardMonitorDelegate
 - (void)keyboardMonitor:(HNWKeyboardMonitor *)keyboardMonitor keyboardWillShow:(HNWKeyboardInfo *)info {
     if (@available(iOS 11.0, *)) {
-        self.bottomLineConstraintB.constant = -info.keyboardEndFrame.size.height+self.view.safeAreaInsets.bottom;
+        self.bottomLineConstraintB.constant = info.keyboardEndFrame.size.height-self.view.safeAreaInsets.bottom;
     } else {
-        self.bottomLineConstraintB.constant = -info.keyboardEndFrame.size.height;
+        self.bottomLineConstraintB.constant = info.keyboardEndFrame.size.height;
     }
     [UIView animateWithDuration:info.animationDuration animations:^{
         [self.view layoutIfNeeded];
