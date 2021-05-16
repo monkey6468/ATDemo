@@ -46,6 +46,10 @@ class ViewController: UIViewController {
     //MARK: UI
     func initTableView() -> Void {
         tableView.tableFooterView = UIView.init()
+        //
+        tableView.register(UINib(nibName: String(describing: TableViewCell.self)
+                                 , bundle: nil),
+                           forCellReuseIdentifier: String(describing: TableViewCell.self))
     }
     
     public func updateUI() -> Void {
@@ -170,15 +174,11 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellid = "testCellID"
-        var cell = tableView.dequeueReusableCell(withIdentifier: cellid)
-        if cell == nil {
-            cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellid)
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TableViewCell.self),
+                                                 for: indexPath) as! TableViewCell
         
         let user: DataModel = dataArray[indexPath.row]
-        
-        cell?.textLabel?.text = user.text
-        return cell!
+        cell.yyLabel.text = user.text
+        return cell
     }
 }
