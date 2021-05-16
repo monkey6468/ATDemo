@@ -7,7 +7,8 @@
 
 #import "ATTextView.h"
 
-#define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
+#define kATRegular                      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
+#define k_default_attributedTextColor   [UIColor blackColor]
 
 #define HAS_TEXT_CONTAINER [self respondsToSelector:@selector(textContainer)]
 #define HAS_TEXT_CONTAINER_INSETS(x) [(x) respondsToSelector:@selector(textContainerInset)]
@@ -40,7 +41,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     [super awakeFromNib];
     
     self.maxTextLength = 100000;
-    self.attributed_TextColor = k_defaultColor;
+    self.attributed_TextColor = k_default_attributedTextColor;
     self.delegate = self;
 }
 
@@ -154,6 +155,22 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         [self addObserver:self forKeyPath:kTextContainerInsetKey
                   options:NSKeyValueObservingOptionNew context:nil];
     }
+}
+
+#pragma mark - other limt length
+- (BOOL)checkAndFilterTextByLength:(NSInteger)limitMaxLength {
+    BOOL beyondLimits = NO;
+    
+    if (self && limitMaxLength > 0) {
+        NSAttributedString *oldText = self.attributedText;
+        // 没有标记的文本，则对已输入的文字进行字数统计和限制
+        if (!self.markedTextRange && oldText.length > limitMaxLength) {
+            beyondLimits = YES;
+            self.attributedText = [oldText attributedSubstringFromRange:NSMakeRange(0, limitMaxLength)];
+        }
+    }
+    
+    return beyondLimits;
 }
 
 - (void)setPlaceholder:(NSString *)placeholderText
@@ -371,62 +388,67 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     }
 }
 
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {    
-    if ([text isEqualToString:@""]) { // 删除
-        NSRange selectedRange = textView.selectedRange;
-        if (selectedRange.length) {
-            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-            [tmpAString deleteCharactersInRange:selectedRange];
-            textView.attributedText = tmpAString;
-            
-            NSInteger lastCursorLocation = selectedRange.location;
-            [self textViewDidChange:textView];
-            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
-            self.cursorLocation = lastCursorLocation;
-            textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
-            return NO;
-        } else {
-            NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
-            for (NSInteger i = 0; i < results.count; i++) {
-                TextViewBinding *bindingModel = results[i];
-                NSRange tmpRange = bindingModel.range;
-                if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
-                    
-                    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-                    [tmpAString deleteCharactersInRange:tmpRange];
-                    textView.attributedText = tmpAString;
-                    
-                    [self textViewDidChange:textView];
-                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
-                    return NO;
-                }
-            }
-        }
-    } else { // 增加
-        NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
-        if ([results count]) {
-            for (NSInteger i = 0; i < results.count; i++) {
-                TextViewBinding *bindingModel = results[i];
-                NSRange tmpRange = bindingModel.range;
-                if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
-                    _changeRange = NSMakeRange(range.location, text.length);
-                    _isChanged = YES;
-                    
-                    return YES;
-                }
-            }
-        } else {
-            // 在第一个删除后 重置text color
-            if (!range.location) {
-                _changeRange = NSMakeRange(range.location, text.length);
-                _isChanged = YES;
-                
-                return YES;
-            }
-        }
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
+    if (textView.textStorage.length != 0) {
+        textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
     }
-    return YES;
-}
+     
+     if ([text isEqualToString:@""]) { // 删除
+         NSRange selectedRange = textView.selectedRange;
+         if (selectedRange.length) {
+             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+             [tmpAString deleteCharactersInRange:selectedRange];
+             textView.attributedText = tmpAString;
+             
+             NSInteger lastCursorLocation = selectedRange.location;
+             [self textViewDidChange:textView];
+             textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+             self.cursorLocation = lastCursorLocation;
+             textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
+             return NO;
+         } else {
+             NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
+             for (NSInteger i = 0; i < results.count; i++) {
+                 TextViewBinding *bindingModel = results[i];
+                 NSRange tmpRange = bindingModel.range;
+                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
+                     
+                     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+                     [tmpAString deleteCharactersInRange:tmpRange];
+                     textView.attributedText = tmpAString;
+                     
+                     [self textViewDidChange:textView];
+                     textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+                     return NO;
+                 }
+             }
+         }
+     } else { // 增加
+         NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
+         if ([results count]) {
+             for (NSInteger i = 0; i < results.count; i++) {
+                 TextViewBinding *bindingModel = results[i];
+                 NSRange tmpRange = bindingModel.range;
+                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+                     _changeRange = NSMakeRange(range.location, text.length);
+                     _isChanged = YES;
+                     
+                     return YES;
+                 }
+             }
+         } else {
+             // 在第一个删除后 重置text color
+             if (!range.location) {
+                 _changeRange = NSMakeRange(range.location, text.length);
+                 _isChanged = YES;
+                 
+                 return YES;
+             }
+         }
+     }
+     return YES;
+ }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     if ([self.atDelegate respondsToSelector:@selector(atTextViewDidBeginEditing:)]) {
@@ -441,22 +463,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 
-- (BOOL)checkAndFilterTextByLength:(NSInteger)limitMaxLength {
-    BOOL beyondLimits = NO;
-    
-    if (self && limitMaxLength > 0) {
-        NSAttributedString *oldText = self.attributedText;
-        // 没有标记的文本，则对已输入的文字进行字数统计和限制
-        if (!self.markedTextRange && oldText.length > limitMaxLength) {
-            beyondLimits = YES;
-            self.attributedText = [oldText attributedSubstringFromRange:NSMakeRange(0, limitMaxLength)];
-        }
-    }
-    
-    return beyondLimits;
-}
-
-#pragma mark - other
+#pragma mark - other binding
 - (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
     NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];

@@ -9,7 +9,9 @@
 
 #import "HNWKeyboardMonitor.h"
 
-#define k_defaultFont   [UIFont systemFontOfSize:25]
+#define k_defaultFont   [UIFont systemFontOfSize:15]
+#define k_defaultColor  [UIColor blueColor]
+#define k_hightColor    [UIColor redColor]
 
 @interface ViewController ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -58,7 +60,7 @@
     self.textView.placeholder = @"我是测试placeholder";
     self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
     self.textView.font = k_defaultFont;
-    self.textView.attributedTextColor = UIColor.darkGrayColor;
+    self.textView.attributedTextColor = k_defaultColor;
     [self.textView becomeFirstResponder];
 }
 

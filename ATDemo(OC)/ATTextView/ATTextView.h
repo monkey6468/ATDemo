@@ -9,9 +9,6 @@
 
 #import "TextViewBinding.h"
 
-#define k_defaultColor  [UIColor greenColor]
-#define k_hightColor    [UIColor redColor]
-
 NS_ASSUME_NONNULL_BEGIN
 
 @class ATTextView;
