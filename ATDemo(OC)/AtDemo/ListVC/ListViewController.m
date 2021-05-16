@@ -7,7 +7,7 @@
 
 #import "ListViewController.h"
 
-@interface ListViewController ()<UITableViewDelegate, UITableViewDelegate>
+@interface ListViewController ()<UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *dataArray;
 @end

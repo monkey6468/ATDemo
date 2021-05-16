@@ -30,8 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"TextViewVC";
+    self.navigationItem.title = @"ATTextView_OC";
     
     [self settingUI];
     [self initTableView];

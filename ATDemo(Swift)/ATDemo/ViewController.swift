@@ -16,18 +16,32 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.title = "ATTextView_Swift";
+
         textView.atDelegate = self;
-        textView.font = k_defaultFont;
+        textView.font = k_defaultFont
         textView.attributed_TextColor = k_defaultColor;
+        
     }
     
-    @IBAction func onActionInsert(_ sender: UIButton) {
+    @IBAction func pushListVC(_ sender: UIButton) {
+        let storyboard: UIStoryboard! = UIStoryboard(name: "Main", bundle: nil)
+        let vc: ListViewController! = storyboard?.instantiateViewController(withIdentifier: "ListViewController") as? ListViewController
+        let nav : UINavigationController = UINavigationController(rootViewController: vc) as UINavigationController
+        self.present(nav, animated: true, completion: nil)
         
-        let name = "测试ABC"
-        let insertText = "@"+name+" "
-        let bindingModel : TextViewBinding = TextViewBinding(name: name, userId: 23)
+        vc.callBack = { (user: User, viewController: UIViewController) in
+            
+            viewController.dismiss(animated: true, completion: nil)
+            
+            self.onActionInsert(user)
+        }
+    }
     
-
+    func onActionInsert(_ user: User) {
+        let insertText = "@" + user.name! + " "
+        let bindingModel : TextViewBinding = TextViewBinding(name: user.name, userId: user.userId)
+    
         textView.insertText(insertText)
         
         let tmpAString : NSMutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText)
@@ -44,8 +58,8 @@ class ViewController: UIViewController {
         textView.selectedRange = NSMakeRange(lastCursorLocation, textView.selectedRange.length)
         textView.cursorLocation = lastCursorLocation
     }
+    
     @IBAction func onActionShow(_ sender: UIButton) {
-        
         let results = textView.atUserList;
 
         print("输出打印:");
