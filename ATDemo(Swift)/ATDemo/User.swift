@@ -9,7 +9,7 @@ import Foundation
 
 class User: NSObject {
     var userId = 0 // 用户ID
-    var name: String?
+    var name: String! = ""
     var range: NSRange?
     
     init(

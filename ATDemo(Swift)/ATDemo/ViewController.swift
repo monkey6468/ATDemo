@@ -178,7 +178,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                                                  for: indexPath) as! TableViewCell
         
         let user: DataModel = dataArray[indexPath.row]
-        cell.yyLabel.text = user.text
+        cell.model = user
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let user: DataModel = dataArray[indexPath.row]
+        return TableViewCell.rowHeightWithModel(model: user)
     }
 }
