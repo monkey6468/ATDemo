@@ -43,13 +43,12 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         let user: User = dataArray[indexPath.row]
-        
         cell?.textLabel?.text = user.name
         return cell!
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user: User = dataArray[indexPath.row] as User
+        let user: User = dataArray[indexPath.row]
         self.callBack!(user, self)
     }
 }

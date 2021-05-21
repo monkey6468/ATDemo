@@ -17,13 +17,13 @@ class TableViewCell: UITableViewCell {
         set {
             _model = newValue
 
-            let muAttriSting: NSMutableAttributedString = NSMutableAttributedString(string: newValue.text ?? "")
+            let muAttriSting: NSMutableAttributedString = NSMutableAttributedString(string: newValue.text)
             muAttriSting.yy_font = UIFont.systemFont(ofSize: 25)
             muAttriSting.yy_color = UIColor.purple
             
             let arr = model.userList!
             for bindingModel in arr {
-                muAttriSting.yy_setTextHighlight(NSRange(location: bindingModel.range?.location ?? 0, length: bindingModel.range?.length ?? 0), color: .red, backgroundColor: .darkGray, userInfo: ["id": bindingModel.userId]) { containerView, text, range, rect in
+                muAttriSting.yy_setTextHighlight(NSRange(location: bindingModel.range.location, length: bindingModel.range.length), color: .red, backgroundColor: .darkGray, userInfo: ["id": bindingModel.userId]) { containerView, text, range, rect in
                     
                     let yyLabel = containerView as! YYLabel
                     let highlight = yyLabel.value(forKey: "_highlight") as! YYTextHighlight
@@ -59,7 +59,7 @@ class TableViewCell: UITableViewCell {
     }
     
     public class func rowHeightWithModel(model: DataModel) -> CGFloat {
-        let height = (model.text?.heightWithFont(font: UIFont.systemFont(ofSize: 25), fixedWidth: UIScreen.main.bounds.size.width) ?? 0) as CGFloat
+        let height = (model.text.heightWithFont(font: UIFont.systemFont(ofSize: 25), fixedWidth: UIScreen.main.bounds.size.width)) as CGFloat
         return height+5
     }
     

@@ -144,7 +144,7 @@ class ViewController: UIViewController {
             print("user info - name:\(String(describing: bindingModel.name))- location:\(String(describing: bindingModel.range?.location))")
         }
         
-        let model : DataModel = DataModel() as DataModel
+        let model : DataModel = DataModel()
         model.userList = results
         model.text = textView.text
         dataArray.append(model)

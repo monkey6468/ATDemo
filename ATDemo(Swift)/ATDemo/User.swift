@@ -10,7 +10,7 @@ import Foundation
 class User: NSObject {
     var userId = 0 // 用户ID
     var name: String! = ""
-    var range: NSRange?
+    var range: NSRange! = NSRange(location: 0, length: 0)
     
     init(
         name: String = "",

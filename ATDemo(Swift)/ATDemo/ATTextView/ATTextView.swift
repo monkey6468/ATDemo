@@ -36,7 +36,7 @@ import UIKit
 }
 
 class ATTextView: UITextView {
-    private var changeRange: NSRange? // 改变Range
+    private var changeRange: NSRange! = NSRange(location: 0, length: 0) // 改变Range
     private var isChanged = false // 是否改变
     private var placeholderTextView: UITextView?
     private var max_TextLength = 0
@@ -100,17 +100,16 @@ extension ATTextView: UITextViewDelegate {
 
         for i in 0..<results.count {
             let bindingModel = results[i] as TextViewBinding
-            let range = bindingModel.range
+            let range: NSRange = bindingModel.range
             if textSelectedLength == 0 {
-                if textSelectedLocation > (range?.location ?? 0) && textSelectedLocation < (range?.location ?? 0) + (range?.length ?? 0) {
+                if textSelectedLocation > range.location && textSelectedLocation < range.location + range.length {
                     inRange = true
-                    if let range = range {
-                        tempRange = range
-                    }
+                    tempRange = range
+
                     break
                 }
             } else {
-                if (textSelectedLocation > (range?.location ?? 0) && textSelectedLocation < (range?.location ?? 0) + (range?.length ?? 0)) || (textSelectedLocation + textSelectedLength > (range?.location ?? 0) && textSelectedLocation + textSelectedLength < (range?.location ?? 0) + (range?.length ?? 0)) {
+                if (textSelectedLocation > range.location && textSelectedLocation < range.location + range.length) || (textSelectedLocation + textSelectedLength > range.location && textSelectedLocation + textSelectedLength < range.location + range.length) {
                     inRange = true
                     break
                 }
@@ -132,7 +131,6 @@ extension ATTextView: UITextViewDelegate {
         cursorLocation = textView.selectedRange.location
     }
     
-    //  Converted to Swift 5.4 by Swiftify v5.4.24202 - https://swiftify.com/
     func textViewDidChange(_ textView: UITextView) {
 //        if checkAndFilterText(byLength: max_TextLength) {
 //            return
@@ -141,7 +139,7 @@ extension ATTextView: UITextViewDelegate {
         if textView.markedTextRange == nil {
             if isChanged {
                 let tmpAString = NSMutableAttributedString(attributedString: textView.attributedText)
-                let changeLocation = changeRange?.location
+                let changeLocation = changeRange.location
                 var changeLength = changeRange!.length
                 // 修复中文预输入时，删除最后一个崩溃的问题
                 if tmpAString.length == changeLocation {
@@ -153,7 +151,7 @@ extension ATTextView: UITextViewDelegate {
                 tmpAString.setAttributes([
                     NSAttributedString.Key.foregroundColor: attributed_TextColor,
                     NSAttributedString.Key.font: font!
-                ], range: NSRange(location: changeLocation ?? 0, length: changeLength))
+                ], range: NSRange(location: changeLocation, length: changeLength))
                 textView.attributedText = tmpAString
                 isChanged = false
             }
@@ -172,7 +170,7 @@ extension ATTextView: UITextViewDelegate {
                 NSAttributedString.Key.foregroundColor: attributed_TextColor
             ]
         }
-//
+
         if text == "" {
             // 删除
             let selectedRange = textView.selectedRange
@@ -194,13 +192,12 @@ extension ATTextView: UITextViewDelegate {
                 let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
                 for i in 0..<results.count {
                     let bindingModel = results[i] as TextViewBinding
-                    let tmpRange = bindingModel.range
-                    if (range.location + range.length) == ((tmpRange?.location ?? 0) + (tmpRange?.length ?? 0)) {
+                    let tmpRange: NSRange = bindingModel.range
+                    if (range.location + range.length) == (tmpRange.location + tmpRange.length) {
                         
                         let tmpAString = NSMutableAttributedString(attributedString: textView.attributedText)
-                        if let tmpRange = tmpRange {
-                            tmpAString.deleteCharacters(in: tmpRange)
-                        }
+                        tmpAString.deleteCharacters(in: tmpRange)
+
                         textView.attributedText = tmpAString
                         
                         textViewDidChange(textView)
@@ -217,8 +214,8 @@ extension ATTextView: UITextViewDelegate {
             if results.count != 0 {
                 for i in 0..<results.count {
                     let bindingModel = results[i] as TextViewBinding
-                    let tmpRange = bindingModel.range
-                    if ((range.location + range.length) == ((tmpRange?.location ?? 0) + (tmpRange?.length ?? 0)) || range.location == 0) {
+                    let tmpRange: NSRange = bindingModel.range
+                    if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || range.location == 0) {
                         changeRange = NSRange(location: range.location, length: text.count)
                         isChanged = true
                         

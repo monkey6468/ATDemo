@@ -15,9 +15,9 @@ let k_hightColor = UIColor.red
 let k_defaultFont =  UIFont.systemFont(ofSize: 18)
 
 class TextViewBinding: NSObject {
-    var name: String?
+    var name: String! = ""
     var userId = 0
-    var range: NSRange?
+    var range: NSRange! = NSRange(location: 0, length: 0)
 
     init(
         name: String?,

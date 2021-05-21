@@ -8,6 +8,6 @@
 import Foundation
 
 class DataModel: NSObject {
-    var text: String?
-    var userList: Array<TextViewBinding>?
+    var text: String! = ""
+    var userList: Array<TextViewBinding>! = []
 }
