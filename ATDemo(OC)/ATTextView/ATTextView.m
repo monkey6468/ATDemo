@@ -8,7 +8,7 @@
 #import "ATTextView.h"
 
 #define kATRegular                      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
-#define k_default_attributedTextColor   [UIColor blackColor]
+#define kAT                             @"@"
 
 #define HAS_TEXT_CONTAINER [self respondsToSelector:@selector(textContainer)]
 #define HAS_TEXT_CONTAINER_INSETS(x) [(x) respondsToSelector:@selector(textContainerInset)]
@@ -23,10 +23,9 @@ static NSString * const kLineFragmentPaddingKey = @"lineFragmentPadding";
 static NSString * const kTextContainerInsetKey = @"textContainerInset";
 static NSString * const kTextAlignmentKey = @"textAlignment";
 
-@interface ATTextView ()<UITextViewDelegate>
+@interface ATTextView () <UITextViewDelegate>
 
-//@property (assign, nonatomic) NSRange changeRange; /// 改变Range
-//@property (assign, nonatomic) BOOL isChanged; /// 是否改变
+@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
 
 @property (strong, nonatomic) UITextView *placeholderTextView;
 @property (assign, nonatomic) NSInteger max_TextLength;
@@ -41,7 +40,9 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     [super awakeFromNib];
     
     self.maxTextLength = 100000;
-    self.attributed_TextColor = k_default_attributedTextColor;
+    self.attributed_TextColor = UIColor.blackColor;
+    self.hightTextColor = UIColor.redColor;
+    self.bSupport = YES;
     self.delegate = self;
 }
 
@@ -379,7 +380,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
+    if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)] && self.isSupport) {
         [self.atDelegate atTextViewDidInputSpecialText:self];
     }
     
@@ -387,31 +388,13 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         return;
     }
     
-//    if (!textView.markedTextRange) {
-//        if (_isChanged) {
-//            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-//            NSInteger changeLocation = _changeRange.location;
-//            NSInteger changeLength = _changeRange.length;
-//            // 修复中文预输入时，删除最后一个崩溃的问题
-//            if (tmpAString.length == changeLocation) {
-//                changeLength = 0;
-//            }
-//            if (changeLength > self.max_TextLength) {
-//                changeLength = self.max_TextLength;
-//            }
-//            [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.attributed_TextColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
-//            textView.attributedText = tmpAString;
-//            _isChanged = NO;
-//        }
-//    }
-    
     if ([self.atDelegate respondsToSelector:@selector(atTextViewDidChange:)]) {
         [self.atDelegate atTextViewDidChange:self];
     }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if ([text isEqualToString:@"@"]) {
+    if ([text isEqualToString:kAT]) {
         self.bAtChart = YES;
     } else {
         self.bAtChart = NO;
@@ -422,64 +405,45 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
     }
 
-     if ([text isEqualToString:@""]) { // 删除
-         NSRange selectedRange = textView.selectedRange;
-         if (selectedRange.length) {
-             NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-             [tmpAString deleteCharactersInRange:selectedRange];
-             textView.attributedText = tmpAString;
-
-             NSInteger lastCursorLocation = selectedRange.location;
-             [self textViewDidChange:textView];
-             textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
-             self.cursorLocation = lastCursorLocation;
-             textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
-             return NO;
-         } else {
-             NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
-             for (NSInteger i = 0; i < results.count; i++) {
-                 ATTextViewBinding *bindingModel = results[i];
-                 NSRange tmpRange = bindingModel.range;
-                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
-
-                     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
-                     [tmpAString deleteCharactersInRange:tmpRange];
-                     textView.attributedText = tmpAString;
-
-                     NSInteger lastCursorLocation = selectedRange.location-tmpRange.length;
-                     [self textViewDidChange:textView];
-                     textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
-                     self.cursorLocation = lastCursorLocation;
-                     textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
-                     return NO;
-                 }
-             }
-         }
-     } else { // 增加
-         textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
-
-//         NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
-//         if ([results count]) {
-//             for (NSInteger i = 0; i < results.count; i++) {
-//                 ATTextViewBinding *bindingModel = results[i];
-//                 NSRange tmpRange = bindingModel.range;
-//                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
-//                     _changeRange = NSMakeRange(range.location, text.length);
-//                     _isChanged = YES;
-//
-//                     return YES;
-//                 }
-//             }
-//         } else {
-//             // 在第一个删除后 重置text color
-//             if (!range.location) {
-//                 _changeRange = NSMakeRange(range.location, text.length);
-//                 _isChanged = YES;
-//
-//                 return YES;
-//             }
-//         }
-     }
+    if ([text isEqualToString:@""]) { // 删除
+        NSRange selectedRange = textView.selectedRange;
+        if (selectedRange.length) {
+            
+            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+            [tmpAString deleteCharactersInRange:selectedRange];
+            textView.attributedText = tmpAString;
+            
+            NSInteger lastCursorLocation = selectedRange.location;
+            [self textViewDidChange:textView];
+            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+            self.cursorLocation = lastCursorLocation;
+            textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
+            
+            return NO;
+        } else {
+            NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
+            for (NSInteger i = 0; i < results.count; i++) {
+                ATTextViewBinding *bindingModel = results[i];
+                NSRange tmpRange = bindingModel.range;
+                if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
+                    
+                    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+                    [tmpAString deleteCharactersInRange:tmpRange];
+                    textView.attributedText = tmpAString;
+                    
+                    NSInteger lastCursorLocation = selectedRange.location-tmpRange.length;
+                    [self textViewDidChange:textView];
+                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+                    self.cursorLocation = lastCursorLocation;
+                    textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
+                    
+                    return NO;
+                }
+            }
+        }
+    } else { // 增加
+        textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
+    }
      return YES;
  }
 
@@ -524,16 +488,16 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     NSString *insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", bindingModel.name] : [NSString stringWithFormat:@"%@ ", bindingModel.name];
 
     // 插入前手动判断
-//    if (self.text.length+insertText.length > k_max_input) {
-//        NSLog(@"已经超出最大输入限制了....");
-//        return;
-//    }
+    if (self.text.length+insertText.length > _max_TextLength) {
+        NSLog(@"已经超出最大输入限制了....");
+        return;
+    }
     
     [self insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
-    NSRange range = isAt == NO?NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
-    [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
-                                NSFontAttributeName:k_defaultFont,
+    NSRange range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
+    [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.hightTextColor,
+                                NSFontAttributeName:self.font,
                                 ATTextBindingAttributeName:bindingModel}
                         range:range];
 

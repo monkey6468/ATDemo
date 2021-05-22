@@ -9,10 +9,8 @@
 
 #import "HNWKeyboardMonitor.h"
 
-#define k_defaultFont   [UIFont systemFontOfSize:15]
-#define k_defaultColor  [UIColor blueColor]
-#define k_hightColor    [UIColor redColor]
-#define k_max_input     20
+#define k_defaultFont   [UIFont systemFontOfSize:15] /// 默认字体大小
+#define k_defaultColor  [UIColor blueColor] /// 默认特殊文本高亮颜色
 
 @interface ViewController ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -60,11 +58,14 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
     self.textView.atDelegate = self;
-//    self.textView.maxTextLength = k_max_input;
     self.textView.placeholder = @"我是测试placeholder";
-//    self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
     self.textView.font = k_defaultFont;
     self.textView.attributedTextColor = k_defaultColor;
+    
+//    self.textView.maxTextLength = 20;
+//    self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
+//    self.textView.bSupport = NO;
+//    self.textView.hightTextColor = UIColor.yellowColor;
     [self.textView becomeFirstResponder];
 }
 
