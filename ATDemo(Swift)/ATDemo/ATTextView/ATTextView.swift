@@ -6,23 +6,7 @@
 //
 
 import UIKit
-
-//let kATRegular = "@[\\u{4e00}-\\u{9fa5}\\w\\-\\_]+ "
-
-//let HAS_TEXT_CONTAINER = responds(to: #selector(UITextView.textContainer))
-//func HAS_TEXT_CONTAINER_INSETS(_ x: Any) -> UnknownType? {
-//    (respondsToSelector as? x)?(#selector(UITextView.textContainerInset))
-//}
-
-//private let kAttributedPlaceholderKey = "attributedPlaceholder"
-//private let kPlaceholderKey = "placeholder"
-//private let kFontKey = "font"
-//private let kAttributedTextKey = "attributedText"
-//private let kTextKey = "text"
-//private let kExclusionPathsKey = "exclusionPaths"
-//private let kLineFragmentPaddingKey = "lineFragmentPadding"
-//private let kTextContainerInsetKey = "textContainerInset"
-//private let kTextAlignmentKey = "textAlignment"
+// placeholder 属性参考了【RSKPlaceholderTextView】
 
 @objc protocol ATTextViewDelegate {
     @objc optional
@@ -36,12 +20,314 @@ import UIKit
 }
 
 class ATTextView: UITextView {
+    
+    // MARK: - Private Properties
+    
+    private var placeholderAttributes: [NSAttributedString.Key: Any] {
+        
+        var placeholderAttributes = self.typingAttributes
+        
+        if placeholderAttributes[.font] == nil {
+            
+            placeholderAttributes[.font] = self.font ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
+        }
+        
+        if placeholderAttributes[.paragraphStyle] == nil {
+            
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = self.textAlignment
+            paragraphStyle.lineBreakMode = self.textContainer.lineBreakMode
+            placeholderAttributes[.paragraphStyle] = paragraphStyle
+        }
+        
+        placeholderAttributes[.foregroundColor] = self.placeholderTextColor
+        
+        return placeholderAttributes
+    }
+    
+    private var placeholderInsets: UIEdgeInsets {
+        
+        let placeholderInsets = UIEdgeInsets(top: self.contentInset.top + self.textContainerInset.top,
+                                             left: self.contentInset.left + self.textContainerInset.left,
+                                             bottom: self.contentInset.bottom + self.textContainerInset.bottom,
+                                             right: self.contentInset.right + self.textContainerInset.right)
+        return placeholderInsets
+    }
+    
+    private lazy var placeholderLayoutManager: NSLayoutManager = NSLayoutManager()
+    
+    private lazy var placeholderTextContainer: NSTextContainer = NSTextContainer()
+    
+    // MARK: - Open Properties
+    
+    /// The attributed string that is displayed when there is no other text in the placeholder text view. This value is `nil` by default.
+    @NSCopying open var attributedPlaceholder: NSAttributedString? {
+        
+        didSet {
+            
+            guard self.attributedPlaceholder != oldValue else {
+                
+                return
+            }
+            if let attributedPlaceholder = self.attributedPlaceholder {
+                
+                let attributes = attributedPlaceholder.attributes(at: 0, effectiveRange: nil)
+                if let font = attributes[.font] as? UIFont,
+                    self.font != font {
+                    
+                    self.font = font
+                    self.typingAttributes[.font] = font
+                }
+                if let foregroundColor = attributes[.foregroundColor] as? UIColor,
+                    self.placeholderTextColor != foregroundColor {
+                    
+                    self.placeholderTextColor = foregroundColor
+                }
+                if let paragraphStyle = attributes[.paragraphStyle] as? NSParagraphStyle,
+                    self.textAlignment != paragraphStyle.alignment {
+                    
+                    let mutableParagraphStyle = NSMutableParagraphStyle()
+                    mutableParagraphStyle.setParagraphStyle(paragraphStyle)
+                    
+                    self.textAlignment = paragraphStyle.alignment
+                    self.typingAttributes[.paragraphStyle] = mutableParagraphStyle
+                }
+            }
+            guard self.isEmpty == true else {
+                
+                return
+            }
+            self.setNeedsDisplay()
+        }
+    }
+    
+    /// Determines whether or not the placeholder text view contains text.
+    open var isEmpty: Bool { return self.text.isEmpty }
+    
+    /// The string that is displayed when there is no other text in the placeholder text view. This value is `nil` by default.
+    @IBInspectable open var placeholder: NSString? {
+        
+        get {
+            
+            return self.attributedPlaceholder?.string as NSString?
+        }
+        set {
+            
+            if let newValue = newValue as String? {
+                
+                self.attributedPlaceholder = NSAttributedString(string: newValue, attributes: self.placeholderAttributes)
+            }
+            else {
+                
+                self.attributedPlaceholder = nil
+            }
+        }
+    }
+    
+    /// The color of the placeholder. This property applies to the entire placeholder string. The default placeholder color is `UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)`.
+    @IBInspectable open var placeholderTextColor: UIColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) {
+        
+        didSet {
+            
+            if let placeholder = self.placeholder as String? {
+                
+                self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
+            }
+        }
+    }
+    
+    // MARK: - Superclass Properties
+    
+    open override var attributedText: NSAttributedString! { didSet { self.setNeedsDisplay() } }
+    
+    open override var bounds: CGRect { didSet { self.setNeedsDisplay() } }
+    
+    open override var contentInset: UIEdgeInsets { didSet { self.setNeedsDisplay() } }
+    
+    open override var font: UIFont? {
+        
+        didSet {
+            
+            if let placeholder = self.placeholder as String? {
+                
+                self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
+            }
+        }
+    }
+    
+    open override var textAlignment: NSTextAlignment {
+        
+        didSet {
+            
+            if let placeholder = self.placeholder as String? {
+                
+                self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
+            }
+        }
+    }
+    
+    open override var textContainerInset: UIEdgeInsets { didSet { self.setNeedsDisplay() } }
+    
+    open override var typingAttributes: [NSAttributedString.Key: Any] {
+        
+        didSet {
+            
+            if let placeholder = self.placeholder as String? {
+                
+                self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
+            }
+        }
+    }
+    
+    // MARK: - Object Lifecycle
+    
+    deinit {
+        
+        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: self)
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        
+        super.init(coder: aDecoder)
+        
+        self.commonInitializer()
+    }
+    
+    public override init(frame: CGRect, textContainer: NSTextContainer?) {
+        
+        super.init(frame: frame, textContainer: textContainer)
+        
+        self.commonInitializer()
+    }
+    
+    // MARK: - Superclass API
+    
+    open override func caretRect(for position: UITextPosition) -> CGRect {
+        
+        guard self.text.isEmpty == true,
+            let attributedPlaceholder = self.attributedPlaceholder,
+            attributedPlaceholder.length > 0 else {
+            
+            return super.caretRect(for: position)
+        }
+        
+        var caretRect = super.caretRect(for: position)
+        
+        let placeholderLineFragmentUsedRect = self.placeholderLineFragmentUsedRectForGlyphAt0GlyphIndex(attributedPlaceholder: attributedPlaceholder)
+        
+        let userInterfaceLayoutDirection: UIUserInterfaceLayoutDirection
+        if #available(iOS 10.0, *) {
+            
+            userInterfaceLayoutDirection = self.effectiveUserInterfaceLayoutDirection
+        }
+        else {
+            
+            userInterfaceLayoutDirection = UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute)
+        }
+        
+        let placeholderInsets = self.placeholderInsets
+        switch userInterfaceLayoutDirection {
+            
+        case .rightToLeft:
+            caretRect.origin.x = placeholderInsets.left + placeholderLineFragmentUsedRect.maxX - self.textContainer.lineFragmentPadding
+            
+        case .leftToRight:
+            fallthrough
+            
+        @unknown default:
+            caretRect.origin.x = placeholderInsets.left + placeholderLineFragmentUsedRect.minX + self.textContainer.lineFragmentPadding
+        }
+        
+        return caretRect
+    }
+    
+    open override func draw(_ rect: CGRect) {
+        
+        super.draw(rect)
+        
+        guard self.isEmpty == true else {
+            
+            return
+        }
+        
+        guard let attributedPlaceholder = self.attributedPlaceholder else {
+            
+            return
+        }
+        
+        var inset = self.placeholderInsets
+        inset.left += self.textContainer.lineFragmentPadding
+        inset.right += self.textContainer.lineFragmentPadding
+        
+        let placeholderRect = rect.inset(by: inset)
+        
+        attributedPlaceholder.draw(in: placeholderRect)
+    }
+    
+    // MARK: - Private API
+    
+    private func commonInitializer() {
+        
+        self.contentMode = .topLeft
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(ATTextView.handleTextViewTextDidChangeNotification(_:)), name: UITextView.textDidChangeNotification, object: self)
+    }
+    
+    @objc internal func handleTextViewTextDidChangeNotification(_ notification: Notification) {
+        
+        guard let object = notification.object as? ATTextView, object === self else {
+            
+            return
+        }
+        self.setNeedsDisplay()
+    }
+    
+    private func placeholderLineFragmentUsedRectForGlyphAt0GlyphIndex(attributedPlaceholder: NSAttributedString) -> CGRect {
+        
+        if self.placeholderTextContainer.layoutManager == nil {
+            
+            self.placeholderLayoutManager.addTextContainer(self.placeholderTextContainer)
+        }
+        
+        let placeholderTextStorage = NSTextStorage(attributedString: attributedPlaceholder)
+        placeholderTextStorage.addLayoutManager(self.placeholderLayoutManager)
+        
+        self.placeholderTextContainer.lineFragmentPadding = self.textContainer.lineFragmentPadding
+        self.placeholderTextContainer.size = CGSize(width: self.textContainer.size.width, height: 0.0)
+        
+        self.placeholderLayoutManager.ensureLayout(for: self.placeholderTextContainer)
+        
+        return self.placeholderLayoutManager.lineFragmentUsedRect(forGlyphAt: 0, effectiveRange: nil)
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private var changeRange: NSRange! = NSRange(location: 0, length: 0) // 改变Range
     private var isChanged = false // 是否改变
     private var placeholderTextView: UITextView?
     private var max_TextLength = 0
     
-    public var attributed_TextColor: UIColor = k_default_attributedTextColor
+    public var attributedTextColor: UIColor = k_default_attributedTextColor
         
     public weak var atDelegate: ATTextViewDelegate?
     public var cursorLocation = 0
@@ -57,7 +343,7 @@ class ATTextView: UITextView {
         set { _ = newValue } // To satisfy the linter otherwise this would be an empty setter
     }
     
-    override class func awakeFromNib() {
+    override func awakeFromNib() {
         super.awakeFromNib()
         
 //        maxTextLength = 100000
@@ -149,7 +435,7 @@ extension ATTextView: UITextViewDelegate {
 //                    changeLength = max_TextLength
 //                }
                 tmpAString.setAttributes([
-                    NSAttributedString.Key.foregroundColor: attributed_TextColor,
+                    NSAttributedString.Key.foregroundColor: attributedTextColor,
                     NSAttributedString.Key.font: font!
                 ], range: NSRange(location: changeLocation, length: changeLength))
                 textView.attributedText = tmpAString
@@ -167,7 +453,7 @@ extension ATTextView: UITextViewDelegate {
         if textView.textStorage.length != 0 {
             textView.typingAttributes = [
                 NSAttributedString.Key.font: font!,
-                NSAttributedString.Key.foregroundColor: attributed_TextColor
+                NSAttributedString.Key.foregroundColor: attributedTextColor
             ]
         }
 
@@ -183,7 +469,7 @@ extension ATTextView: UITextViewDelegate {
                 textViewDidChange(textView)
                 textView.typingAttributes = [
                     NSAttributedString.Key.font: font!,
-                    NSAttributedString.Key.foregroundColor: attributed_TextColor
+                    NSAttributedString.Key.foregroundColor: attributedTextColor
                 ]
                 cursorLocation = lastCursorLocation
                 textView.selectedRange = NSRange(location: lastCursorLocation, length: 0)
@@ -197,13 +483,13 @@ extension ATTextView: UITextViewDelegate {
                         
                         let tmpAString = NSMutableAttributedString(attributedString: textView.attributedText)
                         tmpAString.deleteCharacters(in: tmpRange)
-
+                        
                         textView.attributedText = tmpAString
                         
                         textViewDidChange(textView)
                         textView.typingAttributes = [
                             NSAttributedString.Key.font: font!,
-                            NSAttributedString.Key.foregroundColor: attributed_TextColor
+                            NSAttributedString.Key.foregroundColor: attributedTextColor
                         ]
                         return false
                     }

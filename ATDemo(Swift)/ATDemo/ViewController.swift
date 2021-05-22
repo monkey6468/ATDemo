@@ -36,8 +36,9 @@ class ViewController: UIViewController {
 
         textView.atDelegate = self;
         textView.font = k_defaultFont
-        textView.attributed_TextColor = k_defaultColor;
-     
+        textView.attributedTextColor = k_defaultColor
+        textView.placeholderTextColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.75)
+        textView.placeholder = "我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder"
         textView.becomeFirstResponder()
         
         self.initTableView()
