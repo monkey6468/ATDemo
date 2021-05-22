@@ -1,13 +1,13 @@
 //
-//  TextViewBinding.m
+//  ATTextViewBinding.m
 //  AtDemo
 //
 //  Created by HN on 2021/4/29.
 //
 
-#import "TextViewBinding.h"
+#import "ATTextViewBinding.h"
 
-@implementation TextViewBinding
+@implementation ATTextViewBinding
 
 - (instancetype)initWithName:(NSString*)name
                       userId:(NSInteger)userId {

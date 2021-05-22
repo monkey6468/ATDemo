@@ -8,8 +8,7 @@
 #import "TableViewCell.h"
 
 #import "YYText.h"
-#import "TextViewBinding.h"
-#import "YYLabel.h"
+#import "ATTextViewBinding.h"
 
 @interface TableViewCell ()<UIGestureRecognizerDelegate>
 
@@ -58,7 +57,7 @@
     muAttriSting.yy_font = [UIFont systemFontOfSize:25];
     muAttriSting.yy_color = UIColor.purpleColor;
     
-    for (TextViewBinding *bindingModel in model.userList) {
+    for (ATTextViewBinding *bindingModel in model.userList) {
         [muAttriSting yy_setTextHighlightRange:bindingModel.range
                                          color:UIColor.redColor
                                backgroundColor:UIColor.darkGrayColor

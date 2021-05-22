@@ -7,7 +7,9 @@
 
 #import <UIKit/UIKit.h>
 
-#import "TextViewBinding.h"
+#import "ATTextViewBinding.h"
+
+/// placeholder 属性参考了【SZTextView】
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ATTextView : UITextView
 
 @property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
-@property (copy, nonatomic) NSArray <TextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
+@property (copy, nonatomic) NSArray <ATTextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
 
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
 @property (nonatomic) IBInspectable double fadeTime;

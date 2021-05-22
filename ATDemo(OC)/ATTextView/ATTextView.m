@@ -328,7 +328,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     NSInteger textSelectedLength = textView.selectedRange.length;
 
     for (NSInteger i = 0; i < results.count; i++) {
-        TextViewBinding *bindingModel = results[i];
+        ATTextViewBinding *bindingModel = results[i];
         NSRange range = bindingModel.range;
         if (textSelectedLength == 0) {
             if (textSelectedLocation > range.location
@@ -410,7 +410,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
          } else {
              NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
              for (NSInteger i = 0; i < results.count; i++) {
-                 TextViewBinding *bindingModel = results[i];
+                 ATTextViewBinding *bindingModel = results[i];
                  NSRange tmpRange = bindingModel.range;
                  if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
                      
@@ -428,7 +428,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
          NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
          if ([results count]) {
              for (NSInteger i = 0; i < results.count; i++) {
-                 TextViewBinding *bindingModel = results[i];
+                 ATTextViewBinding *bindingModel = results[i];
                  NSRange tmpRange = bindingModel.range;
                  if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
                      _changeRange = NSMakeRange(range.location, text.length);
@@ -464,7 +464,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 
 #pragma mark - other binding
-- (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
+- (NSArray<ATTextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
     NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
     [iExpression enumerateMatchesInString:attributedString.string
@@ -473,7 +473,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
         NSString *atString = [attributedString.string substringWithRange:result.range];
-        TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        ATTextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
         if (bindingModel) {
             bindingModel.range = result.range;
             [resultArray addObject:bindingModel];
@@ -483,7 +483,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 #pragma mark - get data
-- (NSArray<TextViewBinding *> *)atUserList {
+- (NSArray<ATTextViewBinding *> *)atUserList {
     NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
     return results;
 }

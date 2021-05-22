@@ -1,5 +1,5 @@
 //
-//  TextViewBinding.h
+//  ATTextViewBinding.h
 //  AtDemo
 //
 //  Created by HN on 2021/4/29.
@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define TextBindingAttributeName @"TextViewBingDingFlagName"
 
-@interface TextViewBinding : NSObject
+@interface ATTextViewBinding : NSObject
 
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, assign) NSInteger userId;

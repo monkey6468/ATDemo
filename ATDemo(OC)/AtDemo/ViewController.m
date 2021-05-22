@@ -66,7 +66,7 @@
 - (void)initTableView {
     self.tableView.tableFooterView = UIView.new;
     
-    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([TableViewCell class])
+    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass(TableViewCell.class)
                                                bundle:nil]
          forCellReuseIdentifier:NSStringFromClass(TableViewCell.class)];
 }
@@ -94,10 +94,10 @@
 }
 
 - (void)updateUIWithUser:(User *)user {
-        
+    
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
-                                                                  userId:user.userId];
+    ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
+                                                                      userId:user.userId];
 
     // 插入前手动判断
 //    if (self.textView.text.length+insertText.length > 20) {
@@ -126,7 +126,7 @@
     NSArray *results = self.textView.atUserList;
 
     NSLog(@"输出打印:");
-    for (TextViewBinding *model in results) {
+    for (ATTextViewBinding *model in results) {
         NSLog(@"user info - name:%@ - location:%ld",model.name, model.range.location);
     }
     
