@@ -17,11 +17,16 @@ class ViewController: UIViewController {
     @IBOutlet weak var textViewConstraintH: NSLayoutConstraint!
     @IBOutlet weak var bottomViewConstraintB: NSLayoutConstraint!
     
+    private var bNeedShowKeyboard: Bool = false
     private var dataArray: [DataModel] = []
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.addNotify()
+        if self.bNeedShowKeyboard {
+            self.bNeedShowKeyboard = false
+            textView.becomeFirstResponder()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -100,38 +105,24 @@ class ViewController: UIViewController {
     }
     
     @IBAction func pushListVC(_ sender: UIButton) {
+        self.textView.bAtChart = false
+        self.pushAtVc()
+    }
+    
+    func pushAtVc() -> Void {
+        self.bNeedShowKeyboard = true;
+
         let storyboard: UIStoryboard! = UIStoryboard(name: "Main", bundle: nil)
         let vc: ListViewController! = storyboard?.instantiateViewController(withIdentifier: "ListViewController") as? ListViewController
         let nav : UINavigationController = UINavigationController(rootViewController: vc) as UINavigationController
+        nav.modalPresentationStyle = .fullScreen
         self.present(nav, animated: true, completion: nil)
         
         vc.callBack = { (user: User, viewController: UIViewController) in
-            
             viewController.dismiss(animated: true, completion: nil)
-            
-            self.onActionInsert(user)
+            let bindingModel = ATTextViewBinding(name: user.name, userId: user.userId)
+            self.textView.insertModel(withBindingModel: bindingModel)
         }
-    }
-    
-    func onActionInsert(_ user: User) {
-        let insertText = "@" + user.name! + " "
-        let bindingModel : ATTextViewBinding = ATTextViewBinding(name: user.name, userId: user.userId)
-    
-        textView.insertText(insertText)
-        
-        let tmpAString : NSMutableAttributedString = NSMutableAttributedString(attributedString: textView.attributedText)
-        let range = NSMakeRange(self.textView.selectedRange.location-insertText.count, insertText.count)
-        
-        tmpAString.setAttributes([
-            NSAttributedString.Key.foregroundColor: k_hightColor,
-            NSAttributedString.Key.font: k_defaultFont,
-            NSAttributedString.Key(rawValue: ATTextBindingAttributeName) : bindingModel
-        ], range: range)
-
-        let lastCursorLocation = textView.cursorLocation
-        textView.attributedText = tmpAString
-        textView.selectedRange = NSMakeRange(lastCursorLocation, textView.selectedRange.length)
-        textView.cursorLocation = lastCursorLocation
     }
     
     @IBAction func onActionDone(_ sender: UIBarButtonItem) {
@@ -164,8 +155,11 @@ class ViewController: UIViewController {
 extension ViewController : ATTextViewDelegate {
     func atTextViewDidChange(_ textView: ATTextView) {
         print(textView.text ?? "")
-
         self.updateUI()
+    }
+    
+    func atTextViewDidInputSpecialText(_ textView: ATTextView) {
+        self.pushAtVc()
     }
 }
 

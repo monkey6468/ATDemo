@@ -18,8 +18,14 @@ class ListViewController: UIViewController {
     private var dataArray: [User] = []
     
     override func viewDidLoad() {
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "取消", style: .plain, target: self, action: #selector(done))
+        
         tableView.tableFooterView = UIView.init()
         self.initData()
+    }
+    
+    @objc func done() {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func initData() -> Void {
