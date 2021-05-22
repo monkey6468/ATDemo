@@ -40,8 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (assign, nonatomic) NSInteger maxTextLength; /// 最大长度设置，默认1000
 @property (strong, nonatomic) UIColor *attributedTextColor;
-@property (strong, nonatomic) UIColor *hightTextColor; /// 默认特殊文本高亮颜色
-@property (assign, nonatomic, getter=isSupport) BOOL bSupport; // 支持自动检测特殊文本，默认支持
+@property (strong, nonatomic) UIColor *hightTextColor; /// 默认特殊文本高亮颜色，默认UIColor.redColor
+@property (assign, nonatomic, getter=isSupport) BOOL bSupport; /// 支持自动检测特殊文本，默认YES
 @property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
 
 - (void)insertWithBindingModel:(ATTextViewBinding *)bindingModel;

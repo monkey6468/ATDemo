@@ -8,7 +8,8 @@
 - 以UITextView为基础实现，可以输入时支持`特殊文本`变色
 - 支持 `特殊文本`列表输出（包含在文本中的定位信息、可以自定义其它内容），减少服务器的交互
 - 富文本用 `YYLabel`显示，支持可点击
-- 输入时，不支持艾特点击
+- 输入时，支持监测艾特会自动唤起其它界面
+- 最大字数限制控制功能，暂不支持
 
 ## 二、效果图
 ![](screenshots/2021-04-30.png)
@@ -36,32 +37,8 @@
 
 4、获取已经拆入的话题或人名等特殊文本列表
 ```
-- (void)updateUIWithUser:(User *)user {
-        
-    NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
-    TextViewBinding *bindingModel = [[TextViewBinding alloc]initWithName:user.name
-                                                                  userId:user.userId];
+    [weakSelf.textView insertWithBindingModel:bindingModel];
 
-    // 插入前手动判断
-//    if (self.textView.text.length+insertText.length > 20) {
-//        NSLog(@"已经超出最大输入限制了....");
-//        return;
-//    }
-    
-    [self.textView insertText:insertText];
-    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-    NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);
-    [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
-                                NSFontAttributeName:k_defaultFont,
-                                TextBindingAttributeName:bindingModel}
-                        range:range];
-
-    // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-    NSInteger lastCursorLocation = self.textView.cursorLocation;
-    self.textView.attributedText = tmpAString;
-    self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
-    self.textView.cursorLocation = lastCursorLocation;
-}
 ```
 
 ## 四、说重点！！！
@@ -87,7 +64,7 @@
 #define kATRegular      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 ```
 ```
-- (NSArray<TextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
+- (NSArray<ATTextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
     NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
     [iExpression enumerateMatchesInString:attributedString.string
@@ -95,8 +72,8 @@
                                     range:NSMakeRange(0, attributedString.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
-        NSString *atString = [self.text substringWithRange:result.range];
-        TextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        NSString *atString = [attributedString.string substringWithRange:result.range];
+        ATTextViewBinding *bindingModel = [attributedString attribute:ATTextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
         if (bindingModel) {
             bindingModel.range = result.range;
             [resultArray addObject:bindingModel];

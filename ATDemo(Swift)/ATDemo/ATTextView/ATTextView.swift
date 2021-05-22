@@ -6,7 +6,10 @@
 //
 
 import UIKit
+
 // placeholder 属性参考了【RSKPlaceholderTextView】
+private let kATRegular = "@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
+private let kAT = "@"
 
 @objc protocol ATTextViewDelegate {
     @objc optional
@@ -17,6 +20,9 @@ import UIKit
     
     @objc optional
     func atTextViewDidEndEditing(_ textView: ATTextView) -> Void
+    
+    @objc optional
+    func atTextViewDidInputSpecialText(_ textView: ATTextView) -> Void
 }
 
 class ATTextView: UITextView {
@@ -216,15 +222,9 @@ class ATTextView: UITextView {
     private var isChanged = false // 是否改变
     private var placeholderTextView: UITextView?
     private var max_TextLength = 0
+    private var cursorLocation = 0
     
     // MARK: - Open Properties
-    
-    /// 输入文本  attributedTextColor 。默认UIColor.black
-    public var attributedTextColor: UIColor = k_default_attributedTextColor
-        
-    public weak var atDelegate: ATTextViewDelegate?
-    public var cursorLocation = 0
-    
     /// 获取所有 特殊文本 数组
     public var atUserList : [ATTextViewBinding] {
         get {
@@ -232,6 +232,17 @@ class ATTextView: UITextView {
             return results
         }
     }
+    
+    /// 是否为艾特
+    public var bAtChart: Bool = false
+    /// 输入文本  attributedTextColor 。默认UIColor.black
+    public var attributedTextColor: UIColor = UIColor.black
+    public weak var atDelegate: ATTextViewDelegate?
+    
+    /// 支持自动检测特殊文本，默认支持
+    public var bSupport: Bool = true
+    /// 默认特殊文本高亮颜色，默认UIColor.redColor
+    public var hightTextColor: UIColor = UIColor.red
 }
 
 // MARK: - PlaceHolder 私有API
@@ -309,6 +320,34 @@ extension ATTextView {
             })
         return resultArray
     }
+    
+    func insertModel(withBindingModel bindingModel: ATTextViewBinding) -> Void {
+        let isAt = bAtChart
+        if bAtChart {
+            bAtChart = false
+        }
+        
+        let insertText = isAt == false ? "@" + bindingModel.name! + " " : bindingModel.name! + " "
+    
+        #warning("已经超出最大输入限制了....")
+        
+        self.insertText(insertText)
+        
+        let tmpAString : NSMutableAttributedString = NSMutableAttributedString(attributedString: self.attributedText)
+        let range = isAt == false ? NSMakeRange(self.selectedRange.location-insertText.count, insertText.count) : NSMakeRange(self.selectedRange.location-insertText.count-1, insertText.count+1)
+        
+        tmpAString.setAttributes([
+            NSAttributedString.Key.foregroundColor: self.hightTextColor,
+            NSAttributedString.Key.font: self.font ?? UIFont.systemFont(ofSize: UIFont.systemFontSize),
+            NSAttributedString.Key(rawValue: ATTextBindingAttributeName) : bindingModel
+        ], range: range)
+
+        // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
+        let lastCursorLocation = self.cursorLocation
+        self.attributedText = tmpAString
+        self.selectedRange = NSMakeRange(lastCursorLocation, self.selectedRange.length)
+        self.cursorLocation = lastCursorLocation
+    }
 }
 
 
@@ -329,7 +368,6 @@ extension ATTextView: UITextViewDelegate {
                 if textSelectedLocation > range.location && textSelectedLocation < range.location + range.length {
                     inRange = true
                     tempRange = range
-
                     break
                 }
             } else {
@@ -356,6 +394,12 @@ extension ATTextView: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
+        if let atDelegateOK = self.atDelegate {
+            if self.bAtChart && self.bSupport {
+                atDelegateOK.atTextViewDidInputSpecialText!(textView as! ATTextView)
+            }
+        }
+        
 //        if checkAndFilterText(byLength: max_TextLength) {
 //            return
 //        }
@@ -399,6 +443,12 @@ extension ATTextView: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text == kAT {
+            self.bAtChart = true
+        } else {
+            self.bAtChart = false
+        }
+        
         // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
         if textView.textStorage.length != 0 {
             textView.typingAttributes = [
@@ -423,6 +473,7 @@ extension ATTextView: UITextViewDelegate {
                 ]
                 cursorLocation = lastCursorLocation
                 textView.selectedRange = NSRange(location: lastCursorLocation, length: 0)
+                
                 return false
             } else {
                 let results : [ATTextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
@@ -436,11 +487,15 @@ extension ATTextView: UITextViewDelegate {
                         
                         textView.attributedText = tmpAString
                         
+                        let lastCursorLocation = selectedRange.location-tmpRange.length
                         textViewDidChange(textView)
                         textView.typingAttributes = [
                             NSAttributedString.Key.font: font!,
                             NSAttributedString.Key.foregroundColor: attributedTextColor
                         ]
+                        self.cursorLocation = lastCursorLocation;
+                        textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
+
                         return false
                     }
                 }

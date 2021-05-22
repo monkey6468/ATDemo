@@ -7,7 +7,8 @@
 
 import UIKit
 
-let k_defaultColor = UIColor.blue
+private let k_defaultColor = UIColor.blue // 默认特殊文本高亮颜色
+private let k_defaultFont =  UIFont.systemFont(ofSize: 15) // 默认字体大小
 
 class ViewController: UIViewController {
     
@@ -40,10 +41,13 @@ class ViewController: UIViewController {
         navigationItem.title = "ATTextView_Swift";
 
         textView.atDelegate = self;
+        textView.placeholder = "我是测试placeholder"
         textView.font = k_defaultFont
         textView.attributedTextColor = k_defaultColor
-        textView.placeholderTextColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.75)
-        textView.placeholder = "我是测试placeholder"
+        
+//        textView.placeholderTextColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.75)
+//        textView.bSupport = false
+//        textView.hightTextColor = UIColor.yellow
         textView.becomeFirstResponder()
         
         self.initTableView()

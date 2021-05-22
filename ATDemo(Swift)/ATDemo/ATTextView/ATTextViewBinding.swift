@@ -9,10 +9,6 @@ import UIKit
 import Foundation
 
 let ATTextBindingAttributeName = "TextViewBingDingFlagName"
-let kATRegular = "@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
-let k_default_attributedTextColor = UIColor.black
-let k_hightColor = UIColor.red
-let k_defaultFont =  UIFont.systemFont(ofSize: 18)
 
 class ATTextViewBinding: NSObject {
     var name: String! = ""
