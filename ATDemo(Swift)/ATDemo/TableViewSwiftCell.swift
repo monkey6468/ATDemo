@@ -1,5 +1,5 @@
 //
-//  TableViewCell.swift
+//  TableViewSwiftCell.swift
 //  ATDemo(Swift)
 //
 //  Created by XWH on 2021/5/16.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class TableViewCell: UITableViewCell {
+class TableViewSwiftCell: UITableViewCell {
     
     @IBOutlet weak var yyLabel: YYLabel!
     

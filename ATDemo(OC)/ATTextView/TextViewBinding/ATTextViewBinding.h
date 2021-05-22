@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define TextBindingAttributeName @"TextViewBingDingFlagName"
+#define ATTextBindingAttributeName @"TextViewBingDingFlagName"
 
 @interface ATTextViewBinding : NSObject
 

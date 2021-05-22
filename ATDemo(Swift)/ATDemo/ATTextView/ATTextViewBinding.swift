@@ -1,5 +1,5 @@
 //
-//  TextViewBinding.swift
+//  ATTextViewBinding.swift
 //  ATDemo
 //
 //  Created by XWH on 2021/5/15.
@@ -8,13 +8,13 @@
 import UIKit
 import Foundation
 
-let TextBindingAttributeName = "TextViewBingDingFlagName"
+let ATTextBindingAttributeName = "TextViewBingDingFlagName"
 let kATRegular = "@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
 let k_default_attributedTextColor = UIColor.black
 let k_hightColor = UIColor.red
 let k_defaultFont =  UIFont.systemFont(ofSize: 18)
 
-class TextViewBinding: NSObject {
+class ATTextViewBinding: NSObject {
     var name: String! = ""
     var userId = 0
     var range: NSRange! = NSRange(location: 0, length: 0)

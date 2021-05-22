@@ -16,11 +16,11 @@
 		C9A11356264FFC6E00A0F05F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9A11355264FFC6E00A0F05F /* Assets.xcassets */; };
 		C9A11359264FFC6E00A0F05F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C9A11357264FFC6E00A0F05F /* LaunchScreen.storyboard */; };
 		C9A11362264FFC9500A0F05F /* ATTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A11361264FFC9500A0F05F /* ATTextView.swift */; };
-		C9A113652650099F00A0F05F /* TextViewBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A113642650099F00A0F05F /* TextViewBinding.swift */; };
+		C9A113652650099F00A0F05F /* ATTextViewBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A113642650099F00A0F05F /* ATTextViewBinding.swift */; };
 		C9F0685D26514510004E457D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F0685C26514510004E457D /* User.swift */; };
 		C9F06861265154D9004E457D /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F06860265154D9004E457D /* DataModel.swift */; };
-		C9F0686426516505004E457D /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686326516505004E457D /* TableViewCell.swift */; };
-		C9F0686726516531004E457D /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9F0686626516531004E457D /* TableViewCell.xib */; };
+		C9F0686426516505004E457D /* TableViewSwiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686326516505004E457D /* TableViewSwiftCell.swift */; };
+		C9F0686726516531004E457D /* TableViewSwiftCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9F0686626516531004E457D /* TableViewSwiftCell.xib */; };
 		C9F0689E265165BD004E457D /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686B265165BD004E457D /* YYTextView.m */; };
 		C9F0689F265165BD004E457D /* YYTextMagnifier.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686F265165BD004E457D /* YYTextMagnifier.m */; };
 		C9F068A0265165BD004E457D /* YYTextContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F06872265165BD004E457D /* YYTextContainerView.m */; };
@@ -59,11 +59,11 @@
 		C9A11358264FFC6E00A0F05F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C9A1135A264FFC6E00A0F05F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C9A11361264FFC9500A0F05F /* ATTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATTextView.swift; sourceTree = "<group>"; };
-		C9A113642650099F00A0F05F /* TextViewBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewBinding.swift; sourceTree = "<group>"; };
+		C9A113642650099F00A0F05F /* ATTextViewBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATTextViewBinding.swift; sourceTree = "<group>"; };
 		C9F0685C26514510004E457D /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C9F06860265154D9004E457D /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
-		C9F0686326516505004E457D /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
-		C9F0686626516531004E457D /* TableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TableViewCell.xib; path = "../../ATDemo(OC)/AtDemo/SysTextViewVC/View/TableViewCell.xib"; sourceTree = "<group>"; };
+		C9F0686326516505004E457D /* TableViewSwiftCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewSwiftCell.swift; sourceTree = "<group>"; };
+		C9F0686626516531004E457D /* TableViewSwiftCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TableViewSwiftCell.xib; path = "../../ATDemo(OC)/AtDemo/SysTextViewVC/View/TableViewSwiftCell.xib"; sourceTree = "<group>"; };
 		C9F0686A265165BD004E457D /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
 		C9F0686B265165BD004E457D /* YYTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextView.m; sourceTree = "<group>"; };
 		C9F0686D265165BD004E457D /* YYTextSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextSelectionView.h; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				C9A11361264FFC9500A0F05F /* ATTextView.swift */,
-				C9A113642650099F00A0F05F /* TextViewBinding.swift */,
+				C9A113642650099F00A0F05F /* ATTextViewBinding.swift */,
 			);
 			path = ATTextView;
 			sourceTree = "<group>";
@@ -169,8 +169,8 @@
 				C9A1134C264FFC6B00A0F05F /* AppDelegate.swift */,
 				C9A1134E264FFC6B00A0F05F /* SceneDelegate.swift */,
 				C9A11350264FFC6B00A0F05F /* ViewController.swift */,
-				C9F0686326516505004E457D /* TableViewCell.swift */,
-				C9F0686626516531004E457D /* TableViewCell.xib */,
+				C9F0686326516505004E457D /* TableViewSwiftCell.swift */,
+				C9F0686626516531004E457D /* TableViewSwiftCell.xib */,
 				C950FC9726513BCD00AB3079 /* ListViewController.swift */,
 				C9F0685C26514510004E457D /* User.swift */,
 				C9F06860265154D9004E457D /* DataModel.swift */,
@@ -322,7 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9A11359264FFC6E00A0F05F /* LaunchScreen.storyboard in Resources */,
-				C9F0686726516531004E457D /* TableViewCell.xib in Resources */,
+				C9F0686726516531004E457D /* TableViewSwiftCell.xib in Resources */,
 				C9A11356264FFC6E00A0F05F /* Assets.xcassets in Resources */,
 				C9A11354264FFC6B00A0F05F /* Main.storyboard in Resources */,
 			);
@@ -348,11 +348,11 @@
 				C9F068AA265165BD004E457D /* YYTextParser.m in Sources */,
 				C9F068A0265165BD004E457D /* YYTextContainerView.m in Sources */,
 				C9F068A7265165BD004E457D /* YYTextDebugOption.m in Sources */,
-				C9A113652650099F00A0F05F /* TextViewBinding.swift in Sources */,
+				C9A113652650099F00A0F05F /* ATTextViewBinding.swift in Sources */,
 				C9F068AC265165BD004E457D /* YYTextArchiver.m in Sources */,
 				C9F0685D26514510004E457D /* User.swift in Sources */,
 				C9F068A4265165BD004E457D /* YYTextLine.m in Sources */,
-				C9F0686426516505004E457D /* TableViewCell.swift in Sources */,
+				C9F0686426516505004E457D /* TableViewSwiftCell.swift in Sources */,
 				C99AF3452650D09700317970 /* Extension_String.swift in Sources */,
 				C9F068A8265165BD004E457D /* YYLabel.m in Sources */,
 				C9F068A5265165BD004E457D /* YYTextSelectionView.m in Sources */,

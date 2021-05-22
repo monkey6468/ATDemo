@@ -110,7 +110,7 @@
     NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);
     [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
                                 NSFontAttributeName:k_defaultFont,
-                                TextBindingAttributeName:bindingModel}
+                                ATTextBindingAttributeName:bindingModel}
                         range:range];
 
     // 解决光标在插入‘特殊文本’后 移动到文本最后的问题

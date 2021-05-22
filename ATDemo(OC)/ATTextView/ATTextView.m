@@ -473,7 +473,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
         NSString *atString = [attributedString.string substringWithRange:result.range];
-        ATTextViewBinding *bindingModel = [attributedString attribute:TextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        ATTextViewBinding *bindingModel = [attributedString attribute:ATTextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
         if (bindingModel) {
             bindingModel.range = result.range;
             [resultArray addObject:bindingModel];

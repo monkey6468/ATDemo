@@ -38,7 +38,7 @@ class ViewController: UIViewController {
         textView.font = k_defaultFont
         textView.attributedTextColor = k_defaultColor
         textView.placeholderTextColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.75)
-        textView.placeholder = "我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder我是测试placeholder"
+        textView.placeholder = "我是测试placeholder"
         textView.becomeFirstResponder()
         
         self.initTableView()
@@ -48,9 +48,9 @@ class ViewController: UIViewController {
     func initTableView() -> Void {
         tableView.tableFooterView = UIView.init()
         //
-        tableView.register(UINib(nibName: String(describing: TableViewCell.self)
+        tableView.register(UINib(nibName: String(describing: TableViewSwiftCell.self)
                                  , bundle: nil),
-                           forCellReuseIdentifier: String(describing: TableViewCell.self))
+                           forCellReuseIdentifier: String(describing: TableViewSwiftCell.self))
     }
     
     public func updateUI() -> Void {
@@ -115,7 +115,7 @@ class ViewController: UIViewController {
     
     func onActionInsert(_ user: User) {
         let insertText = "@" + user.name! + " "
-        let bindingModel : TextViewBinding = TextViewBinding(name: user.name, userId: user.userId)
+        let bindingModel : ATTextViewBinding = ATTextViewBinding(name: user.name, userId: user.userId)
     
         textView.insertText(insertText)
         
@@ -125,7 +125,7 @@ class ViewController: UIViewController {
         tmpAString.setAttributes([
             NSAttributedString.Key.foregroundColor: k_hightColor,
             NSAttributedString.Key.font: k_defaultFont,
-            NSAttributedString.Key(rawValue: TextBindingAttributeName) : bindingModel
+            NSAttributedString.Key(rawValue: ATTextBindingAttributeName) : bindingModel
         ], range: range)
 
         let lastCursorLocation = textView.cursorLocation
@@ -141,7 +141,7 @@ class ViewController: UIViewController {
 
         print("输出打印:");
         for i in 0..<results.count {
-            let bindingModel : TextViewBinding = results[i]
+            let bindingModel : ATTextViewBinding = results[i]
             print("user info - name:\(String(describing: bindingModel.name))- location:\(String(describing: bindingModel.range?.location))")
         }
         
@@ -175,8 +175,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TableViewCell.self),
-                                                 for: indexPath) as! TableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TableViewSwiftCell.self),
+                                                 for: indexPath) as! TableViewSwiftCell
         
         let user: DataModel = dataArray[indexPath.row]
         cell.model = user
@@ -185,6 +185,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let user: DataModel = dataArray[indexPath.row]
-        return TableViewCell.rowHeightWithModel(model: user)
+        return TableViewSwiftCell.rowHeightWithModel(model: user)
     }
 }

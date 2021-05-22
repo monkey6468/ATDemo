@@ -226,9 +226,9 @@ class ATTextView: UITextView {
     public var cursorLocation = 0
     
     /// 获取所有 特殊文本 数组
-    public var atUserList : [TextViewBinding] {
+    public var atUserList : [ATTextViewBinding] {
         get {
-            let results : [TextViewBinding] = getResultsListArray(withTextView: self.attributedText)!
+            let results : [ATTextViewBinding] = getResultsListArray(withTextView: self.attributedText)!
             return results
         }
     }
@@ -286,9 +286,9 @@ extension ATTextView {
 //        maxTextLength = 100000
     }
     
-    func getResultsListArray(withTextView attributedString: NSAttributedString) -> [TextViewBinding]? {
+    func getResultsListArray(withTextView attributedString: NSAttributedString) -> [ATTextViewBinding]? {
         
-        var resultArray: [TextViewBinding] = []
+        var resultArray: [ATTextViewBinding] = []
         var iExpression: NSRegularExpression? = nil
         do {
             iExpression = try NSRegularExpression(pattern: kATRegular, options: [])
@@ -301,8 +301,8 @@ extension ATTextView {
             using: { result, flags, stop in
                 var resultRange = result!.range
                 let atString = attributedString.string[resultRange.location, resultRange.length]
-                let bindingModel = attributedString.attribute(NSAttributedString.Key(rawValue: TextBindingAttributeName), at: resultRange.location, longestEffectiveRange: &resultRange, in: NSRange(location: 0, length: atString.count)) as? TextViewBinding
-                if let bindingModelNew : TextViewBinding = bindingModel {
+                let bindingModel = attributedString.attribute(NSAttributedString.Key(rawValue: ATTextBindingAttributeName), at: resultRange.location, longestEffectiveRange: &resultRange, in: NSRange(location: 0, length: atString.count)) as? ATTextViewBinding
+                if let bindingModelNew : ATTextViewBinding = bindingModel {
                     bindingModelNew.range = result?.range
                     resultArray.append(bindingModelNew)
                 }
@@ -316,14 +316,14 @@ extension ATTextView {
 extension ATTextView: UITextViewDelegate {
     
     func textViewDidChangeSelection(_ textView: UITextView) {
-        let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
+        let results : [ATTextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
         var inRange = false
         var tempRange = NSRange(location: 0, length: 0)
         let textSelectedLocation = textView.selectedRange.location
         let textSelectedLength = textView.selectedRange.length
 
         for i in 0..<results.count {
-            let bindingModel = results[i] as TextViewBinding
+            let bindingModel = results[i] as ATTextViewBinding
             let range: NSRange = bindingModel.range
             if textSelectedLength == 0 {
                 if textSelectedLocation > range.location && textSelectedLocation < range.location + range.length {
@@ -425,9 +425,9 @@ extension ATTextView: UITextViewDelegate {
                 textView.selectedRange = NSRange(location: lastCursorLocation, length: 0)
                 return false
             } else {
-                let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
+                let results : [ATTextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
                 for i in 0..<results.count {
-                    let bindingModel = results[i] as TextViewBinding
+                    let bindingModel = results[i] as ATTextViewBinding
                     let tmpRange: NSRange = bindingModel.range
                     if (range.location + range.length) == (tmpRange.location + tmpRange.length) {
                         
@@ -446,10 +446,10 @@ extension ATTextView: UITextViewDelegate {
                 }
             }
         } else {
-            let results : [TextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
+            let results : [ATTextViewBinding] = getResultsListArray(withTextView: textView.attributedText)!
             if results.count != 0 {
                 for i in 0..<results.count {
-                    let bindingModel = results[i] as TextViewBinding
+                    let bindingModel = results[i] as ATTextViewBinding
                     let tmpRange: NSRange = bindingModel.range
                     if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || range.location == 0) {
                         changeRange = NSRange(location: range.location, length: text.count)
