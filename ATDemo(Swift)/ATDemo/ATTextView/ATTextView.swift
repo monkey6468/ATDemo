@@ -22,18 +22,13 @@ import UIKit
 class ATTextView: UITextView {
     
     // MARK: - Private Properties
-    
     private var placeholderAttributes: [NSAttributedString.Key: Any] {
-        
         var placeholderAttributes = self.typingAttributes
-        
         if placeholderAttributes[.font] == nil {
-            
             placeholderAttributes[.font] = self.font ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
         }
         
         if placeholderAttributes[.paragraphStyle] == nil {
-            
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = self.textAlignment
             paragraphStyle.lineBreakMode = self.textContainer.lineBreakMode
@@ -41,12 +36,10 @@ class ATTextView: UITextView {
         }
         
         placeholderAttributes[.foregroundColor] = self.placeholderTextColor
-        
         return placeholderAttributes
     }
     
     private var placeholderInsets: UIEdgeInsets {
-        
         let placeholderInsets = UIEdgeInsets(top: self.contentInset.top + self.textContainerInset.top,
                                              left: self.contentInset.left + self.textContainerInset.left,
                                              bottom: self.contentInset.bottom + self.textContainerInset.bottom,
@@ -55,46 +48,38 @@ class ATTextView: UITextView {
     }
     
     private lazy var placeholderLayoutManager: NSLayoutManager = NSLayoutManager()
-    
     private lazy var placeholderTextContainer: NSTextContainer = NSTextContainer()
     
     // MARK: - Open Properties
-    
     /// The attributed string that is displayed when there is no other text in the placeholder text view. This value is `nil` by default.
     @NSCopying open var attributedPlaceholder: NSAttributedString? {
-        
         didSet {
-            
             guard self.attributedPlaceholder != oldValue else {
-                
                 return
             }
             if let attributedPlaceholder = self.attributedPlaceholder {
-                
                 let attributes = attributedPlaceholder.attributes(at: 0, effectiveRange: nil)
                 if let font = attributes[.font] as? UIFont,
-                    self.font != font {
-                    
+                   self.font != font {
                     self.font = font
                     self.typingAttributes[.font] = font
                 }
+                
                 if let foregroundColor = attributes[.foregroundColor] as? UIColor,
                     self.placeholderTextColor != foregroundColor {
-                    
                     self.placeholderTextColor = foregroundColor
                 }
+                
                 if let paragraphStyle = attributes[.paragraphStyle] as? NSParagraphStyle,
                     self.textAlignment != paragraphStyle.alignment {
-                    
                     let mutableParagraphStyle = NSMutableParagraphStyle()
                     mutableParagraphStyle.setParagraphStyle(paragraphStyle)
-                    
                     self.textAlignment = paragraphStyle.alignment
                     self.typingAttributes[.paragraphStyle] = mutableParagraphStyle
                 }
             }
+            
             guard self.isEmpty == true else {
-                
                 return
             }
             self.setNeedsDisplay()
@@ -106,152 +91,109 @@ class ATTextView: UITextView {
     
     /// The string that is displayed when there is no other text in the placeholder text view. This value is `nil` by default.
     @IBInspectable open var placeholder: NSString? {
-        
         get {
-            
             return self.attributedPlaceholder?.string as NSString?
         }
         set {
-            
             if let newValue = newValue as String? {
-                
                 self.attributedPlaceholder = NSAttributedString(string: newValue, attributes: self.placeholderAttributes)
-            }
-            else {
-                
+            } else {
                 self.attributedPlaceholder = nil
             }
         }
     }
     
-    /// The color of the placeholder. This property applies to the entire placeholder string. The default placeholder color is `UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)`.
-    @IBInspectable open var placeholderTextColor: UIColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0) {
-        
+    /// The color of the placeholder. This property applies to the entire placeholder string. The default placeholder color is `UIColor(white: 0.7, alpha: 0.7)`.
+    @IBInspectable open var placeholderTextColor: UIColor = UIColor(white: 0.7, alpha: 0.7) {
         didSet {
-            
             if let placeholder = self.placeholder as String? {
-                
                 self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
             }
         }
     }
     
     // MARK: - Superclass Properties
-    
     open override var attributedText: NSAttributedString! { didSet { self.setNeedsDisplay() } }
-    
     open override var bounds: CGRect { didSet { self.setNeedsDisplay() } }
-    
     open override var contentInset: UIEdgeInsets { didSet { self.setNeedsDisplay() } }
-    
     open override var font: UIFont? {
-        
         didSet {
-            
             if let placeholder = self.placeholder as String? {
-                
                 self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
             }
         }
     }
     
     open override var textAlignment: NSTextAlignment {
-        
         didSet {
-            
             if let placeholder = self.placeholder as String? {
-                
                 self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
             }
         }
     }
     
     open override var textContainerInset: UIEdgeInsets { didSet { self.setNeedsDisplay() } }
-    
     open override var typingAttributes: [NSAttributedString.Key: Any] {
-        
         didSet {
-            
             if let placeholder = self.placeholder as String? {
-                
                 self.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: self.placeholderAttributes)
             }
         }
     }
     
     // MARK: - Object Lifecycle
-    
     deinit {
-        
         NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: self)
     }
     
     public required init?(coder aDecoder: NSCoder) {
-        
         super.init(coder: aDecoder)
-        
         self.commonInitializer()
     }
     
     public override init(frame: CGRect, textContainer: NSTextContainer?) {
-        
         super.init(frame: frame, textContainer: textContainer)
-        
         self.commonInitializer()
     }
     
     // MARK: - Superclass API
-    
     open override func caretRect(for position: UITextPosition) -> CGRect {
-        
         guard self.text.isEmpty == true,
             let attributedPlaceholder = self.attributedPlaceholder,
             attributedPlaceholder.length > 0 else {
-            
             return super.caretRect(for: position)
         }
         
         var caretRect = super.caretRect(for: position)
-        
         let placeholderLineFragmentUsedRect = self.placeholderLineFragmentUsedRectForGlyphAt0GlyphIndex(attributedPlaceholder: attributedPlaceholder)
         
         let userInterfaceLayoutDirection: UIUserInterfaceLayoutDirection
         if #available(iOS 10.0, *) {
-            
             userInterfaceLayoutDirection = self.effectiveUserInterfaceLayoutDirection
         }
         else {
-            
             userInterfaceLayoutDirection = UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute)
         }
         
         let placeholderInsets = self.placeholderInsets
         switch userInterfaceLayoutDirection {
-            
         case .rightToLeft:
             caretRect.origin.x = placeholderInsets.left + placeholderLineFragmentUsedRect.maxX - self.textContainer.lineFragmentPadding
-            
         case .leftToRight:
             fallthrough
-            
         @unknown default:
             caretRect.origin.x = placeholderInsets.left + placeholderLineFragmentUsedRect.minX + self.textContainer.lineFragmentPadding
         }
-        
         return caretRect
     }
     
     open override func draw(_ rect: CGRect) {
-        
         super.draw(rect)
-        
         guard self.isEmpty == true else {
-            
             return
         }
         
         guard let attributedPlaceholder = self.attributedPlaceholder else {
-            
             return
         }
         
@@ -260,11 +202,40 @@ class ATTextView: UITextView {
         inset.right += self.textContainer.lineFragmentPadding
         
         let placeholderRect = rect.inset(by: inset)
-        
         attributedPlaceholder.draw(in: placeholderRect)
     }
     
-    // MARK: - Private API
+   
+    
+    
+    
+    
+    
+    // MARK: - Private Properties
+    private var changeRange: NSRange! = NSRange(location: 0, length: 0) // 改变Range
+    private var isChanged = false // 是否改变
+    private var placeholderTextView: UITextView?
+    private var max_TextLength = 0
+    
+    // MARK: - Open Properties
+    
+    /// 输入文本  attributedTextColor 。默认UIColor.black
+    public var attributedTextColor: UIColor = k_default_attributedTextColor
+        
+    public weak var atDelegate: ATTextViewDelegate?
+    public var cursorLocation = 0
+    
+    /// 获取所有 特殊文本 数组
+    public var atUserList : [TextViewBinding] {
+        get {
+            let results : [TextViewBinding] = getResultsListArray(withTextView: self.attributedText)!
+            return results
+        }
+    }
+}
+
+// MARK: - PlaceHolder 私有API
+extension ATTextView {
     
     private func commonInitializer() {
         
@@ -299,44 +270,10 @@ class ATTextView: UITextView {
         
         return self.placeholderLayoutManager.lineFragmentUsedRect(forGlyphAt: 0, effectiveRange: nil)
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private var changeRange: NSRange! = NSRange(location: 0, length: 0) // 改变Range
-    private var isChanged = false // 是否改变
-    private var placeholderTextView: UITextView?
-    private var max_TextLength = 0
-    
-    public var attributedTextColor: UIColor = k_default_attributedTextColor
-        
-    public weak var atDelegate: ATTextViewDelegate?
-    public var cursorLocation = 0
-    public var atUserList : [TextViewBinding] {
-        get {
-            let results : [TextViewBinding] = getResultsListArray(withTextView: self.attributedText)!
-            return results
-        }
-    }
+}
+
+// MARK: - 艾特【特殊文本】 私有API
+extension ATTextView {
     
     override open var delegate: UITextViewDelegate? {
         get { return self }
@@ -374,7 +311,8 @@ class ATTextView: UITextView {
     }
 }
 
-// MARK: TextView delegate
+
+// MARK: UITextViewDelegate
 extension ATTextView: UITextViewDelegate {
     
     func textViewDidChangeSelection(_ textView: UITextView) {
@@ -444,10 +382,22 @@ extension ATTextView: UITextViewDelegate {
         }
 
         if let atDelegateOK = self.atDelegate {
-            atDelegateOK.atTextViewDidChange?(textView as! ATTextView)
+            atDelegateOK.atTextViewDidChange!(textView as! ATTextView)
+        }
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if let atDelegateOK = self.atDelegate {
+            atDelegateOK.atTextViewDidBeginEditing!(textView as! ATTextView)
         }
     }
 
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if let atDelegateOK = self.atDelegate {
+            atDelegateOK.atTextViewDidEndEditing!(textView as! ATTextView)
+        }
+    }
+    
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
         if textView.textStorage.length != 0 {

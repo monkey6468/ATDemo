@@ -2,17 +2,17 @@
 <Workspace
    version = "1.0">
    <Group
-      location = "group:ATDemo(Swift)"
-      name = "ATDemo(Swift)">
-      <FileRef
-         location = "group:ATDemo(Swift).xcodeproj">
-      </FileRef>
-   </Group>
-   <Group
       location = "group:ATDemo(OC)"
       name = "ATDemo(OC)">
       <FileRef
          location = "group:AtDemo(OC).xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "group:ATDemo(Swift)"
+      name = "ATDemo(Swift)">
+      <FileRef
+         location = "group:ATDemo(Swift).xcodeproj">
       </FileRef>
    </Group>
 </Workspace>
