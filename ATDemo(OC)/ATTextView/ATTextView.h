@@ -23,11 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)atTextViewDidEndEditing:(ATTextView *)textView;
 
+/// 正在输入的文本
+- (void)atTextView:(ATTextView *)textView replacementText:(NSString *)text;
+
 @end
 
 @interface ATTextView : UITextView
 
-@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
 @property (copy, nonatomic) NSArray <ATTextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
 
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
