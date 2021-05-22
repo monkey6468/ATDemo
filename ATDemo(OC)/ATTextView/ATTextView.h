@@ -23,14 +23,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)atTextViewDidEndEditing:(ATTextView *)textView;
 
-/// 正在输入的文本
-- (void)atTextView:(ATTextView *)textView replacementText:(NSString *)text;
+/// 检查到输入特殊文本的回调
+- (void)atTextViewDidInputSpecialText:(ATTextView *)textView;
 
 @end
 
 @interface ATTextView : UITextView
 
 @property (copy, nonatomic) NSArray <ATTextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
+@property (assign, nonatomic, getter=isAtChart) BOOL bAtChart;
 
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
 @property (nonatomic) IBInspectable double fadeTime;
@@ -39,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (assign, nonatomic) NSInteger maxTextLength; // 最大长度设置，默认1000
 @property (strong, nonatomic) UIColor *attributedTextColor;
-
+//@property (assign, nonatomic, getter=isSupport) BOOL bSupport; // 支持自动检测特殊文本
 @property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
 
 @end

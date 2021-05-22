@@ -360,6 +360,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
+    
     if ([self checkAndFilterTextByLength:self.max_TextLength]) {
         return;
     }
@@ -370,12 +371,14 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    
-    if ([self.atDelegate respondsToSelector:@selector(atTextView:replacementText:)]) {
-        [self.atDelegate atTextView:self replacementText:text];
+    if ([text isEqualToString:@"@"]) {
+        self.bAtChart = YES;
+        if ([self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
+            [self.atDelegate atTextViewDidInputSpecialText:self];
+        }
     }
-
-    
+        
+        
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
     if (textView.textStorage.length != 0) {
         textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};

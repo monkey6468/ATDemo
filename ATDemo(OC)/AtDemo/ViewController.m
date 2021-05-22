@@ -12,6 +12,7 @@
 #define k_defaultFont   [UIFont systemFontOfSize:15]
 #define k_defaultColor  [UIColor blueColor]
 #define k_hightColor    [UIColor redColor]
+#define k_max_input     20
 
 @interface ViewController ()<ATTextViewDelegate, HNWKeyboardMonitorDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -21,7 +22,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomViewConstraintB;
 
 @property (strong, nonatomic) NSMutableArray *dataArray;
-
+@property (assign, nonatomic, getter=isNeedShowKeyboard) BOOL bNeedShowKeyboard;
 
 @end
 
@@ -39,6 +40,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [HNWKeyboardMonitor addDelegate:self];
+    
+    if (self.isNeedShowKeyboard) {
+        self.bNeedShowKeyboard = NO;
+        [self.textView becomeFirstResponder];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -55,9 +61,9 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(done)];
     
     self.textView.atDelegate = self;
-//    self.textView.maxTextLength = 20;
+//    self.textView.maxTextLength = k_max_input;
     self.textView.placeholder = @"我是测试placeholder";
-    self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
+//    self.textView.placeholderTextColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:0.75];
     self.textView.font = k_defaultFont;
     self.textView.attributedTextColor = k_defaultColor;
     [self.textView becomeFirstResponder];
@@ -82,10 +88,12 @@
 
 #pragma mark - other
 - (IBAction)onActionInsert:(UIButton *)sender {
+    self.bNeedShowKeyboard = YES;
+
     ListViewController *vc = [[ListViewController alloc]init];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
-//    nav.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:nav animated:NO completion:nil];
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:nav animated:YES completion:nil];
     
     __weak typeof(self) weakSelf = self;
     vc.block = ^(NSInteger index, User * _Nonnull user) {
@@ -95,15 +103,19 @@
 
 - (void)updateUIWithUser:(User *)user {
     
+    if (self.textView.isAtChart) {
+        self.textView.bAtChart = NO;
+    }
+    
     NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
     ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
                                                                       userId:user.userId];
 
     // 插入前手动判断
-//    if (self.textView.text.length+insertText.length > 20) {
-//        NSLog(@"已经超出最大输入限制了....");
-//        return;
-//    }
+    if (self.textView.text.length+insertText.length > k_max_input) {
+        NSLog(@"已经超出最大输入限制了....");
+        return;
+    }
     
     [self.textView insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
@@ -113,11 +125,7 @@
                                 ATTextBindingAttributeName:bindingModel}
                         range:range];
 
-    // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-    NSInteger lastCursorLocation = self.textView.cursorLocation;
     self.textView.attributedText = tmpAString;
-    self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
-    self.textView.cursorLocation = lastCursorLocation;
 }
 
 - (void)done {
@@ -148,8 +156,9 @@
     [self updateUI];
 }
 
-
-
+- (void)atTextViewDidInputSpecialText:(ATTextView *)textView {
+    [self onActionInsert:nil];
+}
 
 
 
