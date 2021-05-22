@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A62690212658AA6B00843209 /* TableViewSwiftCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A62690202658AA6B00843209 /* TableViewSwiftCell.xib */; };
 		C950FC9826513BCD00AB3079 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C950FC9726513BCD00AB3079 /* ListViewController.swift */; };
 		C99AF3452650D09700317970 /* Extension_String.swift in Sources */ = {isa = PBXBuildFile; fileRef = C99AF3442650D09700317970 /* Extension_String.swift */; };
 		C9A1134D264FFC6B00A0F05F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A1134C264FFC6B00A0F05F /* AppDelegate.swift */; };
@@ -20,7 +21,6 @@
 		C9F0685D26514510004E457D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F0685C26514510004E457D /* User.swift */; };
 		C9F06861265154D9004E457D /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F06860265154D9004E457D /* DataModel.swift */; };
 		C9F0686426516505004E457D /* TableViewSwiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686326516505004E457D /* TableViewSwiftCell.swift */; };
-		C9F0686726516531004E457D /* TableViewSwiftCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C9F0686626516531004E457D /* TableViewSwiftCell.xib */; };
 		C9F0689E265165BD004E457D /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686B265165BD004E457D /* YYTextView.m */; };
 		C9F0689F265165BD004E457D /* YYTextMagnifier.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F0686F265165BD004E457D /* YYTextMagnifier.m */; };
 		C9F068A0265165BD004E457D /* YYTextContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C9F06872265165BD004E457D /* YYTextContainerView.m */; };
@@ -48,6 +48,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A62690202658AA6B00843209 /* TableViewSwiftCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableViewSwiftCell.xib; sourceTree = "<group>"; };
 		C950FC9726513BCD00AB3079 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		C99AF3442650D09700317970 /* Extension_String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension_String.swift; sourceTree = "<group>"; };
 		C9A11349264FFC6B00A0F05F /* ATDemo(Swift).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ATDemo(Swift).app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,7 +64,6 @@
 		C9F0685C26514510004E457D /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		C9F06860265154D9004E457D /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C9F0686326516505004E457D /* TableViewSwiftCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewSwiftCell.swift; sourceTree = "<group>"; };
-		C9F0686626516531004E457D /* TableViewSwiftCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TableViewSwiftCell.xib; path = "../../ATDemo(OC)/AtDemo/SysTextViewVC/View/TableViewSwiftCell.xib"; sourceTree = "<group>"; };
 		C9F0686A265165BD004E457D /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
 		C9F0686B265165BD004E457D /* YYTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextView.m; sourceTree = "<group>"; };
 		C9F0686D265165BD004E457D /* YYTextSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextSelectionView.h; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 				C9A1134E264FFC6B00A0F05F /* SceneDelegate.swift */,
 				C9A11350264FFC6B00A0F05F /* ViewController.swift */,
 				C9F0686326516505004E457D /* TableViewSwiftCell.swift */,
-				C9F0686626516531004E457D /* TableViewSwiftCell.xib */,
+				A62690202658AA6B00843209 /* TableViewSwiftCell.xib */,
 				C950FC9726513BCD00AB3079 /* ListViewController.swift */,
 				C9F0685C26514510004E457D /* User.swift */,
 				C9F06860265154D9004E457D /* DataModel.swift */,
@@ -322,9 +322,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9A11359264FFC6E00A0F05F /* LaunchScreen.storyboard in Resources */,
-				C9F0686726516531004E457D /* TableViewSwiftCell.xib in Resources */,
 				C9A11356264FFC6E00A0F05F /* Assets.xcassets in Resources */,
 				C9A11354264FFC6B00A0F05F /* Main.storyboard in Resources */,
+				A62690212658AA6B00843209 /* TableViewSwiftCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

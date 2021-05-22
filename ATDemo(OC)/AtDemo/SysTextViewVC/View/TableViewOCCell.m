@@ -1,22 +1,22 @@
 //
-//  TableViewCell.m
+//  TableViewOCCell.m
 //  AtDemo
 //
 //  Created by XWH on 2021/4/24.
 //
 
-#import "TableViewCell.h"
+#import "TableViewOCCell.h"
 
 #import "YYText.h"
 #import "ATTextViewBinding.h"
 
-@interface TableViewCell ()<UIGestureRecognizerDelegate>
+@interface TableViewOCCell ()<UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet YYLabel *yyLabel;
 
 @end
 
-@implementation TableViewCell
+@implementation TableViewOCCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];

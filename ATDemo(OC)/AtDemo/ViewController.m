@@ -4,7 +4,7 @@
 #import "ViewController.h"
 #import "ListViewController.h"
 
-#import "TableViewCell.h"
+#import "TableViewOCCell.h"
 #import "ATTextView.h"
 
 #import "HNWKeyboardMonitor.h"
@@ -66,9 +66,9 @@
 - (void)initTableView {
     self.tableView.tableFooterView = UIView.new;
     
-    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass(TableViewCell.class)
+    [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass(TableViewOCCell.class)
                                                bundle:nil]
-         forCellReuseIdentifier:NSStringFromClass(TableViewCell.class)];
+         forCellReuseIdentifier:NSStringFromClass(TableViewOCCell.class)];
 }
 
 - (void)updateUI {
@@ -173,12 +173,12 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     DataModel *model = self.dataArray[indexPath.row];
-    return [TableViewCell rowHeightWithModel:model];
+    return [TableViewOCCell rowHeightWithModel:model];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    TableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(TableViewCell.class)];
+    TableViewOCCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(TableViewOCCell.class)];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.model = self.dataArray[indexPath.row];
     return cell;
