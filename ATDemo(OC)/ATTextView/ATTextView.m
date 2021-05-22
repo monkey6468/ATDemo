@@ -25,6 +25,9 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 @interface ATTextView ()<UITextViewDelegate>
 
+//@property (assign, nonatomic) NSRange changeRange; /// 改变Range
+//@property (assign, nonatomic) BOOL isChanged; /// 是否改变
+
 @property (strong, nonatomic) UITextView *placeholderTextView;
 @property (assign, nonatomic) NSInteger max_TextLength;
 @property (strong, nonatomic) UIColor *attributed_TextColor;
@@ -361,9 +364,28 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
         [self.atDelegate atTextViewDidInputSpecialText:self];
     }
+    
     if ([self checkAndFilterTextByLength:self.max_TextLength]) {
         return;
     }
+    
+//    if (!textView.markedTextRange) {
+//        if (_isChanged) {
+//            NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
+//            NSInteger changeLocation = _changeRange.location;
+//            NSInteger changeLength = _changeRange.length;
+//            // 修复中文预输入时，删除最后一个崩溃的问题
+//            if (tmpAString.length == changeLocation) {
+//                changeLength = 0;
+//            }
+//            if (changeLength > self.max_TextLength) {
+//                changeLength = self.max_TextLength;
+//            }
+//            [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.attributed_TextColor, NSFontAttributeName:self.font} range:NSMakeRange(changeLocation, changeLength)];
+//            textView.attributedText = tmpAString;
+//            _isChanged = NO;
+//        }
+//    }
     
     if ([self.atDelegate respondsToSelector:@selector(atTextViewDidChange:)]) {
         [self.atDelegate atTextViewDidChange:self];
@@ -407,14 +429,39 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                      [tmpAString deleteCharactersInRange:tmpRange];
                      textView.attributedText = tmpAString;
 
+                     NSInteger lastCursorLocation = selectedRange.location-tmpRange.length;
                      [self textViewDidChange:textView];
                      textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+                     self.cursorLocation = lastCursorLocation;
+                     textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
                      return NO;
                  }
              }
          }
      } else { // 增加
          textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
+
+//         NSArray *results = [self getResultsListArrayWithTextView:self.attributedText];
+//         if ([results count]) {
+//             for (NSInteger i = 0; i < results.count; i++) {
+//                 ATTextViewBinding *bindingModel = results[i];
+//                 NSRange tmpRange = bindingModel.range;
+//                 if ((range.location + range.length) == (tmpRange.location + tmpRange.length) || !range.location) {
+//                     _changeRange = NSMakeRange(range.location, text.length);
+//                     _isChanged = YES;
+//
+//                     return YES;
+//                 }
+//             }
+//         } else {
+//             // 在第一个删除后 重置text color
+//             if (!range.location) {
+//                 _changeRange = NSMakeRange(range.location, text.length);
+//                 _isChanged = YES;
+//
+//                 return YES;
+//             }
+//         }
      }
      return YES;
  }
