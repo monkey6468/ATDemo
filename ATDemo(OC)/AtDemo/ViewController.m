@@ -100,39 +100,11 @@
     
     __weak typeof(self) weakSelf = self;
     vc.block = ^(NSInteger index, User * _Nonnull user) {
-        [weakSelf updateUIWithUser:user];
+        
+        ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
+                                                                          userId:user.userId];
+        [weakSelf.textView insertWithBindingModel:bindingModel];
     };
-}
-
-- (void)updateUIWithUser:(User *)user {
-    BOOL isAt = self.textView.isAtChart;
-    if (self.textView.isAtChart) {
-        self.textView.bAtChart = NO;
-    }
-    
-    NSString *insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", user.name] : [NSString stringWithFormat:@"%@ ", user.name];
-    ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
-                                                                      userId:user.userId];
-
-    // 插入前手动判断
-//    if (self.textView.text.length+insertText.length > k_max_input) {
-//        NSLog(@"已经超出最大输入限制了....");
-//        return;
-//    }
-    
-    [self.textView insertText:insertText];
-    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-    NSRange range = isAt == NO?NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.textView.selectedRange.location - insertText.length - 1, insertText.length + 1);
-    [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
-                                NSFontAttributeName:k_defaultFont,
-                                ATTextBindingAttributeName:bindingModel}
-                        range:range];
-
-    // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
-    NSInteger lastCursorLocation = self.textView.cursorLocation;
-    self.textView.attributedText = tmpAString;
-    self.textView.selectedRange = NSMakeRange(lastCursorLocation, self.textView.selectedRange.length);
-    self.textView.cursorLocation = lastCursorLocation;
 }
 
 - (void)done {

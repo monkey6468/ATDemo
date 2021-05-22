@@ -319,6 +319,24 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #pragma mark - UITextViewDelegate
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSArray *results = [self getResultsListArrayWithTextView:textView.attributedText];
@@ -398,8 +416,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     } else {
         self.bAtChart = NO;
     }
-
-
+    
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
     if (textView.textStorage.length != 0) {
         textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
@@ -496,6 +513,35 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         }
     }];
     return resultArray;
+}
+
+- (void)insertWithBindingModel:(ATTextViewBinding *)bindingModel {
+    BOOL isAt = self.isAtChart;
+    if (self.isAtChart) {
+        self.bAtChart = NO;
+    }
+    
+    NSString *insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", bindingModel.name] : [NSString stringWithFormat:@"%@ ", bindingModel.name];
+
+    // 插入前手动判断
+//    if (self.text.length+insertText.length > k_max_input) {
+//        NSLog(@"已经超出最大输入限制了....");
+//        return;
+//    }
+    
+    [self insertText:insertText];
+    NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
+    NSRange range = isAt == NO?NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
+    [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
+                                NSFontAttributeName:k_defaultFont,
+                                ATTextBindingAttributeName:bindingModel}
+                        range:range];
+
+    // 解决光标在插入‘特殊文本’后 移动到文本最后的问题
+    NSInteger lastCursorLocation = self.cursorLocation;
+    self.attributedText = tmpAString;
+    self.selectedRange = NSMakeRange(lastCursorLocation, self.selectedRange.length);
+    self.cursorLocation = lastCursorLocation;
 }
 
 #pragma mark - get data

@@ -13,6 +13,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define k_defaultFont   [UIFont systemFontOfSize:15]
+#define k_defaultColor  [UIColor blueColor]
+#define k_hightColor    [UIColor redColor]
+
 @class ATTextView;
 @protocol ATTextViewDelegate <NSObject>
 
@@ -31,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ATTextView : UITextView
 
 @property (copy, nonatomic) NSArray <ATTextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
-@property (assign, nonatomic, getter=isAtChart) BOOL bAtChart;
+@property (assign, nonatomic, getter=isAtChart) BOOL bAtChart; /// 是否为艾特
 @property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
 
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
@@ -43,6 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIColor *attributedTextColor;
 //@property (assign, nonatomic, getter=isSupport) BOOL bSupport; // 支持自动检测特殊文本
 @property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
+
+- (void)insertWithBindingModel:(ATTextViewBinding *)bindingModel;
 
 @end
 
