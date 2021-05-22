@@ -360,7 +360,10 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    
+    if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
+        self.bAtChart = NO;
+        [self.atDelegate atTextViewDidInputSpecialText:self];
+    }
     if ([self checkAndFilterTextByLength:self.max_TextLength]) {
         return;
     }
@@ -373,24 +376,25 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([text isEqualToString:@"@"]) {
         self.bAtChart = YES;
-        if ([self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
-            [self.atDelegate atTextViewDidInputSpecialText:self];
-        }
+//        textView.text = [NSString stringWithFormat:@"%@%@",textView.text,text];
+//        if ([self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
+//            [self.atDelegate atTextViewDidInputSpecialText:self];
+//        }
     }
-        
-        
+
+
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
     if (textView.textStorage.length != 0) {
         textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
     }
-     
+
      if ([text isEqualToString:@""]) { // 删除
          NSRange selectedRange = textView.selectedRange;
          if (selectedRange.length) {
              NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
              [tmpAString deleteCharactersInRange:selectedRange];
              textView.attributedText = tmpAString;
-             
+
              NSInteger lastCursorLocation = selectedRange.location;
              [self textViewDidChange:textView];
              textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
@@ -403,11 +407,11 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                  ATTextViewBinding *bindingModel = results[i];
                  NSRange tmpRange = bindingModel.range;
                  if ((range.location + range.length) == (tmpRange.location + tmpRange.length)) {
-                     
+
                      NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:textView.attributedText];
                      [tmpAString deleteCharactersInRange:tmpRange];
                      textView.attributedText = tmpAString;
-                     
+
                      [self textViewDidChange:textView];
                      textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
                      return NO;

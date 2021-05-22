@@ -40,7 +40,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [HNWKeyboardMonitor addDelegate:self];
-    
     if (self.isNeedShowKeyboard) {
         self.bNeedShowKeyboard = NO;
         [self.textView becomeFirstResponder];
@@ -88,8 +87,12 @@
 
 #pragma mark - other
 - (IBAction)onActionInsert:(UIButton *)sender {
-    self.bNeedShowKeyboard = YES;
+    self.textView.bAtChart = YES;
+    [self pushAtVc];
+}
 
+- (void)pushAtVc {
+    self.bNeedShowKeyboard = YES;
     ListViewController *vc = [[ListViewController alloc]init];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
     nav.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -102,24 +105,24 @@
 }
 
 - (void)updateUIWithUser:(User *)user {
-    
+    BOOL isAt = self.textView.isAtChart;
     if (self.textView.isAtChart) {
         self.textView.bAtChart = NO;
     }
     
-    NSString *insertText = [NSString stringWithFormat:@"@%@ ", user.name];
+    NSString *insertText = isAt ? [NSString stringWithFormat:@"@%@ ", user.name] : [NSString stringWithFormat:@"%@ ", user.name];
     ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
                                                                       userId:user.userId];
 
     // 插入前手动判断
-    if (self.textView.text.length+insertText.length > k_max_input) {
-        NSLog(@"已经超出最大输入限制了....");
-        return;
-    }
+//    if (self.textView.text.length+insertText.length > k_max_input) {
+//        NSLog(@"已经超出最大输入限制了....");
+//        return;
+//    }
     
     [self.textView insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.textView.attributedText];
-    NSRange range = NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length);
+    NSRange range = isAt ?NSMakeRange(self.textView.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.textView.selectedRange.location - insertText.length - 1, insertText.length + 1);
     [tmpAString setAttributes:@{NSForegroundColorAttributeName:k_hightColor,
                                 NSFontAttributeName:k_defaultFont,
                                 ATTextBindingAttributeName:bindingModel}
@@ -157,7 +160,7 @@
 }
 
 - (void)atTextViewDidInputSpecialText:(ATTextView *)textView {
-    [self onActionInsert:nil];
+    [self pushAtVc];
 }
 
 
