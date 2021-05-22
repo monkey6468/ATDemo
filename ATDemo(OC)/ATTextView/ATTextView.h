@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (copy, nonatomic) NSArray <ATTextViewBinding *> *atUserList; /// 艾特的用户列表，内容可自定义
 @property (assign, nonatomic, getter=isAtChart) BOOL bAtChart;
+@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
 
 @property (copy, nonatomic) IBInspectable NSString *placeholder;
 @property (nonatomic) IBInspectable double fadeTime;

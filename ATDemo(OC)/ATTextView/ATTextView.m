@@ -25,8 +25,6 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 @interface ATTextView ()<UITextViewDelegate>
 
-@property (assign, nonatomic) NSInteger cursorLocation; /// 光标位置
-
 @property (strong, nonatomic) UITextView *placeholderTextView;
 @property (assign, nonatomic) NSInteger max_TextLength;
 @property (strong, nonatomic) UIColor *attributed_TextColor;
@@ -361,7 +359,6 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 - (void)textViewDidChange:(UITextView *)textView {
     if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
-        self.bAtChart = NO;
         [self.atDelegate atTextViewDidInputSpecialText:self];
     }
     if ([self checkAndFilterTextByLength:self.max_TextLength]) {
@@ -376,10 +373,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([text isEqualToString:@"@"]) {
         self.bAtChart = YES;
-//        textView.text = [NSString stringWithFormat:@"%@%@",textView.text,text];
-//        if ([self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)]) {
-//            [self.atDelegate atTextViewDidInputSpecialText:self];
-//        }
+    } else {
+        self.bAtChart = NO;
     }
 
 
