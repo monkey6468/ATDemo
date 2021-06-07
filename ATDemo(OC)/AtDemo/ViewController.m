@@ -87,14 +87,20 @@
 }
 
 #pragma mark - other
-- (IBAction)onActionInsert:(UIButton *)sender {
+- (IBAction)onActionInsertUser:(UIButton *)sender {
     self.textView.bAtChart = NO;
-    [self pushAtVc];
+    [self pushListVc:ATTypeUser];
 }
 
-- (void)pushAtVc {
+- (IBAction)onActionInsertTopic:(UIButton *)sender {
+    self.textView.bAtChart = NO;
+    [self pushListVc:ATTypeTopic];
+}
+
+- (void)pushListVc:(ATType)type {
     self.bNeedShowKeyboard = YES;
     ListViewController *vc = [[ListViewController alloc]init];
+    vc.type = type;
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:vc];
     nav.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:nav animated:YES completion:nil];
@@ -104,6 +110,7 @@
         
         ATTextViewBinding *bindingModel = [[ATTextViewBinding alloc]initWithName:user.name
                                                                           userId:user.userId];
+        bindingModel.bindingType = type == ATTypeUser ? ATTextViewBindingTypeUser : ATTextViewBindingTypeTopic;
         [weakSelf.textView insertWithBindingModel:bindingModel];
     };
 }
@@ -137,7 +144,8 @@
 }
 
 - (void)atTextViewDidInputSpecialText:(ATTextView *)textView {
-    [self pushAtVc];
+#warning <#message#>
+    [self pushListVc:ATTypeUser];
 }
 
 

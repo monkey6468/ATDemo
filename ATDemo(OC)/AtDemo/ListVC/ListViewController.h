@@ -11,9 +11,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, ATType) {
+    ATTypeUser     = 0,
+    ATTypeTopic,
+};
+
 @interface ListViewController : UIViewController
 
 @property (copy, nonatomic) void(^block) (NSInteger index, User *user);
+@property (assign, nonatomic) ATType type;
 
 @end
 

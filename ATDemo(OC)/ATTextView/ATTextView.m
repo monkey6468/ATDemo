@@ -463,11 +463,28 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 #pragma mark - other binding
 - (NSArray<ATTextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {
     __block NSMutableArray *resultArray = [NSMutableArray array];
+    
+    // user type
     NSRegularExpression *iExpression = [NSRegularExpression regularExpressionWithPattern:kATRegular options:0 error:NULL];
     [iExpression enumerateMatchesInString:attributedString.string
                                   options:0
                                     range:NSMakeRange(0, attributedString.string.length)
                                usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSRange resultRange = result.range;
+        NSString *atString = [attributedString.string substringWithRange:result.range];
+        ATTextViewBinding *bindingModel = [attributedString attribute:ATTextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
+        if (bindingModel) {
+            bindingModel.range = result.range;
+            [resultArray addObject:bindingModel];
+        }
+    }];
+    
+    // topic type
+    NSRegularExpression *iExpressionTopic = [NSRegularExpression regularExpressionWithPattern:@"#(.*?)#+ " options:0 error:NULL];
+    [iExpressionTopic enumerateMatchesInString:attributedString.string
+                                       options:0
+                                         range:NSMakeRange(0, attributedString.string.length)
+                                    usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
         NSRange resultRange = result.range;
         NSString *atString = [attributedString.string substringWithRange:result.range];
         ATTextViewBinding *bindingModel = [attributedString attribute:ATTextBindingAttributeName atIndex:resultRange.location longestEffectiveRange:&resultRange inRange:NSMakeRange(0, atString.length)];
@@ -485,7 +502,12 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
         self.bAtChart = NO;
     }
     
-    NSString *insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", bindingModel.name] : [NSString stringWithFormat:@"%@ ", bindingModel.name];
+    NSString *insertText;
+    if (bindingModel.bindingType == ATTextViewBindingTypeUser) {
+        insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", bindingModel.name] : [NSString stringWithFormat:@"%@ ", bindingModel.name];
+    } else {
+        insertText = isAt == NO ? [NSString stringWithFormat:@"#%@# ", bindingModel.name] : [NSString stringWithFormat:@"%@# ", bindingModel.name];
+    }
 
     // 插入前手动判断
     if (self.text.length+insertText.length > _max_TextLength) {
@@ -495,7 +517,12 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     
     [self insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
-    NSRange range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
+    NSRange range = NSMakeRange(0, 0);
+    if (bindingModel.bindingType == ATTextViewBindingTypeUser) {
+        range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
+    } else {
+        range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 3, insertText.length + 3);
+    }
     [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.hightTextColor,
                                 NSFontAttributeName:self.font,
                                 ATTextBindingAttributeName:bindingModel}

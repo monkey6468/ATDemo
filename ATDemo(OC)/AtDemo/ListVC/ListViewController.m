@@ -60,7 +60,11 @@
         _dataArray = [NSMutableArray array];
         for (int i = 0; i < 10; i++) {
             User *user = [[User alloc]init];
-            user.name = [NSString stringWithFormat:@"测试0%d_A",i+1];
+            if (self.type == ATTypeUser) {
+                user.name = [NSString stringWithFormat:@"用户0%d_A",i+1];
+            } else {
+                user.name = [NSString stringWithFormat:@"话题0%d_A",i+1];
+            }
             user.userId = i+1;
             [_dataArray addObject:user];
         }
