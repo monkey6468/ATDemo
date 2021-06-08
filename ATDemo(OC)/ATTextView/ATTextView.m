@@ -8,7 +8,9 @@
 #import "ATTextView.h"
 
 #define kATRegular                      @"@[\\u4e00-\\u9fa5\\w\\-\\_]+ "
+#define kTopicRegular                   @"#(.*?)#+ "
 #define kAT                             @"@"
+#define kTopic                          @"#"
 
 #define HAS_TEXT_CONTAINER [self respondsToSelector:@selector(textContainer)]
 #define HAS_TEXT_CONTAINER_INSETS(x) [(x) respondsToSelector:@selector(textContainerInset)]
@@ -30,6 +32,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 @property (strong, nonatomic) UITextView *placeholderTextView;
 @property (assign, nonatomic) NSInteger max_TextLength;
 @property (strong, nonatomic) UIColor *attributed_TextColor;
+
+@property (nonatomic, assign) ATTextViewBindingType type;
 
 @end
 
@@ -380,8 +384,8 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (self.bAtChart && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText:)] && self.isSupport) {
-        [self.atDelegate atTextViewDidInputSpecialText:self];
+    if (self.bSpecialText && [self.atDelegate respondsToSelector:@selector(atTextViewDidInputSpecialText: type:)] && self.isSupport) {
+        [self.atDelegate atTextViewDidInputSpecialText:self type:self.type];
     }
     
     if ([self checkAndFilterTextByLength:self.max_TextLength]) {
@@ -394,10 +398,18 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if ([text isEqualToString:kAT]) {
-        self.bAtChart = YES;
-    } else {
-        self.bAtChart = NO;
+    if (self.isSupport) {
+        if ([text isEqualToString:kAT]
+            || [text isEqualToString:kTopic]) {
+            if ([text isEqualToString:kAT]) {
+                self.type = ATTextViewBindingTypeUser;
+            } else {
+                self.type = ATTextViewBindingTypeTopic;
+            }
+            self.bSpecialText = YES;
+        } else {
+            self.bSpecialText = NO;
+        }
     }
     
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
@@ -480,7 +492,15 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     }];
     
     // topic type
-    NSRegularExpression *iExpressionTopic = [NSRegularExpression regularExpressionWithPattern:@"#(.*?)#+ " options:0 error:NULL];
+    NSArray *topicArray = [self getTopicResultsListArrayWithTextView:attributedString];
+    [resultArray addObjectsFromArray:topicArray];
+    return resultArray;
+}
+
+- (NSArray<ATTextViewBinding *> *)getTopicResultsListArrayWithTextView:(NSAttributedString *)attributedString {
+    __block NSMutableArray *resultArray = [NSMutableArray array];
+    // topic type
+    NSRegularExpression *iExpressionTopic = [NSRegularExpression regularExpressionWithPattern:kTopicRegular options:0 error:NULL];
     [iExpressionTopic enumerateMatchesInString:attributedString.string
                                        options:0
                                          range:NSMakeRange(0, attributedString.string.length)
@@ -497,15 +517,34 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 }
 
 - (void)insertWithBindingModel:(ATTextViewBinding *)bindingModel {
-    BOOL isAt = self.isAtChart;
-    if (self.isAtChart) {
-        self.bAtChart = NO;
+    BOOL isAt = self.isSpecialText;
+    if (self.isSpecialText) {
+        self.bSpecialText = NO;
     }
     
     NSString *insertText;
     if (bindingModel.bindingType == ATTextViewBindingTypeUser) {
         insertText = isAt == NO ? [NSString stringWithFormat:@"@%@ ", bindingModel.name] : [NSString stringWithFormat:@"%@ ", bindingModel.name];
     } else {
+//        if (self.bTopicFirst) {
+//            NSArray *topicArray = [self getTopicResultsListArrayWithTextView:self.attributedText];
+//            if (topicArray.count == 1) {
+//                ATTextViewBinding *bindingModel = topicArray.firstObject;
+//                NSRange selectedRange = bindingModel.range;
+//
+//                NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
+//                [tmpAString deleteCharactersInRange:selectedRange];
+//                self.attributedText = tmpAString;
+//
+//                NSInteger lastCursorLocation = selectedRange.location;
+//                [self textViewDidChange:self];
+//                self.selectedRange = NSMakeRange(lastCursorLocation, 0);
+//            }
+//
+//            self.cursorLocation = 0;
+//            self.selectedRange = NSMakeRange(self.cursorLocation, self.selectedRange.length);
+//        }
+        
         insertText = isAt == NO ? [NSString stringWithFormat:@"#%@# ", bindingModel.name] : [NSString stringWithFormat:@"%@# ", bindingModel.name];
     }
 
@@ -517,12 +556,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     
     [self insertText:insertText];
     NSMutableAttributedString *tmpAString = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedText];
-    NSRange range = NSMakeRange(0, 0);
-    if (bindingModel.bindingType == ATTextViewBindingTypeUser) {
-        range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
-    } else {
-        range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 3, insertText.length + 3);
-    }
+    NSRange range = range = isAt == NO ? NSMakeRange(self.selectedRange.location - insertText.length, insertText.length) : NSMakeRange(self.selectedRange.location - insertText.length - 1, insertText.length + 1);
     [tmpAString setAttributes:@{NSForegroundColorAttributeName:self.hightTextColor,
                                 NSFontAttributeName:self.font,
                                 ATTextBindingAttributeName:bindingModel}
@@ -548,6 +582,10 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
 
 - (void)setAttributedTextColor:(UIColor *)attributedTextColor {
     _attributed_TextColor = attributedTextColor;
+}
+
+- (void)setBSupport:(BOOL)bSupport {
+    _bSupport = bSupport;
 }
 
 @end

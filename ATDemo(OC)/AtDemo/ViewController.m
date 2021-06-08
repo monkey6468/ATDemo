@@ -88,12 +88,12 @@
 
 #pragma mark - other
 - (IBAction)onActionInsertUser:(UIButton *)sender {
-    self.textView.bAtChart = NO;
+    self.textView.bSpecialText = NO;
     [self pushListVc:ATTypeUser];
 }
 
 - (IBAction)onActionInsertTopic:(UIButton *)sender {
-    self.textView.bAtChart = NO;
+    self.textView.bSpecialText = NO;
     [self pushListVc:ATTypeTopic];
 }
 
@@ -143,9 +143,13 @@
     [self updateUI];
 }
 
-- (void)atTextViewDidInputSpecialText:(ATTextView *)textView {
+- (void)atTextViewDidInputSpecialText:(ATTextView *)textView type:(ATTextViewBindingType)type {
 #warning <#message#>
-    [self pushListVc:ATTypeUser];
+    if (type == ATTextViewBindingTypeUser) {
+        [self pushListVc:ATTypeUser];
+    } else {
+        [self pushListVc:ATTypeTopic];
+    }
 }
 
 
