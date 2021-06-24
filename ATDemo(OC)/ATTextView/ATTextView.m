@@ -414,7 +414,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     
     // 解决UITextView富文本编辑会连续的问题，且预输入颜色不变的问题
     if (textView.textStorage.length != 0) {
-        textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
+        textView = [self setTextViewAttributes:textView];
     }
 
     if ([text isEqualToString:@""]) { // 删除
@@ -427,7 +427,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             
             NSInteger lastCursorLocation = selectedRange.location;
             [self textViewDidChange:textView];
-            textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+            textView = [self setTextViewAttributes:textView];
             self.cursorLocation = lastCursorLocation;
             textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
             
@@ -445,7 +445,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
                     
                     NSInteger lastCursorLocation = selectedRange.location-tmpRange.length;
                     [self textViewDidChange:textView];
-                    textView.typingAttributes = @{NSFontAttributeName:self.font,NSForegroundColorAttributeName:self.attributed_TextColor};
+                    textView = [self setTextViewAttributes:textView];
                     self.cursorLocation = lastCursorLocation;
                     textView.selectedRange = NSMakeRange(lastCursorLocation, 0);
                     
@@ -454,7 +454,7 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
             }
         }
     } else { // 增加
-        textView.typingAttributes = @{NSFontAttributeName:self.font, NSForegroundColorAttributeName:self.attributed_TextColor};
+        textView = [self setTextViewAttributes:textView];        
     }
      return YES;
  }
@@ -471,6 +471,18 @@ static NSString * const kTextAlignmentKey = @"textAlignment";
     }
 }
 
+- (UITextView *)setTextViewAttributes:(UITextView *)textView {
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+    attributes[NSFontAttributeName] = self.font;
+    attributes[NSForegroundColorAttributeName] = self.attributed_TextColor;
+    if (self.lineSpacing > 0) {
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.lineSpacing = self.lineSpacing;// 字体的行间距
+        attributes[NSParagraphStyleAttributeName] = paragraphStyle;
+    }
+    textView.typingAttributes = attributes;
+    return textView;
+}
 
 #pragma mark - other binding
 - (NSArray<ATTextViewBinding *> *)getResultsListArrayWithTextView:(NSAttributedString *)attributedString {

@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIColor *attributedTextColor;
 /// 默认特殊文本高亮颜色，默认UIColor.redColor
 @property (strong, nonatomic) UIColor *hightTextColor;
+@property (assign, nonatomic) NSInteger lineSpacing;
 /// 支持自动检测特殊文本【艾特、话题】，默认YES
 @property (assign, nonatomic, getter=isSupport) BOOL bSupport;
 @property (nonatomic, weak) id<ATTextViewDelegate> atDelegate;
