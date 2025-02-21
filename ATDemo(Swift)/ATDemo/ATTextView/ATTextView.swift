@@ -311,8 +311,7 @@ extension ATTextView {
             range: NSRange(location: 0, length: attributedString.string.count),
             using: { result, flags, stop in
                 var resultRange = result!.range
-                let atString = attributedString.string[resultRange.location, resultRange.length]
-                let bindingModel = attributedString.attribute(NSAttributedString.Key(rawValue: ATTextBindingAttributeName), at: resultRange.location, longestEffectiveRange: &resultRange, in: NSRange(location: 0, length: atString.count)) as? ATTextViewBinding
+                let bindingModel = attributedString.attribute(NSAttributedString.Key(rawValue: ATTextBindingAttributeName), at: resultRange.location, longestEffectiveRange: &resultRange, in: NSRange(location: resultRange.location, length: resultRange.length)) as? ATTextViewBinding
                 if let bindingModelNew : ATTextViewBinding = bindingModel {
                     bindingModelNew.range = result?.range
                     resultArray.append(bindingModelNew)
